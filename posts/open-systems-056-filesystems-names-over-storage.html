@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A filesystem turns storage blocks into named objects, directories, metadata, permissions, and durable update rules. The filename you see is an abstraction over a much larger persistence system." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Filesystems: Names over Storage — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-056-filesystems-names-over-storage.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Filesystems: Names over Storage" property="og:title"/><meta content="A filesystem turns storage blocks into named objects, directories, metadata, permissions, and durable update rules. The filename you see is an abstraction over a much larger persistence system." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-056-filesystems-names-over-storage.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Filesystems: Names over Storage</h1><p class="lede">A filesystem turns storage blocks into named objects, directories, metadata, permissions, and durable update rules. The filename you see is an abstraction over a much larger persistence system.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>An SSD exposes persistent storage.</p>
+<p>Your application wants:</p>
+<pre><code>/home/romen/notes.txt
+</code></pre>pre
+<p>Between those two ideas sits a filesystem.</p>
+<p>The filesystem gives names, directories, metadata, permissions, and allocation rules to persistent data.</p>
+<p>Without it, applications would have to manage raw storage locations directly.</p>
+<h2>A pathname is not the file data</h2>
+<p>Consider:</p>
+<pre><code>/home/user/photo.jpg
+</code></pre>pre
+<p>The path is a sequence of names used to locate an object through directory relationships.</p>
+<p>The bytes of the photo live elsewhere in filesystem-managed storage.</p>
+<p>Rename the file.</p>
+<p>The image data may not move at all.</p>
+<p>The name changed.</p>
+<p>The underlying object and its allocated blocks can remain.</p>
+<p>This distinction becomes especially visible on Unix-like filesystems.</p>
+<h2>Inodes separate metadata from names</h2>
+<p>On many Unix filesystems, an inode represents filesystem object metadata while directory entries associate names with inode numbers.</p>
+<p>The inode can describe attributes such as:</p>
+<ul>
+<li>file type;</li>
+<li>ownership;</li>
+<li>permissions;</li>
+<li>size;</li>
+<li>timestamps;</li>
+<li>block mappings.</li>
+</ul>
+<p>The filename lives in the directory entry.</p>
+<p>This explains hard links.</p>
+<p>Two directory entries can refer to the same inode.</p>
+<p>Delete one name and the underlying file data can remain reachable through another link.</p>
+<p>"Delete file" is therefore partly a namespace operation.</p>
+<h2>Directories are data structures</h2>
+<p>A directory is not merely a visual folder.</p>
+<p>It maps names to filesystem objects.</p>
+<p>For a small directory, the implementation may be simple.</p>
+<p>For directories containing huge numbers of entries, filesystems use indexing or tree structures to keep lookup efficient.</p>
+<p>The filesystem is itself a database-like system maintaining structured metadata over storage.</p>
+<h2>Allocation connects files to blocks</h2>
+<p>A file may occupy several storage extents or blocks.</p>
+<p>The filesystem tracks which storage regions belong to which files and which are free.</p>
+<p>Growing a file can require allocating more blocks.</p>
+<p>Deleting a file can return blocks to the free-space pool.</p>
+<p>Fragmentation can occur when logically adjacent file data is physically scattered.</p>
+<p>Modern filesystems use many strategies to manage allocation efficiently.</p>
+<p>The path abstraction hides all of this.</p>
+<h2>Crash consistency is the difficult part</h2>
+<p>Imagine creating a file requires:</p>
+<ol>
+<li>allocate inode;</li>
+<li>allocate data block;</li>
+<li>write directory entry;</li>
+<li>update free-space metadata.</li>
+</ol>
+<p>Power fails after step 2.</p>
+<p>Now internal metadata may disagree.</p>
+<p>Filesystems use techniques such as journaling or copy-on-write designs to maintain recoverable consistency under crashes.</p>
+<p>The exact mechanism differs by filesystem.</p>
+<p>"Write bytes" is not the whole persistence problem.</p>
+<p>The metadata describing those bytes must remain coherent too.</p>
+<h2>Caches sit in front of storage</h2>
+<p>Operating systems cache file data in RAM.</p>
+<p>Read a file once.</p>
+<p>Read it again.</p>
+<p>The second read may come from page cache rather than physical storage.</p>
+<p>Write a file.</p>
+<p>The kernel may buffer dirty data before later flushing it.</p>
+<p>This improves performance.</p>
+<p>It complicates durability.</p>
+<p>A successful write call does not necessarily mean the bytes are already on stable storage unless the relevant API and filesystem guarantees say so.</p>
+<p>Databases care intensely about this boundary.</p>
+<h2>Mounts combine filesystems into one namespace</h2>
+<p>Linux can mount separate filesystems into one directory tree.</p>
+<p>A path such as:</p>
+<pre><code>/mnt/data
+</code></pre>pre
+<p>may enter a completely different storage device or network filesystem.</p>
+<p>The path looks continuous.</p>
+<p>The underlying persistence system changed.</p>
+<p>This is abstraction at the namespace level.</p>
+<p>You can cross device boundaries without the application path syntax changing.</p>
+<h2>Permissions live on filesystem objects</h2>
+<p>Unix permission bits and ownership metadata let the kernel decide whether a process may read, write, or execute.</p>
+<p>Filesystems can support richer access-control models too.</p>
+<p>The decision combines:</p>
+<ul>
+<li>process credentials;</li>
+<li>object metadata;</li>
+<li>mount options;</li>
+<li>security modules;</li>
+<li>filesystem semantics.</li>
+</ul>
+<p>A permission error is therefore not "the disk refusing."</p>
+<p>It is access policy enforced through the operating-system filesystem layer.</p>
+<h2>Exercise: separate path, inode, and data</h2>
+<p>On Linux, use files you own:</p>
+<pre><code>echo hello &gt; a.txt
+ln a.txt b.txt
+ls -li a.txt b.txt
+</code></pre>pre
+<p>You should see two names with the same inode number on a filesystem that supports hard links.</p>
+<p>Remove one:</p>
+<pre><code>rm a.txt
+</code></pre>pre
+<p>The other can still contain the data.</p>
+<p>This makes the difference between name and object tangible.</p>
+<h2>The lesson to carry forward</h2>
+<p>A filesystem transforms block storage into a persistent namespace.</p>
+<p>It manages:</p>
+<ul>
+<li>names;</li>
+<li>objects;</li>
+<li>metadata;</li>
+<li>directories;</li>
+<li>allocation;</li>
+<li>permissions;</li>
+<li>caching;</li>
+<li>crash recovery.</li>
+</ul>
+<p>When you call open("/path/file"), you are using an enormous abstraction.</p>
+<p>Later, databases will build another persistent abstraction on top of this one.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

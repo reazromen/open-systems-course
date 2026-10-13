@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Before learning a programming language, build a mental model of the machine: information enters, state changes, instructions execute, and observable output emerges through layers of hardware and software." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>What Is a Computer, Really? — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-001-what-is-a-computer-really.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="What Is a Computer, Really?" property="og:title"/><meta content="Before learning a programming language, build a mental model of the machine: information enters, state changes, instructions execute, and observable output emerges through layers of hardware and software." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-001-what-is-a-computer-really.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>What Is a Computer, Really?</h1><p class="lede">Before learning a programming language, build a mental model of the machine: information enters, state changes, instructions execute, and observable output emerges through layers of hardware and software.</p><div class="article-meta"><span>Published 2026-10-06</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A computer is easy to recognize and surprisingly hard to define well. A laptop is a computer. A phone is a computer. A server in a data center is a computer. An ESP32 is a computer. A washing-machine controller may also contain one. They differ enormously in size, power, interfaces, operating systems, and purpose, so the useful question is not what a computer looks like. The useful question is: <strong>what kind of system is it?</strong></p>
+<p>For this course, we will use a practical engineering model. A computer is a physical system that represents information, changes internal state according to rules, and produces observable effects. Those rules may be fixed in hardware, supplied as software, or divided between the two. This is not meant to replace the formal definitions used in theoretical computer science. It is a mental model for understanding real machines.</p>
+<p>That model immediately gives us four things to look for:</p>
+<ol>
+<li><strong>representation</strong> — how information is encoded;</li>
+<li><strong>state</strong> — what the system currently remembers;</li>
+<li><strong>transformation</strong> — what operations change that state;</li>
+<li><strong>interfaces</strong> — how the system interacts with other systems.</li>
+</ol>
+<p>If you can locate those four things, an unfamiliar device becomes less mysterious.</p>
+<h2>Start with an event, not a programming language</h2>
+<p>Imagine pressing the volume-up button on a laptop.</p>
+<p>You experience one event: the sound becomes louder. The machine experiences a chain of events. A physical switch changes an electrical condition. Hardware reports an input event. Software receives that event. Some component changes a stored volume value. The audio system applies the new setting. The next audio samples sent toward the speaker are processed differently.</p>
+<p>The exact implementation varies by platform, but the important idea does not: what looks like one action to a person is usually a path through several layers.</p>
+<p>This is why learning only syntax can leave a beginner with a strange gap. They may know how to write:</p>
+<pre><code class="language-python">volume = volume + 1
+</code></pre>pre
+<p>without knowing where a real volume value lives, which process owns it, how an input event reaches that process, or what happens after the value changes.</p>
+<p>The code is not wrong. The mental model is incomplete.</p>
+<p>MIT's Computation Structures course is useful because it treats digital systems as a hierarchy of building blocks. Its published course description moves from low-level digital elements through instructions, procedures, processes, and complete systems. The important lesson for us is not that every learner must begin by designing transistors. It is that higher-level behaviour is implemented by lower-level mechanisms.</p>
+<h2>A computer is made of layers that hide detail</h2>
+<p>Suppose you save a text file.</p>
+<p>At the level you care about, you might think:</p>
+<pre><code class="language-text">my idea → file
+</code></pre>pre
+<p>That abstraction is useful. If every application developer had to manually control flash cells or magnetic domains, software development would be nearly impossible.</p>
+<p>Under that simple action, however, are additional layers:</p>
+<pre><code class="language-text">application
+    ↓
+runtime or libraries
+    ↓
+operating-system interface
+    ↓
+filesystem
+    ↓
+storage driver
+    ↓
+storage controller
+    ↓
+physical storage medium
+</code></pre>pre
+<p>This diagram is conceptual, not a universal implementation. Some systems omit layers, combine them, or add more. But it exposes one of the central ideas in computing: <strong>abstraction lets one layer use a simpler model of the layer below it.</strong></p>
+<p>The filesystem lets software work with names such as <code>notes.txt</code>code instead of storage-cell addresses. A network socket lets an application exchange bytes without directly controlling a radio waveform or Ethernet signaling. A programming language lets us express logic without manually encoding every processor instruction.</p>
+<p>Abstraction is not deception. It is controlled ignorance.</p>
+<p>You ignore details until those details become relevant.</p>
+<p>That final sentence is important because every abstraction leaks eventually. A slow disk can become an application problem. Packet loss can become a voice-quality problem. Memory pressure can become a database problem. A production engineer learns when to stay at the current layer and when to descend.</p>
+<h2>Where do CPU, memory, and storage fit?</h2>
+<p>A general-purpose computer usually has some mechanism that executes instructions, some working storage for active computation, longer-lived storage, and interfaces to other devices. In familiar machines we call these things CPU, RAM, storage, and I/O, although real architectures are more complicated than those four labels.</p>
+<p>A processor does not understand "open Spotify" or "render this website" as human intentions. At a lower level it executes instructions defined by its architecture. Those instructions manipulate data, move values, perform arithmetic or logical operations, and control which instruction comes next.</p>
+<p>Memory gives active computation a place to keep instructions and data. Storage preserves data across power cycles. Devices create boundaries with the physical world: keyboards, displays, network adapters, microphones, sensors, radios, storage controllers, and many others.</p>
+<p>Do not turn this into a rigid diagram too early. Modern processors have caches, multiple cores, memory-management hardware, accelerators, buses, controllers, and layers of firmware. The first goal is simply to understand the responsibilities.</p>
+<h2>Information needs a physical representation</h2>
+<p>A file, an image, and a program can all be represented using bits, but a bit is not a tiny physical object floating inside a computer. NIST defines a bit as a binary digit with value 0 or 1. The physical system needs some distinguishable states that can represent those values.</p>
+<p>Different technologies can realize those distinctions differently. Voltage ranges may represent logic values in a circuit. Charge states may represent stored data in flash memory. Magnetic states can represent data in some storage media. Optical systems use other physical mechanisms.</p>
+<p>That means "everything is zeros and ones" is useful only if we remember the missing half of the sentence:</p>
+<blockquote>
+<p>zeros and ones are <strong>representations implemented by physical systems</strong>.</p>
+</blockquote>
+<p>Later we will study why digital abstraction is so powerful, and why real electronics still has analog behaviour underneath it.</p>
+<h2>Programs are not magic instructions written directly to the machine</h2>
+<p>When you write a Python program or a C program, you are operating at a high level of abstraction.</p>
+<p>Consider:</p>
+<pre><code class="language-python">print("hello")
+</code></pre>pre
+<p>The word <code>print</code>code is meaningful because a programming environment defines what it does. The processor does not have a universal <code>print</code>code instruction that knows what a terminal is.</p>
+<p>Several mechanisms may be involved between that source line and visible pixels: language runtime behaviour, operating-system calls, terminal handling, font rendering, graphics processing, and a display subsystem. The exact path depends on the environment.</p>
+<p>This is one reason the course will not treat programming languages as the beginning of computing. A language is one layer in a larger system.</p>
+<p>But we also will not postpone programming for months. As soon as code helps us test a model, we will use it. Code is an instrument for investigation.</p>
+<h2>A useful boundary: mechanism versus intention</h2>
+<p>People describe computers using intentional language:</p>
+<ul>
+<li>"the browser wants to connect";</li>
+<li>"the server knows my session";</li>
+<li>"the router decides where to send the packet";</li>
+<li>"the AI understands the question."</li>
+</ul>
+<p>Sometimes this is convenient shorthand. It becomes dangerous when the language replaces the mechanism.</p>
+<p>If a server "knows" that you are logged in, what state represents that fact? A cookie? A session record? A signed token? Which component verifies it? When does it expire?</p>
+<p>If a router "decides," what table or algorithm determines the forwarding action?</p>
+<p>If a device is "connected," which protocol state says so, and what does that state fail to prove?</p>
+<p>Engineering starts when vague verbs become inspectable mechanisms.</p>
+<h2>The first systems habit: follow one thing end to end</h2>
+<p>You do not need expensive hardware for the first exercise.</p>
+<p>Pick one familiar action:</p>
+<ul>
+<li>press a key;</li>
+<li>open a web page;</li>
+<li>save a file;</li>
+<li>play an audio track;</li>
+<li>connect to Wi-Fi.</li>
+</ul>
+<p>Now write the path as boxes and arrows. Do not search for perfect terminology yet.</p>
+<p>For a web page, you might begin with:</p>
+<pre><code class="language-text">keyboard
+  ↓
+browser
+  ↓
+operating system
+  ↓
+network
+  ↓
+remote service
+  ↓
+network
+  ↓
+browser
+  ↓
+display
+</code></pre>pre
+<p>Then mark every box you cannot explain.</p>
+<p>Those unknown boxes are not evidence that you are bad at computing. They are your syllabus.</p>
+<p>As the course progresses, we will repeatedly return to this technique. We will follow a byte, a packet, a process, an interrupt, a database write, an audio frame, a SIP message, and a sensor reading across system boundaries.</p>
+<h2>What this lesson does not claim</h2>
+<p>This article does not define every formal model of computation. It does not claim that all computers share one hardware organization. It does not reduce computing to CPU, RAM, and storage. It also does not claim that high-level abstractions are unimportant.</p>
+<p>The opposite is true. We need abstractions because real systems contain too much detail to reason about all at once.</p>
+<p>The skill is learning to move between levels deliberately.</p>
+<p>At one moment you may be discussing what a user needs. A minute later you may be looking at an HTTP request. Then a TCP connection. Then a packet capture. Then a driver or an interrupt. The system has not changed. Your viewpoint has.</p>
+<p>That ability—to change viewpoint without losing the relationships between layers—is one of the central skills this course is designed to build.</p>
+<h2>Try it yourself</h2>
+<p>Without writing code, draw the path for this event:</p>
+<blockquote>
+<p>You press the letter <strong>A</strong> and it appears in a text editor.</p>
+</blockquote>
+<p>Include at least five boxes.</p>
+<p>Then answer three questions:</p>
+<ol>
+<li>Where is state likely to change?</li>
+<li>Which box directly observes the physical key press?</li>
+<li>Which box ultimately causes pixels to change?</li>
+</ol>
+<p>Your diagram will be incomplete. That is expected.</p>
+<p>Save it.</p>
+<p>Near the end of this course, draw the same diagram again. The difference between those two drawings will be a better measure of learning than memorizing the syntax of a programming language.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

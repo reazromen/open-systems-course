@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A compiler does far more than replace words with opcodes. It parses meaning, checks constraints, transforms representations, optimizes under language rules, and generates target-specific code." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Compilers: Translating Programs into Machine Code — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-022-compilers-translating-programs.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Compilers: Translating Programs into Machine Code" property="og:title"/><meta content="A compiler does far more than replace words with opcodes. It parses meaning, checks constraints, transforms representations, optimizes under language rules, and generates target-specific code." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-022-compilers-translating-programs.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Compilers: Translating Programs into Machine Code</h1><p class="lede">A compiler does far more than replace words with opcodes. It parses meaning, checks constraints, transforms representations, optimizes under language rules, and generates target-specific code.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A compiler is sometimes described as a translator from a programming language to machine language.</p>
+<p>That is directionally correct and mechanically incomplete.</p>
+<p>A modern compiler is closer to a pipeline of analyses and transformations.</p>
+<p>It must understand the source language well enough to preserve its defined behaviour while producing a representation suitable for another stage or target machine.</p>
+<h2>Start with structure, not instructions</h2>
+<p>Consider:</p>
+<pre><code>result = a + b * c
+</code></pre>pre
+<p>The compiler does not treat this as an arbitrary string.</p>
+<p>The language grammar gives multiplication and addition structure and precedence.</p>
+<p>A front end typically performs work such as:</p>
+<ul>
+<li>lexical analysis;</li>
+<li>parsing;</li>
+<li>semantic analysis;</li>
+<li>type checking where applicable.</li>
+</ul>
+<p>The result becomes an internal representation of the program's meaning.</p>
+<p>Only later does target-specific code generation become central.</p>
+<h2>Intermediate representations create separation</h2>
+<p>Compilers often use one or more intermediate representations, or IRs.</p>
+<p>Why not translate source directly to target instructions in one giant step?</p>
+<p>Because an IR separates concerns.</p>
+<p>A language front end can lower source constructs into a common form.</p>
+<p>Optimization passes can transform that form.</p>
+<p>A back end can translate toward a specific target architecture.</p>
+<p>Conceptually:</p>
+<pre><code>source language
+   -&gt; front end
+   -&gt; IR
+   -&gt; optimization
+   -&gt; target-specific lowering
+   -&gt; machine code
+</code></pre>pre
+<p>Real compiler architectures vary, but the separation allows one compiler infrastructure to support multiple languages or targets more effectively.</p>
+<h2>Optimization must preserve allowed behaviour</h2>
+<p>Suppose source contains:</p>
+<pre><code>x = 2 + 3
+</code></pre>pre
+<p>A compiler can often replace this with the constant 5 before execution.</p>
+<p>That is constant folding.</p>
+<p>Suppose it calculates a value that is never used and has no required observable effect.</p>
+<p>The compiler may remove the work.</p>
+<p>Suppose a loop performs the same invariant calculation repeatedly.</p>
+<p>The compiler may move it.</p>
+<p>These transformations are not random.</p>
+<p>They are constrained by language semantics, aliasing rules, memory model, side effects, target architecture, and optimization level.</p>
+<p>The compiler is allowed to change how a result is produced only when the observable behaviour remains valid under the language rules.</p>
+<h2>Undefined behaviour changes the contract</h2>
+<p>Languages such as C define some operations as undefined behaviour.</p>
+<p>That does not mean "the compiler will kindly throw an error."</p>
+<p>It means the language standard imposes no requirements for that case.</p>
+<p>Optimizers can make transformations based on the assumption that defined programs do not invoke undefined behaviour.</p>
+<p>This is why low-level language bugs can produce surprising optimized results.</p>
+<p>The compiler did not necessarily "break your code."</p>
+<p>The source may have left the language contract.</p>
+<h2>Target architecture matters</h2>
+<p>Compile the same C function for x86-64 and AArch64.</p>
+<p>The machine instructions differ because the ISAs differ.</p>
+<p>Register sets differ.</p>
+<p>Calling conventions differ.</p>
+<p>Available vector instructions differ.</p>
+<p>The source algorithm may be the same.</p>
+<p>Code generation adapts the implementation to the target.</p>
+<p>Cross-compilation simply makes this explicit: the compiler runs on one machine while producing code intended for another target platform.</p>
+<p>This is normal in embedded development.</p>
+<h2>Compilation is not always the whole toolchain</h2>
+<p>GCC documents up to four conventional stages:</p>
+<pre><code>preprocessing
+compilation proper
+assembly
+linking
+</code></pre>pre
+<p>The compiler proper can produce assembly.</p>
+<p>An assembler encodes instructions and data into an object file.</p>
+<p>A linker combines object files and libraries, resolves symbols, and builds an executable or shared object.</p>
+<p>People often use the word compiler for the entire toolchain.</p>
+<p>That is fine conversationally.</p>
+<p>When debugging a build, the distinction becomes useful.</p>
+<p>A compilation error and a linker error are different failure stages.</p>
+<h2>Debug information creates another mapping</h2>
+<p>Optimized machine code can look very different from source.</p>
+<p>Debug formats record information that helps tools map machine addresses and variables back toward source files, lines, functions, and types.</p>
+<p>Optimization complicates that mapping.</p>
+<p>A variable may live in a register briefly, move, be optimized away, or never exist as one stable storage location.</p>
+<p>This is why debugging highly optimized code can feel strange.</p>
+<p>The source abstraction and execution representation have diverged.</p>
+<h2>Compiler warnings are static evidence</h2>
+<p>A compiler can identify suspicious constructs without executing the program.</p>
+<p>Examples include:</p>
+<ul>
+<li>type mismatches;</li>
+<li>unreachable code;</li>
+<li>uninitialized values in some analyzable cases;</li>
+<li>suspicious conversions;</li>
+<li>format-string mismatches.</li>
+</ul>
+<p>Warnings are not proof that the program is correct when none appear.</p>
+<p>They are one source of static evidence.</p>
+<p>A good engineering workflow combines compiler diagnostics, tests, static analysis, runtime observability, and review.</p>
+<p>No single layer proves the whole system.</p>
+<h2>Exercise: stop GCC at every stage</h2>
+<p>For a tiny C program, inspect:</p>
+<pre><code>gcc -E
+gcc -S
+gcc -c
+gcc
+</code></pre>pre
+<p>The exact filenames and options are documented by GCC.</p>
+<p>Ask what each output contains.</p>
+<p>Preprocessed source.</p>
+<p>Assembly text.</p>
+<p>Relocatable object.</p>
+<p>Linked executable.</p>
+<p>Do not memorize commands as ritual.</p>
+<p>Use them to see the pipeline.</p>
+<h2>The lesson to carry forward</h2>
+<p>A compiler is a semantic transformer.</p>
+<p>It reads a source language, builds internal representations, checks rules, performs valid transformations, and generates code for a target.</p>
+<p>The processor executes the target instructions.</p>
+<p>The compiler is the bridge that lets us write at a higher abstraction without abandoning the hardware contract below.</p>
+<p>Next we compare that pipeline with interpreters and virtual machines, where translation and execution can happen differently.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="One connection ties together DHCP, DNS, local routing, neighbor discovery, NAT, Internet routing, TCP, TLS, and edge infrastructure. Following it end to end turns the Internet from one cloud into inspectable state transitions." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Follow One Connection Across the Internet — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-090-follow-one-connection-across-the-internet.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Follow One Connection Across the Internet" property="og:title"/><meta content="One connection ties together DHCP, DNS, local routing, neighbor discovery, NAT, Internet routing, TCP, TLS, and edge infrastructure. Following it end to end turns the Internet from one cloud into inspectable state transitions." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-090-follow-one-connection-across-the-internet.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Follow One Connection Across the Internet</h1><p class="lede">One connection ties together DHCP, DNS, local routing, neighbor discovery, NAT, Internet routing, TCP, TLS, and edge infrastructure. Following it end to end turns the Internet from one cloud into inspectable state transitions.</p><div class="article-meta"><span>Published 2026-10-07</span><span>14 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>We have spent twenty lessons taking networks apart.</p>
+<p>Now put the path back together.</p>
+<p>Consider a constructed example:</p>
+<p>A laptop on a small IPv4 LAN opens:</p>
+<pre><code class="language-text">https://service.example/
+</code></pre>pre
+<p>The public service is fronted by an edge reverse proxy. The laptop's network uses DHCP and IPv4 NAT.</p>
+<p>No single real provider is being described. The addresses below use documentation ranges. The purpose is to connect mechanisms.</p>
+<h2>0. State exists before the click</h2>
+<p>Before the user opens the service, the laptop may already have:</p>
+<pre><code class="language-text">address:       192.168.1.20/24
+default route: 192.168.1.1
+DNS resolver:  192.168.1.53
+</code></pre>pre
+<p>That state might have come from DHCP.</p>
+<p>The resolver can already contain cached answers.</p>
+<p>The router can already contain NAT/connection-tracking state for other flows.</p>
+<p>The operating system has routing and neighbor caches.</p>
+<p>The browser can have connection pools and application caches.</p>
+<p>"Start the request" does not mean "start from an empty system."</p>
+<h2>1. The application begins with a name</h2>
+<p>The URL contains:</p>
+<pre><code class="language-text">service.example
+</code></pre>pre
+<p>not an IP route.</p>
+<p>The application asks the host's resolver path for address information.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">browser
+  ↓
+system resolver / stub
+  ↓
+configured recursive resolver
+</code></pre>pre
+<p>If the answer is cached, the resolver may reply without walking the DNS hierarchy.</p>
+<p>Assume the result is:</p>
+<pre><code class="language-text">198.51.100.80
+</code></pre>pre
+<p>DNS has now produced address data.</p>
+<p>It has not opened a connection.</p>
+<h2>2. The host selects a route</h2>
+<p>The kernel performs a route lookup for the destination.</p>
+<p>Because <code>198.51.100.80</code>code is not on the local subnet, the default route selects:</p>
+<pre><code class="language-text">next hop: 192.168.1.1
+</code></pre>pre
+<p>The IP destination remains the remote edge address.</p>
+<p>The local link destination is the gateway.</p>
+<p>This is the distinction from lesson 80:</p>
+<pre><code class="language-text">destination IP  = remote endpoint
+destination MAC = local next hop
+</code></pre>pre
+<p>on the first Ethernet link.</p>
+<h2>3. The host resolves the next-hop link address</h2>
+<p>If the ARP/neighbor cache lacks the gateway's MAC address, the host can use ARP on this IPv4 LAN.</p>
+<p>After resolution, the first frame can be modeled as:</p>
+<pre><code class="language-text">Ethernet destination = gateway MAC
+IPv4 destination     = 198.51.100.80
+TCP destination      = 443
+</code></pre>pre
+<p>Different layers identify different things.</p>
+<p>The switch forwards the frame locally.</p>
+<p>The gateway receives it because the Ethernet destination is local to that link.</p>
+<h2>4. NAT creates another representation of the flow</h2>
+<p>Assume the laptop opens TCP from:</p>
+<pre><code class="language-text">192.168.1.20:51000
+        →
+198.51.100.80:443
+</code></pre>pre
+<p>The router translates the source to:</p>
+<pre><code class="language-text">203.0.113.25:62044
+        →
+198.51.100.80:443
+</code></pre>pre
+<p>and remembers the mapping.</p>
+<p>The private tuple and public tuple now represent one logical outbound connection on different sides of the translator.</p>
+<p>The remote edge will not see <code>192.168.1.20</code>code as the Internet source of this TCP flow.</p>
+<h2>5. Routers forward toward the advertised prefix</h2>
+<p>The packet enters the provider network.</p>
+<p>Routers forward according to installed forwarding state.</p>
+<p>Across administrative domains, BGP advertisements and policy contribute to how reachability to the destination prefix is learned and selected.</p>
+<p>The packet does not carry a list saying:</p>
+<pre><code class="language-text">visit AS A, then AS B, then AS C
+</code></pre>pre
+<p>Each router makes a forwarding decision based on local state.</p>
+<p>At each routed hop, the IPv4 TTL is decremented according to IP forwarding rules. Link-layer framing changes as the packet moves onto new links.</p>
+<p>The destination IP can remain <code>198.51.100.80</code>code while Ethernet or other link-layer headers are replaced hop by hop.</p>
+<p>NAT is the deliberate exception in this constructed path that changes the IP/port representation.</p>
+<h2>6. TCP establishes transport state</h2>
+<p>The client sends a SYN.</p>
+<p>The edge replies with SYN-ACK.</p>
+<p>The client sends ACK.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">client                    edge
+
+SYN      -------------------&gt;
+         &lt;------------------- SYN-ACK
+ACK      -------------------&gt;
+</code></pre>pre
+<p>TCP state now exists at both endpoints.</p>
+<p>That proves a transport connection was established.</p>
+<p>It does not yet prove the TLS service identity.</p>
+<h2>7. TLS establishes protected application transport</h2>
+<p>The client sends a TLS ClientHello for the service.</p>
+<p>The TLS 1.3 handshake negotiates parameters and establishes shared keying material.</p>
+<p>In a certificate-based public service, the edge presents authentication evidence.</p>
+<p>The client checks:</p>
+<pre><code class="language-text">certificate path
+      +
+local trust anchors
+      +
+service identity for service.example
+</code></pre>pre
+<p>If those checks and the handshake succeed, the connection gains TLS traffic keys and protected application data can flow.</p>
+<p>The TLS endpoint in this example is the edge.</p>
+<p>The browser has not authenticated the private origin directly.</p>
+<h2>8. The edge becomes a new client toward the origin</h2>
+<p>The edge receives the protected client connection, processes the application request, and decides how to satisfy it.</p>
+<p>It might serve cached content.</p>
+<p>If it needs the origin, it creates or reuses another connection:</p>
+<pre><code class="language-text">client
+  ↓ connection A
+edge
+  ↓ connection B
+origin
+</code></pre>pre
+<p>Connection B has its own:</p>
+<ul>
+<li>DNS or service-discovery state;</li>
+<li>route;</li>
+<li>source and destination addresses;</li>
+<li>transport state;</li>
+<li>TLS state if TLS is used;</li>
+<li>timeouts.</li>
+</ul>
+<p>An origin failure can therefore occur after the user's client connection is already completely healthy through TLS.</p>
+<h2>9. The application protocol finally gets its turn</h2>
+<p>After transport and TLS are available, application messages can be exchanged.</p>
+<p>For HTTPS, that means HTTP semantics above the TLS channel.</p>
+<p>We stop at that boundary in this module.</p>
+<p>Lesson 91 begins the Web Systems module and asks what HTTP actually is, how requests and responses are represented, and what browsers and servers do with them.</p>
+<p>The important point here is ordering:</p>
+<pre><code class="language-text">a successful application request depends on
+many lower-layer contracts,
+but is not equivalent to any one of them
+</code></pre>pre
+<h2>10. The reply follows state back</h2>
+<p>The response travels through the established connections.</p>
+<p>For the client-facing leg:</p>
+<pre><code class="language-text">edge
+  ↓ TCP/TLS records
+Internet routing
+  ↓
+public NAT address and mapped port
+  ↓ translation
+192.168.1.20:51000
+  ↓
+client socket
+  ↓
+application
+</code></pre>pre
+<p>The NAT recognizes the returning tuple and mapping state.</p>
+<p>Routers forward toward the client's public address according to their own routing state.</p>
+<p>The local router rewrites the packet back toward the internal endpoint.</p>
+<p>The final Ethernet frame on the LAN is addressed to the laptop's local MAC address.</p>
+<p>One response crosses several address spaces and state machines.</p>
+<h2>Which fields change?</h2>
+<p>A useful summary:</p>
+<p><strong>Link-layer addresses</strong></p>
+<p>Change from link to link. They identify local next-hop delivery, not global Internet endpoints.</p>
+<p><strong>IP addresses</strong></p>
+<p>Usually identify the routed endpoints across ordinary routers. They can be changed by NAT in this example.</p>
+<p><strong>TTL / Hop Limit</strong></p>
+<p>Changes as routing hops forward the packet.</p>
+<p><strong>TCP ports</strong></p>
+<p>Identify transport endpoints. NAT can rewrite them.</p>
+<p><strong>TCP sequence and acknowledgement state</strong></p>
+<p>Evolves throughout the connection according to the byte-stream state.</p>
+<p><strong>TLS ciphertext</strong></p>
+<p>Carries protected application data after key establishment. Routers forward it without understanding the plaintext application semantics.</p>
+<p><strong>Application data</strong></p>
+<p>Is interpreted at application endpoints and participating intermediaries that terminate the application/TLS layer.</p>
+<p>Keeping these scopes separate prevents many debugging mistakes.</p>
+<h2>Observe one connection on your own system</h2>
+<p>Choose a service you operate or a public service you are permitted to access normally.</p>
+<p>Before the request:</p>
+<pre><code class="language-bash">resolvectl status
+ip address
+ip route
+</code></pre>pre
+<p>Resolve:</p>
+<pre><code class="language-bash">dig example.com A
+dig example.com AAAA
+</code></pre>pre
+<p>Inspect route selection:</p>
+<pre><code class="language-bash">ip route get &lt;resolved-address&gt;
+</code></pre>pre
+<p>Observe transport and TLS:</p>
+<pre><code class="language-bash">curl -v https://example.com/
+</code></pre>pre
+<p>While connecting, inspect local sockets:</p>
+<pre><code class="language-bash">ss -tnp
+</code></pre>pre
+<p>On your own host or lab network, a packet capture can connect the model to frames and packets:</p>
+<pre><code class="language-bash">sudo tcpdump -ni &lt;interface&gt; host &lt;resolved-address&gt;
+</code></pre>pre
+<p>Do not capture traffic you are not authorized to inspect.</p>
+<h2>Build an evidence notebook</h2>
+<p>For one request, record:</p>
+<pre><code class="language-text">time
+hostname
+DNS answer + TTL
+selected destination address
+local source address
+next hop
+TCP source/destination ports
+TCP outcome
+TLS version
+certificate service identity
+application response status
+known proxy/CDN boundary
+</code></pre>pre
+<p>If you control the gateway, add the NAT mapping.</p>
+<p>If you control the edge, add the origin connection.</p>
+<p>If you control the origin, add server-side socket and application logs.</p>
+<p>The same request becomes visible from multiple boundaries.</p>
+<h2>Break one layer at a time</h2>
+<p>In an isolated environment you control:</p>
+<ol>
+<li>use a nonexistent DNS name;</li>
+<li>restore DNS but remove the route;</li>
+<li>restore the route but stop the TCP listener;</li>
+<li>restore the listener but present a mismatched test certificate;</li>
+<li>restore TLS but stop the reverse proxy's origin;</li>
+<li>restore the origin and return a deliberate application error.</li>
+</ol>
+<p>Record the client symptom at each stage.</p>
+<p>The visible phrase "site does not work" remains similar.</p>
+<p>The evidence changes completely.</p>
+<h2>The module to carry forward</h2>
+<p>Networking is not a cloud between two programs.</p>
+<p>It is a stack of stateful systems:</p>
+<pre><code class="language-text">configuration
+naming
+local-link delivery
+routing
+translation
+inter-domain reachability
+transport
+cryptographic identity and protection
+intermediaries
+application semantics
+</code></pre>pre
+<p>A systems engineer learns to move through those layers without confusing one contract for another.</p>
+<p>That is the real purpose of packet tracing, DNS tools, route inspection, socket state, TLS diagnostics, and proxy logs.</p>
+<p>The tools are not the skill.</p>
+<p>The skill is knowing <strong>what each observation proves</strong>.</p>
+<p>Module 10 begins above this path with Web Systems: HTTP, browsers, APIs, servers, sessions, and backends.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

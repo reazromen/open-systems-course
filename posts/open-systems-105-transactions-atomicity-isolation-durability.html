@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A transaction groups database operations into a unit with defined commit and rollback behavior. Atomicity, isolation, and durability are separate guarantees built from logging, MVCC, locking, and storage synchronization." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Transactions: Atomicity, Isolation, and Durability — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-105-transactions-atomicity-isolation-durability.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Transactions: Atomicity, Isolation, and Durability" property="og:title"/><meta content="A transaction groups database operations into a unit with defined commit and rollback behavior. Atomicity, isolation, and durability are separate guarantees built from logging, MVCC, locking, and storage synchronization." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-105-transactions-atomicity-isolation-durability.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Transactions: Atomicity, Isolation, and Durability</h1><p class="lede">A transaction groups database operations into a unit with defined commit and rollback behavior. Atomicity, isolation, and durability are separate guarantees built from logging, MVCC, locking, and storage synchronization.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A database transaction is often explained as all or nothing. That describes only part of the story.</p>
+<p>Transactions exist because data changes happen in the presence of failures, concurrency, constraints, crashes, and retries.</p>
+<p>A useful model separates atomicity, isolation, durability, and application consistency.</p>
+<h2>Begin and commit define a logical boundary</h2>
+<p>Imagine a transfer that debits account A and credits account B inside one transaction.</p>
+<p>Without a transaction, a crash between the writes can leave half the transfer.</p>
+<p>With an atomic transaction, the database recovery model ensures that the committed logical result is not debit-without-credit.</p>
+<p>How the engine achieves this depends on architecture. Common mechanisms include write-ahead logging, rollback journals, undo information, MVCC, locks, and commit records.</p>
+<p>The SQL boundary is the interface. The recovery machinery makes the guarantee real.</p>
+<h2>Atomicity does not mean simultaneous physical writes</h2>
+<p>Internally, pages, log records, indexes, and buffers can be modified at different moments.</p>
+<p>Atomicity means the database exposes the transaction as committed or not committed according to its visibility and recovery rules.</p>
+<p>Physical work can happen incrementally while the logical outcome is still all-or-nothing.</p>
+<h2>Rollback stops at the database boundary</h2>
+<p>If a transaction fails before commit, database changes can be rolled back.</p>
+<p>But rollback cannot unsend an email, reverse an external payment call, or erase an already-published message in another independent system.</p>
+<p>That is a distributed-systems boundary.</p>
+<p>Database transactions protect state inside the database transaction domain. External effects need patterns such as transactional outbox, idempotent consumers, or compensating workflows.</p>
+<h2>Consistency is not automatic business correctness</h2>
+<p>A database can enforce declared constraints and structural invariants.</p>
+<p>It cannot know every business rule unless the system encodes that rule.</p>
+<p>If application code debits the wrong account while satisfying every database constraint, the transaction can still commit successfully.</p>
+<p>Transactions preserve the rules represented in the system. They do not invent missing requirements.</p>
+<h2>Isolation controls concurrent visibility</h2>
+<p>Two transactions can overlap in time.</p>
+<p>Now ask: can one see the other's uncommitted writes, can the same query return different rows later, can two writers overwrite assumptions, and can predicates change because of concurrent commits?</p>
+<p>SQL databases expose isolation levels to define classes of allowed and prevented phenomena.</p>
+<p>PostgreSQL implements concurrency using MVCC plus other mechanisms. SQLite uses a different model depending on journal mode and transaction behavior.</p>
+<p>Isolation is not simply transactions running one at a time.</p>
+<h2>Durability begins at acknowledgement policy</h2>
+<p>A client sends COMMIT. When may the database reply success?</p>
+<p>One policy can wait until required log state is durably persisted. Another configuration may acknowledge earlier to reduce latency while accepting a larger loss window.</p>
+<p>PostgreSQL exposes synchronous commit behavior because this is a real durability/latency trade-off. SQLite exposes synchronous settings that influence persistence guarantees.</p>
+<p>The SQL word COMMIT is therefore only the top of a deeper storage contract.</p>
+<h2>WAL records durable intent before final page placement</h2>
+<p>Write-ahead logging uses a core ordering rule: log the change before relying on the changed data page as durable state.</p>
+<p>A simplified sequence is: change data in memory, append WAL, make required WAL durable, acknowledge commit, and flush data pages later.</p>
+<p>After a crash, recovery can replay log records for committed work that had not reached its final data pages.</p>
+<p>This is why database directories contain different categories of state with different roles.</p>
+<h2>Commit does not mean every replica has the change</h2>
+<p>If replication is asynchronous, the primary can acknowledge a commit before a replica receives it.</p>
+<p>A primary failure followed by promotion of a lagging replica can therefore lose acknowledged work depending on the replication contract.</p>
+<p>Synchronous replication can strengthen the acknowledgement contract at the cost of latency and sometimes availability.</p>
+<p>Durability on one node and durability across a replicated system are different properties.</p>
+<h2>Long transactions have operational cost</h2>
+<p>Long transactions can hold locks, retain old row versions, delay cleanup, expand conflict windows, and occupy connection-pool slots.</p>
+<p>Transactions are not safer merely because they are longer.</p>
+<p>Keep the transaction boundary aligned with the smallest unit of state that needs atomic consistency.</p>
+<h2>Practical experiment</h2>
+<p>Using SQLite, create two account rows with a non-negative balance constraint.</p>
+<p>Begin a transaction, update one row, inspect the changed value inside the transaction, then roll back and inspect again. Repeat and commit.</p>
+<p>Then open two connections and observe how concurrent operations behave.</p>
+<p>Do not generalize SQLite's exact behavior to PostgreSQL or another engine. The purpose is to see transaction boundaries as state transitions.</p>
+<h2>The lesson to carry forward</h2>
+<p>Transactions group database work into a recoverable concurrent unit. Atomicity, isolation, and durability are separate guarantees.</p>
+<p>The next lesson goes deeper into concurrency: what two transactions can see and why isolation levels exist.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

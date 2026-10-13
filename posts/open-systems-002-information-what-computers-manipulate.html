@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A computer does not store meaning directly. It stores physical representations that software interprets as numbers, text, images, instructions, identities, measurements, and much more." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Information: What Computers Actually Manipulate — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-002-information-what-computers-manipulate.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Information: What Computers Actually Manipulate" property="og:title"/><meta content="A computer does not store meaning directly. It stores physical representations that software interprets as numbers, text, images, instructions, identities, measurements, and much more." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-002-information-what-computers-manipulate.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Information: What Computers Actually Manipulate</h1><p class="lede">A computer does not store meaning directly. It stores physical representations that software interprets as numbers, text, images, instructions, identities, measurements, and much more.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A photograph, a bank balance, a song, a program, and the word <strong>hello</strong> can all live inside a computer. That sounds almost magical until we ask a smaller question:</p>
+<p><strong>What is actually stored?</strong></p>
+<p>Not the smell of the room in the photograph. Not the feeling produced by the song. Not the social meaning of the bank balance. A computer stores and transforms representations.</p>
+<p>That distinction is the beginning of a useful theory of information for engineers.</p>
+<h2>A bit is a distinction</h2>
+<p>NIST defines a bit as a binary digit with value 0 or 1. Eight bits form a byte in the common definition used by modern computing standards.</p>
+<p>But do not imagine a bit as a microscopic printed zero or one.</p>
+<p>A physical device must implement two distinguishable conditions that we agree to interpret as 0 and 1. In one context that distinction may be represented by voltage ranges. In another it may be represented by stored electrical charge, magnetic orientation, or another physical state.</p>
+<p>The symbol is abstract. The implementation is physical.</p>
+<p>This is a pattern we will see throughout computing:</p>
+<pre><code class="language-text">meaning
+  ↓ interpreted through
+representation
+  ↓ implemented by
+physical state
+</code></pre>pre
+<p>Those three layers should not be confused.</p>
+<h2>The same bits can mean different things</h2>
+<p>Consider this byte:</p>
+<pre><code class="language-text">01000001
+</code></pre>pre
+<p>As an unsigned binary integer it represents 65.</p>
+<p>Under ASCII, the numeric code 65 represents the uppercase letter A.</p>
+<p>The same eight bits could also be part of a pixel value, a machine instruction, a compressed file, an encrypted message, or a network packet.</p>
+<p>The bits did not announce what they meant.</p>
+<p><strong>Context supplied the interpretation.</strong></p>
+<p>This matters enormously in debugging. When a program reads the right bytes using the wrong interpretation, the hardware may be functioning perfectly while the result is nonsense.</p>
+<p>A file format is therefore not just data. It is an agreement about how sequences of bytes should be interpreted.</p>
+<p>A network protocol performs a similar job across machines.</p>
+<p>A data structure performs a similar job inside software.</p>
+<h2>Information is not the same thing as meaning</h2>
+<p>Claude Shannon's 1948 paper on communication theory deliberately separates the engineering problem of transmitting messages from their semantic meaning. That move is easy to misunderstand.</p>
+<p>It does not say meaning is unimportant.</p>
+<p>It says that one useful engineering problem can be studied without first solving the problem of meaning.</p>
+<p>Suppose I transmit one of four possible symbols:</p>
+<pre><code class="language-text">A
+B
+C
+D
+</code></pre>pre
+<p>A communication system can be evaluated on whether the receiver can distinguish which symbol was sent.</p>
+<p>It does not need to know whether A means "open the valve," "I love you," or "the experiment failed."</p>
+<p>This separation is powerful because it lets engineers reason about channels, errors, coding, capacity, and uncertainty without pretending that transmission theory is also a theory of human interpretation.</p>
+<p>Throughout this course we will protect that boundary.</p>
+<h2>Data is useful only when a system knows how to interpret it</h2>
+<p>Imagine a sensor transmits these two bytes:</p>
+<pre><code class="language-text">00000001 00101100
+</code></pre>pre
+<p>Together they could represent the integer 300.</p>
+<p>But several questions remain:</p>
+<ul>
+<li>Is the value signed or unsigned?</li>
+<li>What byte order is being used?</li>
+<li>Is 300 the actual measurement or a scaled value?</li>
+<li>Is the unit Celsius, millivolts, pascals, millimeters, or something else?</li>
+<li>Is there a calibration offset?</li>
+<li>Is the value valid?</li>
+<li>When was it measured?</li>
+</ul>
+<p>A number without metadata can be precise and still be useless.</p>
+<p>Suppose a temperature sensor sends 3000.</p>
+<p>Maybe that means 30.00 °C because the device uses hundredths of a degree.</p>
+<p>Maybe it means an ADC count.</p>
+<p>Maybe it is a raw resistance measurement.</p>
+<p>Maybe it is an error code.</p>
+<p>The computer can store the bits perfectly while the application misunderstands the world.</p>
+<p>This is why engineering systems need schemas, units, timestamps, versioning, and contracts.</p>
+<h2>Representation creates limits</h2>
+<p>If a field contains eight unsigned bits, it can represent 256 different bit patterns:</p>
+<pre><code class="language-text">00000000
+...
+11111111
+</code></pre>pre
+<p>If those patterns are interpreted as consecutive unsigned integers, the range is 0 through 255.</p>
+<p>That is not a limitation of mathematics. It is a limitation of the chosen representation.</p>
+<p>With more bits, more distinct patterns become available.</p>
+<p>But more bits are not automatically better.</p>
+<p>More bits may require more memory, more bandwidth, more storage, or more processing. In embedded systems those costs can matter. In network protocols a few bytes repeated millions of times can matter. In large models or databases representation choices can affect both cost and performance.</p>
+<p>Engineering is full of decisions about how much information needs to be represented and at what precision.</p>
+<h2>Compression is possible because representation contains structure</h2>
+<p>Suppose a file contains:</p>
+<pre><code class="language-text">AAAAAAAAAAAAAAAAAAAA
+</code></pre>pre
+<p>Writing twenty copies of A is one representation.</p>
+<p>Another possible representation is something like:</p>
+<pre><code class="language-text">20 × A
+</code></pre>pre
+<p>The second description can be shorter because the original sequence contains repetition.</p>
+<p>Real compression algorithms are more sophisticated, but the principle is important: <strong>structure and predictability can make a representation compressible.</strong></p>
+<p>Lossless compression allows the original data to be reconstructed exactly.</p>
+<p>Lossy compression deliberately discards some information according to a model of what can be removed while still meeting a goal. JPEG images and many audio codecs use forms of lossy compression.</p>
+<p>The word "lossy" should therefore trigger a systems question:</p>
+<blockquote>
+<p>Which information was discarded, according to which assumptions, and does the remaining representation still satisfy the application?</p>
+</blockquote>
+<p>A tiny image thumbnail may be excellent for a contact list and unacceptable for medical imaging.</p>
+<p>The technology did not change. The requirement did.</p>
+<h2>Text is not characters stored directly in memory</h2>
+<p>When you see the word Hello, the computer needs an encoding that maps characters to numerical values and then to bytes.</p>
+<p>Unicode defines a large character repertoire and code points. Encodings such as UTF-8 define how those code points are represented as sequences of bytes.</p>
+<p>This is why text bugs can appear even when all the bytes arrived successfully. Sender and receiver may disagree about the encoding or interpret byte sequences incorrectly.</p>
+<p>The same principle applies to images, audio, video, and structured documents.</p>
+<p>For an image, software needs to know dimensions, pixel organization, color representation, compression format, and often metadata.</p>
+<p>For audio, software needs sample format, sample rate, channel arrangement, and codec information.</p>
+<p>A stream of bytes becomes meaningful only through an agreed interpretation.</p>
+<h2>Instructions are information too</h2>
+<p>One of the most important ideas in general-purpose computing is that instructions can themselves be represented as data.</p>
+<p>A compiled program is ultimately stored as a sequence of bytes. Some of those bytes encode machine instructions understood by a processor architecture. Other bytes represent constants, metadata, or other program data.</p>
+<p>This is why a storage device can contain both:</p>
+<pre><code class="language-text">photo.jpg
+program
+database
+configuration
+</code></pre>pre
+<p>All are encoded information.</p>
+<p>Their differences emerge from structure, interpretation, and the software that processes them.</p>
+<p>That observation prepares us for a later idea: <strong>a computer can manipulate descriptions of processes using the same storage mechanisms it uses for ordinary data.</strong></p>
+<p>That is one reason software is so flexible.</p>
+<h2>Information crosses boundaries</h2>
+<p>Now imagine an ESP32 measuring temperature and sending it to a server.</p>
+<p>A simplified path might be:</p>
+<pre><code class="language-text">physical temperature
+        ↓
+sensor response
+        ↓
+electrical signal
+        ↓
+digital measurement
+        ↓
+number in memory
+        ↓
+serialized message
+        ↓
+network packets
+        ↓
+server bytes
+        ↓
+database field
+        ↓
+dashboard pixels
+</code></pre>pre
+<p>At every arrow, information is represented differently.</p>
+<p>The dashboard is not "seeing the temperature."</p>
+<p>It is seeing the final result of a chain of measurements, conversions, encodings, transmissions, storage operations, queries, and rendering steps.</p>
+<p>This is why a dashboard value should never be treated as magical truth.</p>
+<p>When it looks wrong, trace the representation backwards.</p>
+<h2>Errors can preserve syntax while destroying truth</h2>
+<p>Imagine a sensor value of 31.2 °C.</p>
+<p>The message reaches the server correctly.</p>
+<p>The server stores it correctly.</p>
+<p>The API returns it correctly.</p>
+<p>The dashboard renders it correctly.</p>
+<p>But the sensor was mounted beside a heat source.</p>
+<p>Every digital layer behaved perfectly.</p>
+<p>The measurement was still a poor representation of the quantity the user thought they were seeing.</p>
+<p>This is a crucial engineering lesson:</p>
+<blockquote>
+<p>data integrity and measurement validity are different problems.</p>
+</blockquote>
+<p>A checksum can help detect transmission errors. It cannot prove the sensor was installed in the right place.</p>
+<p>Encryption can protect confidentiality. It cannot prove the value is physically meaningful.</p>
+<p>A database constraint can preserve a schema. It cannot prove the source measured what you intended.</p>
+<p>Accuracy depends on the entire evidence chain.</p>
+<h2>Try it yourself: one value, five interpretations</h2>
+<p>Take the number 65.</p>
+<p>Now describe five possible interpretations:</p>
+<ol>
+<li>the integer sixty-five;</li>
+<li>an ASCII code for A;</li>
+<li>a percentage;</li>
+<li>a temperature reading;</li>
+<li>a byte inside a compressed image.</li>
+</ol>
+<p>Notice that the stored value alone does not select among those interpretations.</p>
+<p>Now add metadata:</p>
+<pre><code class="language-json">{
+  "value": 65,
+  "unit": "percent",
+  "source": "battery_monitor"
+}
+</code></pre>pre
+<p>The representation has become richer.</p>
+<p>But even now, you can ask additional questions:</p>
+<ul>
+<li>what does 65% mean for this battery chemistry?</li>
+<li>how was it estimated?</li>
+<li>how old is the reading?</li>
+<li>has the monitor been calibrated?</li>
+<li>what happens when the source becomes unavailable?</li>
+</ul>
+<p>Those questions are not outside computing. They are part of building systems that people can trust.</p>
+<h2>The lesson to carry forward</h2>
+<p>Computers manipulate representations.</p>
+<p>Bits provide discrete symbols. Bytes group bits. Encodings give structure to byte sequences. Protocols and file formats establish shared interpretation. Programs transform representations. Sensors connect physical phenomena to digital values. Displays transform digital state back into signals people can perceive.</p>
+<p>Meaning enters through context.</p>
+<p>That single idea explains an enormous number of software bugs, protocol failures, data-quality problems, encoding errors, and misleading dashboards.</p>
+<p>When you encounter data in the rest of this course, ask:</p>
+<blockquote>
+<p>What exactly is represented here, and what assumptions are required to interpret it?</p>
+</blockquote>
+<p>That question is more useful than memorizing that computers "use zeros and ones."</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

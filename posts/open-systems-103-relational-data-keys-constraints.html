@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A relational schema does more than describe columns. Keys and constraints make important invariants executable so invalid states can be rejected close to the data." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Relational Data: Tables, Keys, and Constraints — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-103-relational-data-keys-constraints.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Relational Data: Tables, Keys, and Constraints" property="og:title"/><meta content="A relational schema does more than describe columns. Keys and constraints make important invariants executable so invalid states can be rejected close to the data." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-103-relational-data-keys-constraints.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Relational Data: Tables, Keys, and Constraints</h1><p class="lede">A relational schema does more than describe columns. Keys and constraints make important invariants executable so invalid states can be rejected close to the data.</p><div class="article-meta"><span>Published 2026-10-07</span><span>10 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A database schema is often treated as documentation. It is stronger than that.</p>
+<p>A relational schema can make parts of the application's truth executable. If every order must reference a real customer, the database can enforce that relationship. If email addresses must be unique, the database can reject conflicts. If a field must always exist, the database can reject NULL.</p>
+<p>The schema is therefore part of the system's correctness boundary.</p>
+<h2>Tables give data a shared shape</h2>
+<p>A table defines named columns and rows that follow the table's schema.</p>
+<p>That structure gives every consumer a common vocabulary. One application process does not get to interpret a timestamp as a Boolean while another treats it as text without violating the schema.</p>
+<p>SQL systems include implementation behavior beyond the pure relational model, but the model remains useful: think in structured sets of rows rather than unrelated files.</p>
+<h2>Types remove impossible interpretations</h2>
+<p>If created_at is a timestamp column, the database can reject a value that cannot be represented as a timestamp.</p>
+<p>Types move some validation closer to the data. They do not encode every business rule. A text column can still contain an invalid email address, and an integer can still represent a semantically impossible quantity.</p>
+<p>Database types and application validation work together.</p>
+<h2>Primary keys define row identity</h2>
+<p>A primary key gives each row a stable unique identity within a table.</p>
+<p>Identity is more than a performance hint. Other tables can reference it. The application can reason about one entity even if descriptive fields change.</p>
+<p>Natural keys, generated integers, UUIDs, and other identifiers have different trade-offs. The important property is that identity should not accidentally change when a display name or description changes.</p>
+<h2>Foreign keys encode relationships</h2>
+<p>If orders.customer_id must refer to customers.id, a foreign-key constraint can enforce that relationship.</p>
+<p>Now the database can reject an order referring to a nonexistent customer.</p>
+<p>That prevents one class of orphaned data. It also forces lifecycle decisions: should customer deletion cascade, be restricted, or leave a nullable reference?</p>
+<p>Those are domain semantics made explicit.</p>
+<h2>UNIQUE protects global invariants</h2>
+<p>Suppose no two users can share the same handle.</p>
+<p>Checking in application code is not enough under concurrency. Request A can check that the handle is free, request B can check the same thing, and both can attempt insertion.</p>
+<p>A unique constraint gives the database authority to serialize that conflict and reject one write.</p>
+<p>Application checks can still produce friendly messages. The database remains the final guard.</p>
+<h2>NOT NULL encodes whether absence is valid</h2>
+<p>Nullable columns are not simply optional fields. NULL has special semantics in SQL and participates in three-valued logic.</p>
+<p>If every order must have a creation timestamp, marking the column NOT NULL makes that invariant executable.</p>
+<p>Many unexplained nullable columns often indicate that the data model has not decided what absence means.</p>
+<h2>CHECK constraints encode local rules</h2>
+<p>A CHECK constraint can enforce rules such as quantity greater than zero or end_at not earlier than start_at.</p>
+<p>This does not mean all business logic belongs in SQL. It means that invariants the database can evaluate cheaply and reliably should not depend only on every application caller remembering the same rule.</p>
+<h2>Normalization reduces contradictory copies</h2>
+<p>Duplicated facts create opportunities for disagreement. If the same current address appears in thousands of rows, changing it becomes ambiguous.</p>
+<p>Normalization is a family of techniques for representing dependencies more cleanly and reducing unnecessary duplication.</p>
+<p>Denormalization can be deliberate for performance, snapshots, or history. It should be a conscious trade-off rather than accidental duplication.</p>
+<h2>Joins reconstruct relationships</h2>
+<p>When orders reference customers by key, queries can combine them with a join.</p>
+<p>The database can choose an execution plan based on indexes, statistics, and available operators. The query says what result is wanted more than exactly how to retrieve every page.</p>
+<p>This separation between declarative intent and execution strategy is one of the strengths of relational systems.</p>
+<h2>Schema changes are production changes</h2>
+<p>Adding a column may be easy. Changing a type, adding a constraint, or building a large index can be operationally expensive.</p>
+<p>Before a migration ask: is it backward compatible, can old and new application versions coexist, can it lock large tables, can it be rolled back, and what happens to replicas?</p>
+<p>The database schema is part of the contract between application versions.</p>
+<h2>Practical experiment</h2>
+<p>Create a small SQLite database with customers and orders. Add a primary key, UNIQUE email, NOT NULL fields, a positive-quantity CHECK, and a foreign key.</p>
+<p>Then deliberately attempt a duplicate email, a missing customer reference, zero quantity, and a NULL required field.</p>
+<p>Enable foreign-key enforcement according to SQLite's documentation before testing.</p>
+<p>The exercise shows which invalid states are rejected by the database rather than by application code.</p>
+<h2>The lesson to carry forward</h2>
+<p>Tables organize structured rows. Keys define identity. Foreign keys define relationships. Constraints define invariants.</p>
+<p>The next lesson asks how a database finds rows efficiently without scanning everything: indexes and the cost trade-offs they introduce.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

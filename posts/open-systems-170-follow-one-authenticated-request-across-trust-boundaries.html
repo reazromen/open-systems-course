@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="One protected request crosses DNS, TLS, login/session state, gateway policy, service identity, authorization, secrets, database permissions, audit, and response handling. Security comes from the composition of those boundaries." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Follow One Authenticated Request Across Trust Boundaries — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-170-follow-one-authenticated-request-across-trust-boundaries.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Follow One Authenticated Request Across Trust Boundaries" property="og:title"/><meta content="One protected request crosses DNS, TLS, login/session state, gateway policy, service identity, authorization, secrets, database permissions, audit, and response handling. Security comes from the composition of those boundaries." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-170-follow-one-authenticated-request-across-trust-boundaries.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Follow One Authenticated Request Across Trust Boundaries</h1><p class="lede">One protected request crosses DNS, TLS, login/session state, gateway policy, service identity, authorization, secrets, database permissions, audit, and response handling. Security comes from the composition of those boundaries.</p><div class="article-meta"><span>Published 2026-10-07</span><span>16 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Constructed example:</p>
+<p>A tenant administrator changes one IoT device's configuration.</p>
+<p>The request crosses a browser, identity provider, public API, internal service, database, and device command system.</p>
+<p>No real deployment is described.</p>
+<h2>1. Browser authenticates the service</h2>
+<p>The browser resolves the application name.</p>
+<p>TLS validates the service certificate for that name.</p>
+<p>This protects the connection to the TLS endpoint.</p>
+<p>It does not authenticate the human yet.</p>
+<h2>2. User authenticates through identity provider</h2>
+<p>The application redirects to an OpenID Connect provider.</p>
+<p>The user completes authentication, possibly with a passkey or MFA.</p>
+<p>The client receives protocol artifacts according to the OIDC flow.</p>
+<p>The application validates issuer, audience, signature, nonce/state, and expiry as required.</p>
+<p>Now the application has authenticated identity context.</p>
+<h2>3. Session preserves continuity</h2>
+<p>The application creates a secure session or uses appropriate tokens.</p>
+<p>The browser does not resend the passkey secret on every request.</p>
+<p>Session lifetime, cookie scope, revocation, and CSRF protections become part of the boundary.</p>
+<h2>4. API authorizes the specific object</h2>
+<p>Request:</p>
+<p>PATCH /devices/abc123.</p>
+<p>The API does not stop at “user is admin.”</p>
+<p>It checks:</p>
+<p>user tenant;
+device tenant;
+required role/permission;
+operation allowed;
+current device state.</p>
+<p>This prevents object-level authorization failure.</p>
+<h2>5. Gateway and service identity are separate</h2>
+<p>The public gateway forwards the request to a device-management service.</p>
+<p>Internal mTLS or workload identity authenticates the service path.</p>
+<p>The downstream service does not trust a forged X-User header from any network client.</p>
+<p>It trusts identity context only from an authenticated upstream under explicit policy.</p>
+<h2>6. Service obtains secrets through workload identity</h2>
+<p>The service needs database credentials or a short-lived database token.</p>
+<p>It authenticates to secret/KMS infrastructure using workload identity.</p>
+<p>No permanent production password is embedded in the container image.</p>
+<p>Secret access is audited.</p>
+<h2>7. Database enforces its own boundary</h2>
+<p>The service account has only the required database privileges.</p>
+<p>The transaction updates desired device configuration.</p>
+<p>Tenant identifiers and constraints protect data integrity.</p>
+<p>A database superuser credential is not required for a normal request.</p>
+<h2>8. Audit records the security-relevant change</h2>
+<p>Audit event records:</p>
+<p>actor;
+tenant;
+device;
+old configuration;
+new configuration;
+request/trace ID;
+time;
+result.</p>
+<p>It excludes bearer tokens and secrets.</p>
+<p>This lets incident responders later answer who changed the device.</p>
+<h2>9. Command service receives narrow authority</h2>
+<p>A separate component publishes the desired state to the device.</p>
+<p>Its broker credentials permit only command namespaces it owns.</p>
+<p>The device itself validates command identity, expiry, and local safety rules.</p>
+<p>Cloud authorization does not bypass device safety.</p>
+<h2>10. Supply-chain trust sits underneath every process</h2>
+<p>Gateway, application, and command service all run signed/verified artifacts produced by controlled CI.</p>
+<p>If the build pipeline is compromised, runtime identity can faithfully authenticate malicious code.</p>
+<p>Runtime security depends on supply-chain security.</p>
+<h2>11. Observability must not leak credentials</h2>
+<p>Trace IDs and authorization decisions can be logged.</p>
+<p>Raw session cookies, access tokens, private keys, and device secrets should not be.</p>
+<p>Security observability and secret minimization must coexist.</p>
+<h2>12. Revocation changes future authorization</h2>
+<p>Suppose the administrator account is disabled.</p>
+<p>Existing sessions may need revocation.</p>
+<p>Cached authorization decisions need expiry.</p>
+<p>Long-lived tokens can delay enforcement.</p>
+<p>The revocation requirement influences session/token architecture.</p>
+<h2>Failure drill</h2>
+<p>Test in a controlled environment:</p>
+<p>expired certificate;
+invalid OIDC audience;
+revoked session;
+wrong tenant;
+missing role;
+database permission denied;
+broker authorization denied;
+expired device command.</p>
+<p>For each, verify that failure occurs at the intended boundary and is observable without exposing sensitive data.</p>
+<h2>What Module 17 added</h2>
+<p>Security and Trust Boundaries connected:</p>
+<p>threat modeling;
+authentication;
+authorization;
+sessions/tokens;
+secrets;
+encryption;
+PKI;
+network segmentation;
+software supply chain;
+end-to-end security reasoning.</p>
+<p>Security is not one perimeter.</p>
+<p>It is a chain of explicit trust decisions.</p>
+<h2>The module to carry forward</h2>
+<p>The final module applies the full systems method to AI: models, tokens, embeddings, inference, retrieval, tools, agents, memory, evaluation, safety, cost, and one complete production architecture.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

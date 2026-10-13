@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Arrays organize ordered elements so indexed access can be direct and cache-friendly. Their strengths come from layout, and their weaknesses appear when size and insertion patterns change." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Arrays: Contiguous Data and Indexing — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-041-arrays-contiguous-data-indexing.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Arrays: Contiguous Data and Indexing" property="og:title"/><meta content="Arrays organize ordered elements so indexed access can be direct and cache-friendly. Their strengths come from layout, and their weaknesses appear when size and insertion patterns change." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-041-arrays-contiguous-data-indexing.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Arrays: Contiguous Data and Indexing</h1><p class="lede">Arrays organize ordered elements so indexed access can be direct and cache-friendly. Their strengths come from layout, and their weaknesses appear when size and insertion patterns change.</p><div class="article-meta"><span>Published 2026-10-06</span><span>10 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>You have one temperature reading.</p>
+<p>A variable is enough.</p>
+<p>You have one million readings in order.</p>
+<p>Now the organization of data matters.</p>
+<p>An array is one of the simplest and most important data structures: an ordered sequence of elements accessible by position.</p>
+<p>The interesting part is not square-bracket syntax.</p>
+<p>It is layout.</p>
+<h2>Indexing converts position into address</h2>
+<p>Imagine fixed-size elements stored consecutively.</p>
+<p>If each element occupies four bytes and the array begins at address B, then element i can be located conceptually as:</p>
+<pre><code>address = B + i × 4
+</code></pre>pre
+<p>That arithmetic gives direct indexed access.</p>
+<p>No need to scan earlier elements to find item 900,000.</p>
+<p>This is why arrays support constant-time positional access in the standard model.</p>
+<h2>Contiguity helps caches</h2>
+<p>Read:</p>
+<pre><code>array[0]
+array[1]
+array[2]
+array[3]
+</code></pre>pre
+<p>Nearby elements often occupy nearby memory.</p>
+<p>Cache lines fetch blocks of neighbouring bytes.</p>
+<p>Sequential traversal can therefore reuse data already brought into cache.</p>
+<p>This is one reason arrays perform well in many numeric and systems workloads.</p>
+<p>Data structure and hardware architecture meet.</p>
+<h2>Fixed-size arrays have limits</h2>
+<p>In low-level languages, a basic array may have fixed length.</p>
+<p>Need more capacity?</p>
+<p>A dynamic-array implementation can allocate a larger block and copy elements.</p>
+<p>Languages expose names such as vector, list, ArrayList, or slice-backed structures depending on their model.</p>
+<p>Appending can be efficient on average when capacity grows geometrically, even though occasional resizing is expensive.</p>
+<p>This introduces amortized analysis: rare expensive operations can be spread across many cheap ones.</p>
+<p>We will not treat "append is O(1)" as magic. It is a statement about a particular implementation and analysis model.</p>
+<h2>Inserting near the front moves data</h2>
+<p>Suppose an array contains:</p>
+<pre><code>A B C D E
+</code></pre>pre
+<p>Insert X at index 1:</p>
+<pre><code>A X B C D E
+</code></pre>pre
+<p>If the representation is contiguous, B through E may need to move.</p>
+<p>The operation is structurally different from reading item 1.</p>
+<p>This is the central data-structure lesson:</p>
+<p>Different operations have different costs.</p>
+<p>Do not ask "is array fast?"</p>
+<p>Ask:</p>
+<p>Fast for what operation under what workload?</p>
+<h2>Capacity and length are different</h2>
+<p>A dynamic array might reserve space for 16 elements while currently holding 10.</p>
+<p>Length:</p>
+<pre><code>10
+</code></pre>pre
+<p>Capacity:</p>
+<pre><code>16
+</code></pre>pre
+<p>That extra space allows several appends without reallocating.</p>
+<p>Memory use therefore exceeds the exact payload.</p>
+<p>Data structures trade capacity, speed, and implementation complexity.</p>
+<h2>Arrays need element-size rules</h2>
+<p>A C array of fixed-width integers is very different from a Python list.</p>
+<p>CPython lists are dynamic arrays of references to Python objects, not a flat packed sequence of arbitrary Python object contents.</p>
+<p>The source syntax:</p>
+<pre><code>items[3]
+</code></pre>pre
+<p>does not tell you the physical representation.</p>
+<p>Know the language/runtime implementation before making memory-performance claims.</p>
+<h2>Multidimensional arrays expose layout</h2>
+<p>A matrix may be stored row-major or column-major.</p>
+<p>Traversal order can therefore change cache locality.</p>
+<p>Numerical libraries care deeply about layout because operations touch huge volumes of data.</p>
+<p>The mathematical matrix is an abstraction.</p>
+<p>The linear memory arrangement determines much of performance.</p>
+<h2>Bounds are a correctness boundary</h2>
+<p>Access index 100 in a ten-element array.</p>
+<p>Safe languages usually check and report an error.</p>
+<p>Low-level languages may leave out automatic bounds enforcement for raw arrays, making invalid access a potential memory-safety bug.</p>
+<p>Performance, safety, and control interact at the language boundary.</p>
+<p>Do not assume one array model applies everywhere.</p>
+<h2>Exercise: choose an array workload</h2>
+<p>You need to store one hour of sensor readings sampled once per second.</p>
+<p>That is 3,600 values.</p>
+<p>Operations:</p>
+<ul>
+<li>append newest;</li>
+<li>scan in chronological order;</li>
+<li>access reading by index;</li>
+<li>occasionally compute average.</li>
+</ul>
+<p>An array-like structure is a natural starting point.</p>
+<p>Now add requirement:</p>
+<p>Keep only newest 3,600 forever while adding one each second.</p>
+<p>Shifting the whole array each time would be wasteful.</p>
+<p>A ring buffer may fit better.</p>
+<p>Requirements choose structures.</p>
+<h2>The lesson to carry forward</h2>
+<p>Arrays are powerful because contiguous or indexable organization gives efficient positional access and often strong locality.</p>
+<p>Their limitations appear in resizing and insertion/removal patterns.</p>
+<p>Never learn a data structure as a definition only.</p>
+<p>Learn:</p>
+<ul>
+<li>representation;</li>
+<li>supported operations;</li>
+<li>cost;</li>
+<li>memory behaviour;</li>
+<li>workload fit.</li>
+</ul>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

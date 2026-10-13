@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Compiled code is usually built in pieces. Object files carry machine code, data, symbols, and relocation information; the linker connects those pieces into executable or shared objects." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Executables, Object Files, and Linking — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-024-executables-object-files-linking.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Executables, Object Files, and Linking" property="og:title"/><meta content="Compiled code is usually built in pieces. Object files carry machine code, data, symbols, and relocation information; the linker connects those pieces into executable or shared objects." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-024-executables-object-files-linking.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Executables, Object Files, and Linking</h1><p class="lede">Compiled code is usually built in pieces. Object files carry machine code, data, symbols, and relocation information; the linker connects those pieces into executable or shared objects.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A project contains:</p>
+<pre><code>main.c
+audio.c
+network.c
+</code></pre>pre
+<p>You compile it.</p>
+<p>One executable appears.</p>
+<p>What happened to the boundaries between those source files?</p>
+<p>They did not simply vanish.</p>
+<p>The build pipeline created intermediate object files and then linked pieces together.</p>
+<p>ELF, the Executable and Linking Format used widely on Unix-like systems, explicitly distinguishes relocatable files, executable files, and shared objects.</p>
+<p>That distinction gives us a clean way to understand linking.</p>
+<h2>Compilation can produce relocatable object files</h2>
+<p>A compiler and assembler can turn one source unit into an object file.</p>
+<p>That object may contain:</p>
+<ul>
+<li>machine code;</li>
+<li>constant data;</li>
+<li>symbol information;</li>
+<li>relocation information;</li>
+<li>sections and metadata.</li>
+</ul>
+<p>Some addresses are not final yet.</p>
+<p>Suppose main.c calls:</p>
+<pre><code>send_packet()
+</code></pre>pre
+<p>but the implementation lives in network.c.</p>
+<p>The compiler knows a symbol is referenced.</p>
+<p>It may not yet know the final address where the function will live.</p>
+<p>That problem belongs to linking.</p>
+<h2>Symbols are names that cross compilation boundaries</h2>
+<p>An object file can define symbols and reference symbols.</p>
+<p>Conceptually:</p>
+<pre><code>main.o:
+  references send_packet
+
+network.o:
+  defines send_packet
+</code></pre>pre
+<p>The linker's job includes resolving references to definitions.</p>
+<p>If no compatible definition exists, you can get the familiar category:</p>
+<pre><code>undefined reference
+</code></pre>pre
+<p>That is not a syntax error in the source.</p>
+<p>Compilation may have succeeded.</p>
+<p>The build failed later because program pieces could not be connected.</p>
+<p>Knowing the stage narrows debugging.</p>
+<h2>Relocation means addresses can change</h2>
+<p>Machine code sometimes needs addresses of functions or data.</p>
+<p>When object files are built independently, final layout is not yet known.</p>
+<p>Relocation records tell the linker or loader which places need adjustment when final addresses become known.</p>
+<p>This is why relocatable object files can be combined flexibly.</p>
+<p>The code is partly complete but not yet fixed to one final memory layout.</p>
+<h2>Static linking copies needed code into the final artifact</h2>
+<p>With static linking, required library code can be incorporated into the produced executable according to toolchain behaviour.</p>
+<p>Advantages can include easier deployment of one self-contained binary in some environments.</p>
+<p>Costs can include larger binaries and duplicated library code across programs.</p>
+<p>Security updates can also require rebuilding or replacing statically included dependencies.</p>
+<p>Do not reduce the choice to "static good" or "dynamic good."</p>
+<p>It is a deployment and lifecycle trade-off.</p>
+<h2>Dynamic linking defers some work</h2>
+<p>Shared libraries allow multiple programs to rely on separately stored library objects.</p>
+<p>The executable records dependencies.</p>
+<p>At program load or runtime, a dynamic linker maps required shared objects and resolves symbols according to platform rules.</p>
+<p>The ELF specification describes both linking and program-loading views and the role of shared objects.</p>
+<p>This creates powerful reuse.</p>
+<p>It also creates a new failure class:</p>
+<p>The program exists, but a required compatible shared library does not.</p>
+<p>Now "it compiled on my machine" is not enough.</p>
+<p>The runtime environment matters.</p>
+<h2>ABI is the boundary below the source language</h2>
+<p>Two pieces of binary code need agreements about more than symbol names.</p>
+<p>They may need to agree on:</p>
+<ul>
+<li>calling convention;</li>
+<li>register usage;</li>
+<li>stack layout;</li>
+<li>data-type layout;</li>
+<li>binary object format;</li>
+<li>system interfaces.</li>
+</ul>
+<p>These agreements form parts of an Application Binary Interface, or ABI.</p>
+<p>An API is typically a source-level interface.</p>
+<p>An ABI is a binary-level contract.</p>
+<p>You can preserve an API while breaking binary compatibility if the lower-level representation changes.</p>
+<p>This distinction matters in operating systems and library distribution.</p>
+<h2>Executable does not mean "already in memory"</h2>
+<p>An executable file is a persistent representation suitable for program loading.</p>
+<p>When launched, the operating system loader uses information in the executable to construct a process image.</p>
+<p>Segments are mapped.</p>
+<p>Permissions are established.</p>
+<p>The dynamic loader may map libraries.</p>
+<p>The program begins from a defined entry point.</p>
+<p>So:</p>
+<pre><code>executable file != running process
+</code></pre>pre
+<p>This is the same program-versus-process distinction from earlier, now seen through the file format.</p>
+<h2>Object formats contain two views of one artifact</h2>
+<p>ELF documentation presents a linking view organized around sections and an execution view organized around segments.</p>
+<p>That is an elegant systems idea.</p>
+<p>The same file format supports two different consumers:</p>
+<p>The linker cares about pieces used to build programs.</p>
+<p>The loader cares about regions used to create a process image.</p>
+<p>One artifact, two abstractions.</p>
+<h2>Exercise: inspect an executable</h2>
+<p>On Linux, if tools are available:</p>
+<pre><code>file program
+readelf -h program
+readelf -S program
+readelf -l program
+nm program
+</code></pre>pre
+<p>Use a tiny program you compiled yourself.</p>
+<p>Do not memorize every section.</p>
+<p>Ask:</p>
+<p>Which tool is showing the file type?</p>
+<p>Which shows sections?</p>
+<p>Which shows program segments?</p>
+<p>Which shows symbols?</p>
+<p>The binary stops being a black box.</p>
+<h2>The lesson to carry forward</h2>
+<p>Compiled programs are usually assembled from pieces.</p>
+<p>Object files carry code, data, symbols, and relocation information.</p>
+<p>Linkers resolve those pieces into executable or shared objects.</p>
+<p>Loaders later map executable structures into a process.</p>
+<p>The full path is:</p>
+<pre><code>source
+  -&gt; object files
+  -&gt; link
+  -&gt; executable/shared objects
+  -&gt; load
+  -&gt; running process
+</code></pre>pre
+<p>Each arrow has its own failure modes.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

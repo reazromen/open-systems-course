@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A recursive resolver can answer from cache or follow DNS delegations through the hierarchy. Understanding referrals, authoritative answers, TTLs, and negative caching makes DNS failures much smaller." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>How DNS Resolution Actually Works — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-082-how-dns-resolution-actually-works.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="How DNS Resolution Actually Works" property="og:title"/><meta content="A recursive resolver can answer from cache or follow DNS delegations through the hierarchy. Understanding referrals, authoritative answers, TTLs, and negative caching makes DNS failures much smaller." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-082-how-dns-resolution-actually-works.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>How DNS Resolution Actually Works</h1><p class="lede">A recursive resolver can answer from cache or follow DNS delegations through the hierarchy. Understanding referrals, authoritative answers, TTLs, and negative caching makes DNS failures much smaller.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A DNS lookup often appears to be one request and one reply.</p>
+<p>The work behind that reply may have happened earlier, may be satisfied entirely from cache, or may require a resolver to follow the DNS hierarchy.</p>
+<p>The first rule is therefore:</p>
+<p><strong>Do not assume that every application lookup causes a query to a root server.</strong></p>
+<p>Most do not.</p>
+<h2>Recursion and iteration are different jobs</h2>
+<p>A normal host commonly sends a query to a recursive resolver and asks it to obtain the final answer.</p>
+<p>That relationship looks like:</p>
+<pre><code class="language-text">stub resolver
+      ↓ recursive query
+recursive resolver
+      ↓
+final answer or error
+</code></pre>pre
+<p>RFC 9499 describes recursive mode as the mode in which a server answers from local cache or sends other queries to obtain the final answer rather than merely returning a referral.</p>
+<p>When a resolver follows referrals through DNS servers, the conceptual path can look like:</p>
+<pre><code class="language-text">recursive resolver
+      ↓
+root zone server
+      ↓ referral
+top-level-domain server
+      ↓ referral
+authoritative server for the child zone
+      ↓ answer
+recursive resolver cache
+      ↓
+stub resolver
+</code></pre>pre
+<p>That is a model of a cache miss, not a packet trace of every DNS lookup.</p>
+<h2>Start with the cache</h2>
+<p>Suppose the resolver is asked for:</p>
+<pre><code class="language-text">www.example.com. A
+</code></pre>pre
+<p>Before it performs external resolution, it can check whether it already has usable cached data.</p>
+<p>If a valid cached answer exists, it can reply immediately.</p>
+<p>It might also have cached pieces of the path: for example, which servers are authoritative for <code>.com</code>code or for <code>example.com</code>code. A partial cache can let it start closer to the destination instead of repeating the entire hierarchy.</p>
+<p>This is why two queries for the same name can have very different latency without anything being wrong.</p>
+<h2>Delegation connects zones</h2>
+<p>DNS is hierarchical, but the hierarchy is divided into zones.</p>
+<p>A parent zone can delegate responsibility for a child zone using NS records.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">root
+  ↓ delegates .com
+.com
+  ↓ delegates example.com
+example.com
+  ↓ contains authoritative data
+</code></pre>pre
+<p>A referral tells the resolver which name servers it should ask next.</p>
+<p>Sometimes the resolver also needs an address for one of those name servers. DNS can include address information called <strong>glue</strong> where it is needed to make a delegation usable without creating a circular dependency.</p>
+<p>The exact rules matter to DNS operators, but the systems lesson is simpler: resolution is a graph of dependencies. Even discovering the server that knows an answer can itself require DNS data.</p>
+<h2>An authoritative answer is a narrower claim</h2>
+<p>An authoritative server answers from the zone data it serves.</p>
+<p>That does not mean it knows every name on the Internet.</p>
+<p>It knows the zones for which it is authoritative and can provide referrals for delegated children when appropriate.</p>
+<p>Likewise, receiving an authoritative DNS answer for an address does not prove that the address currently hosts a healthy service. DNS authority is authority over naming data, not over the runtime state of the destination application.</p>
+<p>Keep the evidence boundary narrow.</p>
+<h2>CNAME can extend the resolution path</h2>
+<p>A queried name can be an alias.</p>
+<p>Constructed example:</p>
+<pre><code class="language-text">app.example.       CNAME  edge.example.net.
+edge.example.net.  A      192.0.2.80
+</code></pre>pre
+<p>The resolver has to obtain the address data associated with the canonical target.</p>
+<p>That target can live in another zone with another authority.</p>
+<p>So "one name lookup" at the application boundary can depend on several DNS names and several zones.</p>
+<p>RFC 1034 and RFC 1035 describe the core DNS resolution model and protocol data structures.</p>
+<h2>Negative answers are cached too</h2>
+<p>Caching is not only for successful answers.</p>
+<p>DNS can cache knowledge that a requested name does not exist or that the requested record type has no data.</p>
+<p>RFC 2308 defines negative caching behavior.</p>
+<p>This matters operationally.</p>
+<p>Suppose you query a name before creating it in your zone. The resolver receives a definitive negative answer and caches it. You then create the record immediately.</p>
+<p>The authoritative server may now contain the record while the recursive resolver still has a valid negative cached result.</p>
+<p>From one viewpoint:</p>
+<pre><code class="language-text">authoritative zone: record exists
+</code></pre>pre
+<p>From another:</p>
+<pre><code class="language-text">recursive cache: earlier negative answer still valid
+</code></pre>pre
+<p>Those observations can coexist.</p>
+<h2>NXDOMAIN and no data are not identical</h2>
+<p>At a high level:</p>
+<ul>
+<li><strong>NXDOMAIN</strong> means the queried domain name does not exist in DNS;</li>
+<li>a <strong>no-data</strong> response means the name exists but no record of the requested type is available in the answer.</li>
+</ul>
+<p>That distinction matters for caching and diagnosis.</p>
+<p>If an A query has no data but an AAAA record exists, saying "the domain does not exist" would be wrong.</p>
+<p>When debugging DNS, always preserve:</p>
+<pre><code class="language-text">query name + query type + response code + returned sections
+</code></pre>pre
+<p>Do not reduce all failures to "DNS error."</p>
+<h2>TTL is remaining permission to reuse data</h2>
+<p>A TTL tells a cache how long a resource record may be retained.</p>
+<p>When you inspect a cached reply, the displayed TTL may be lower than the value configured at the authoritative source because time has already passed since the resolver cached it.</p>
+<p>That gives you useful evidence.</p>
+<p>If repeated queries show a decreasing TTL, you are probably observing cached state.</p>
+<p>When the cache expires, a later query can cause fresh resolution.</p>
+<h2>Observe with dig</h2>
+<p>Use a public test domain or a domain you control.</p>
+<p>A normal query through your configured resolver:</p>
+<pre><code class="language-bash">dig example.com A
+</code></pre>pre
+<p>Ask a specific resolver you are authorized to query:</p>
+<pre><code class="language-bash">dig @192.0.2.53 example.com A
+</code></pre>pre
+<p>The address above is documentation space; replace it only with a resolver you are allowed to use.</p>
+<p>Inspect:</p>
+<ul>
+<li>status;</li>
+<li>flags;</li>
+<li>answer;</li>
+<li>authority section;</li>
+<li>additional section;</li>
+<li>TTL;</li>
+<li>responding server.</li>
+</ul>
+<p>A tool such as <code>drill</code>code can provide similar evidence.</p>
+<h2>Understand what +trace actually proves</h2>
+<p><code>dig +trace</code>code is useful, but its name can cause a bad mental model.</p>
+<p>It does not ask your normal recursive resolver to print the exact historical path it followed.</p>
+<p>Instead, it performs iterative-style queries from the machine running <code>dig</code>code, beginning from root information and following delegations.</p>
+<p>Use it to study the DNS hierarchy:</p>
+<pre><code class="language-bash">dig +trace example.com
+</code></pre>pre
+<p>Do not present its output as a packet-for-packet trace of some other resolver's internal work.</p>
+<h2>Build a DNS failure ladder</h2>
+<p>If an application fails to resolve a name, ask in this order:</p>
+<pre><code class="language-text">Does the local stub know which resolver to use?
+        ↓
+Can the host reach that resolver?
+        ↓
+Does the resolver answer from cache?
+        ↓
+Can it reach the authoritative path if needed?
+        ↓
+Is the delegation correct?
+        ↓
+Does the authoritative zone contain the requested data?
+        ↓
+Is a cached positive or negative answer still valid?
+</code></pre>pre
+<p>That is more useful than repeatedly clearing caches.</p>
+<p>Cache flushing destroys evidence and can make a transient symptom disappear before you understand it.</p>
+<h2>Break it safely</h2>
+<p>On a DNS zone you control, create a short-lived test record.</p>
+<ol>
+<li>Query it through your normal resolver.</li>
+<li>Query the authoritative server directly.</li>
+<li>Change the test value.</li>
+<li>Query both again without flushing anything.</li>
+<li>Record TTLs and timestamps.</li>
+<li>Wait for the relevant cache lifetime to expire and repeat.</li>
+</ol>
+<p>Then create a new test name only after first querying it while it does not exist. Observe how a cached negative answer changes the experiment.</p>
+<p>This turns "DNS propagation" from a vague phrase into observable distributed cache state.</p>
+<h2>The lesson to carry forward</h2>
+<p>DNS resolution is not one global database read.</p>
+<p>It is a distributed process involving caches, delegations, referrals, authoritative data, and time.</p>
+<p>A recursive resolver hides much of that work from the client, which is useful. Troubleshooting sometimes requires revealing the hidden boundaries again.</p>
+<p>The next lesson moves earlier in a host's network life: before DNS can be useful, the machine often needs local configuration such as an address, a route, and a resolver. DHCP is one way IPv4 hosts obtain that configuration.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

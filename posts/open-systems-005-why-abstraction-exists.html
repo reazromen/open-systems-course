@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Abstraction is how engineers make systems small enough to reason about. It hides detail behind a contract, but the hidden detail still matters when the contract fails." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Why Abstraction Exists — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-005-why-abstraction-exists.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Why Abstraction Exists" property="og:title"/><meta content="Abstraction is how engineers make systems small enough to reason about. It hides detail behind a contract, but the hidden detail still matters when the contract fails." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-005-why-abstraction-exists.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Why Abstraction Exists</h1><p class="lede">Abstraction is how engineers make systems small enough to reason about. It hides detail behind a contract, but the hidden detail still matters when the contract fails.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>If you had to understand semiconductor physics every time you wrote a web request, modern software development would be impossible.</p>
+<p>If a firmware engineer had to reason about every transistor before reading a GPIO pin, embedded development would be impossible.</p>
+<p>If an application had to place individual Ethernet symbols onto a wire before sending JSON, networking would be unusable.</p>
+<p>The escape hatch is abstraction.</p>
+<p>MIT's Computation Structures course lists understanding major hardware and software abstractions as a learning objective and develops digital systems as layers of increasingly powerful building blocks. That is not just a classroom convenience. It is how large engineered systems become manageable.</p>
+<h2>A file is an abstraction</h2>
+<p>Suppose you open a file called notes.txt.</p>
+<p>The file gives you a simple model:</p>
+<ul>
+<li>it has a name;</li>
+<li>it contains bytes;</li>
+<li>it can be read;</li>
+<li>it can be written;</li>
+<li>it can persist.</li>
+</ul>
+<p>That model hides a huge amount.</p>
+<p>Depending on the system, the bytes may be split into blocks. Metadata may be stored separately. Data may be cached in RAM. Writes may be buffered. Storage hardware may remap failing cells. A filesystem may journal metadata. An SSD controller may perform wear leveling.</p>
+<p>Yet most software can ignore those details most of the time.</p>
+<p>That phrase, most of the time, is the important one.</p>
+<p>When storage is full, corrupted, slow, unexpectedly cached, or lost after a crash, the hidden layers become relevant.</p>
+<p>An abstraction is useful because it hides detail. It is dangerous when we forget that detail still exists.</p>
+<h2>Interfaces are promises between layers</h2>
+<p>A strong abstraction usually has a contract.</p>
+<p>A file interface may promise operations such as open, read, write, seek, and close.</p>
+<p>A socket interface may promise a way to exchange bytes through a network.</p>
+<p>A database interface may promise that a transaction satisfies certain guarantees or fails according to documented rules.</p>
+<p>A programming language may promise type behaviour, memory semantics, or exceptions.</p>
+<p>The layer above does not need to know exactly how the layer below implements the promise.</p>
+<p>This gives us a powerful separation:</p>
+<pre><code>what the interface promises
+          !=
+how the implementation achieves it
+</code></pre>pre
+<p>Two implementations can be completely different underneath while presenting the same interface.</p>
+<p>That is why hardware, operating systems, databases, or services can sometimes be replaced without rewriting every component, provided the contract that other components depend on remains compatible.</p>
+<h2>Good abstraction reduces the number of facts you must hold at once</h2>
+<p>Imagine reasoning about a web request with every layer expanded:</p>
+<pre><code>JavaScript function
+browser networking stack
+TLS state
+TCP state
+IP routing
+Wi-Fi MAC
+radio modulation
+antenna behaviour
+access point
+router
+ISP
+remote network
+kernel socket
+web server
+application
+database
+storage
+</code></pre>pre
+<p>Every line contains additional layers of its own.</p>
+<p>No person can keep the full implementation detail of a modern computing system active in working memory at once.</p>
+<p>So we zoom.</p>
+<p>At one moment:</p>
+<pre><code>client -&gt; API -&gt; database
+</code></pre>pre
+<p>may be enough.</p>
+<p>During a TLS failure, that model is too coarse.</p>
+<p>During a disk-latency incident, the database box may need to be opened.</p>
+<p>During a radio problem, the client box may need to be opened.</p>
+<p>Expertise is not memorizing every layer simultaneously.</p>
+<p>It is learning which abstraction is appropriate for the current question.</p>
+<h2>An abstraction can be correct and still be insufficient</h2>
+<p>Suppose a monitoring dashboard says:</p>
+<pre><code>service = healthy
+</code></pre>pre
+<p>That may be a valid abstraction if healthy means the process answered one HTTP health endpoint.</p>
+<p>But a customer may still be unable to complete a transaction because a payment provider is down.</p>
+<p>The health abstraction is not necessarily false. It is incomplete for the user's question.</p>
+<p>This is one of the most common systems mistakes: treating a local abstraction as proof of an end-to-end property.</p>
+<p>Examples:</p>
+<ul>
+<li>connected does not always mean media is flowing;</li>
+<li>replicated does not always mean immediately consistent;</li>
+<li>encrypted does not mean trustworthy;</li>
+<li>container running does not mean application useful;</li>
+<li>200 OK does not mean a business action completed;</li>
+<li>backup succeeded does not mean restore works.</li>
+</ul>
+<p>The abstraction must be matched to the claim.</p>
+<h2>Leaky abstractions are not a reason to abandon abstraction</h2>
+<p>Engineers sometimes say that abstractions leak. The practical meaning is that details hidden by a layer can become observable in the layer above.</p>
+<p>A database abstraction may hide disk I/O until latency spikes.</p>
+<p>A virtual machine may hide hardware until CPU contention matters.</p>
+<p>A language runtime may hide memory management until garbage collection pauses matter.</p>
+<p>A network connection may hide packet-level behaviour until retransmissions or MTU problems matter.</p>
+<p>The wrong conclusion is that abstractions are fake and should be ignored.</p>
+<p>The useful conclusion is that abstractions are tools: know their contracts and know how to descend when evidence requires it.</p>
+<p>Without abstraction, large systems are incomprehensible.</p>
+<p>Without the ability to cross abstraction boundaries, failures become mysterious.</p>
+<h2>Architecture is largely the design of abstractions and boundaries</h2>
+<p>Consider a service that sends email.</p>
+<p>One architecture might expose a simple operation:</p>
+<pre><code>send_email(to, subject, body)
+</code></pre>pre
+<p>The application using it does not need to know SMTP server details.</p>
+<p>The email service may internally handle provider credentials, retry policy, templates, rate limits, delivery events, suppression lists, and logs.</p>
+<p>This abstraction is valuable because it gives the caller a smaller surface.</p>
+<p>But now ask about failure.</p>
+<p>If the operation returns success, what does success mean?</p>
+<p>Queued?</p>
+<p>Accepted by provider?</p>
+<p>Delivered to recipient server?</p>
+<p>Seen by a human?</p>
+<p>The abstraction needs semantics, not just a convenient function name.</p>
+<p>A clean interface with vague meaning is still a poor contract.</p>
+<h2>Abstraction can protect change</h2>
+<p>Suppose every part of an application directly issues provider-specific cloud API calls.</p>
+<p>Changing cloud providers becomes expensive because provider assumptions leak everywhere.</p>
+<p>If a smaller internal interface captures what the application actually needs, provider-specific code can be isolated behind it.</p>
+<p>This is not automatically better. Extra layers have cost. They can hide capabilities, create maintenance burden, or become premature generalization.</p>
+<p>The question is not:</p>
+<p>How many abstractions can we create?</p>
+<p>It is:</p>
+<p>Which changes, responsibilities, and failure domains deserve a boundary?</p>
+<p>That is a much more useful architecture question.</p>
+<h2>A beginner needs both directions</h2>
+<p>Many programming courses move only downward from syntax:</p>
+<pre><code>variable
+function
+class
+framework
+application
+</code></pre>pre
+<p>A systems-first course also moves upward and downward:</p>
+<pre><code>user problem
+    |
+    v
+system behaviour
+    |
+    v
+software components
+    |
+    v
+operating-system mechanisms
+    |
+    v
+hardware mechanisms
+</code></pre>pre
+<p>Then back up again.</p>
+<p>You should be able to ask:</p>
+<ul>
+<li>What problem is this abstraction solving?</li>
+<li>What contract does it expose?</li>
+<li>What details does it hide?</li>
+<li>Which failures leak through?</li>
+<li>What layer below would I inspect next?</li>
+</ul>
+<p>Those questions turn vocabulary into a mental model.</p>
+<h2>Exercise: open one familiar abstraction</h2>
+<p>Choose a URL.</p>
+<p>At the high level you see one object:</p>
+<pre><code>https://example.com
+</code></pre>pre
+<p>Open it one layer:</p>
+<pre><code>scheme + hostname + path
+</code></pre>pre
+<p>Open hostname resolution:</p>
+<pre><code>hostname -&gt; DNS lookup -&gt; address
+</code></pre>pre
+<p>Open the connection:</p>
+<pre><code>address -&gt; transport connection -&gt; TLS -&gt; HTTP
+</code></pre>pre
+<p>You do not need all implementation details yet.</p>
+<p>The exercise is learning that a familiar object is a compressed description of lower-level mechanisms.</p>
+<p>Try the same with a file, database table, process, container, phone call, or ESP32 sensor reading.</p>
+<h2>The lesson to carry forward</h2>
+<p>Abstraction is not the opposite of understanding.</p>
+<p>It is the mechanism that makes understanding large systems possible.</p>
+<p>The engineering skill is knowing what the abstraction promises, what it hides, where its boundary lies, and when the current problem requires you to look underneath.</p>
+<p>We will use that skill throughout the course. CPU instructions abstract transistor behaviour. Processes abstract execution resources. Files abstract storage. Sockets abstract communication. APIs abstract services. Databases abstract durable structured state.</p>
+<p>Each one is powerful precisely because you do not need to think about everything below it all the time.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

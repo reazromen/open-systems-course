@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A browser navigation crosses URL parsing, policy, fetching, HTTP, HTML parsing, subresource discovery, script execution, style calculation, layout, and painting. A visible page is the result of many cooperating state machines." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>From URL to Rendered Page — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-095-from-url-to-rendered-page.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="From URL to Rendered Page" property="og:title"/><meta content="A browser navigation crosses URL parsing, policy, fetching, HTTP, HTML parsing, subresource discovery, script execution, style calculation, layout, and painting. A visible page is the result of many cooperating state machines." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-095-from-url-to-rendered-page.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>From URL to Rendered Page</h1><p class="lede">A browser navigation crosses URL parsing, policy, fetching, HTTP, HTML parsing, subresource discovery, script execution, style calculation, layout, and painting. A visible page is the result of many cooperating state machines.</p><div class="article-meta"><span>Published 2026-10-07</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A user types a URL and sees a page.</p>
+<p>That looks like one action.</p>
+<p>The browser performs a sequence of operations across several subsystems: URL processing, network fetching, HTTP, document parsing, subresource loading, script execution, style processing, layout, painting, and browser security policy.</p>
+<p>The useful systems lesson is not to memorize one browser's internal function names.</p>
+<p>It is to stop treating "the page loaded" as one event.</p>
+<h2>Start with the URL</h2>
+<p>A URL contains structured components such as scheme, host, port, path, query, and fragment according to the URL processing model.</p>
+<p>For example:</p>
+<pre><code class="language-text">https://example.com:443/docs?id=7#section
+</code></pre>pre
+<p>contains several different pieces of information.</p>
+<p>The scheme influences how the resource is fetched.</p>
+<p>The host participates in name resolution and origin calculations.</p>
+<p>The port can identify the network service.</p>
+<p>The path and query become part of the request target.</p>
+<p>The fragment is normally interpreted by the client and is not sent as part of the HTTP request target.</p>
+<p>So even before networking begins, the browser has parsed structured state from the text the user entered.</p>
+<h2>Navigation is a browser operation</h2>
+<p>Entering a URL in the address bar is not the same thing as an arbitrary script issuing a fetch.</p>
+<p>Browsers apply navigation algorithms, history handling, security checks, referrer policy, sandboxing rules, origin rules, and other state around document navigation. The HTML Living Standard defines the web-platform navigation model and document lifecycle.</p>
+<p>That means two requests for the same URL can occur in different browser contexts and be governed by different policy.</p>
+<p>Protocol endpoint equality does not imply identical browser semantics.</p>
+<h2>Fetching crosses the lower layers</h2>
+<p>To retrieve an HTTPS document, the browser can need:</p>
+<pre><code class="language-text">DNS or cached name state
+        ↓
+route and connection selection
+        ↓
+TCP or QUIC
+        ↓
+TLS
+        ↓
+HTTP
+        ↓
+response
+</code></pre>pre
+<p>The Fetch Standard defines the web platform's fetching model above those lower-level mechanisms.</p>
+<p>A browser can reuse DNS state, TLS sessions, connections, caches, or service-worker results. Therefore a navigation does not necessarily create a fresh network connection.</p>
+<p>The visible page load begins in a system that already has state.</p>
+<h2>The first HTML response is only the beginning</h2>
+<p>Suppose the server returns an HTML document.</p>
+<p>The browser begins parsing that document into a tree representation of the document structure.</p>
+<p>While parsing, it can discover references to additional resources such as:</p>
+<ul>
+<li>stylesheets;</li>
+<li>scripts;</li>
+<li>images;</li>
+<li>fonts;</li>
+<li>frames;</li>
+<li>media.</li>
+</ul>
+<p>Each of those can trigger additional fetches subject to browser policy and cache state.</p>
+<p>So:</p>
+<pre><code class="language-text">one navigation
+→ many resource requests
+</code></pre>pre
+<p>is normal.</p>
+<p>The browser network panel makes this visible immediately.</p>
+<p>A page that appears to be "one document" can depend on dozens or hundreds of resources.</p>
+<h2>Parsing can overlap with fetching</h2>
+<p>The browser does not necessarily wait for the complete HTML file before noticing every subresource.</p>
+<p>As parsing progresses, resource discovery can begin early.</p>
+<p>Some browser implementations also use speculative loading mechanisms to discover likely resources ahead of the main parser.</p>
+<p>The exact optimization is implementation-specific, but the general systems consequence is important:</p>
+<p><strong>document parsing and network activity can overlap.</strong></p>
+<p>That is why resource order and dependency structure affect page-load behavior.</p>
+<h2>CSS changes what can be painted</h2>
+<p>Stylesheets contribute rules used when determining how document elements should appear.</p>
+<p>The browser needs style information to calculate presentation.</p>
+<p>A useful simplified model is:</p>
+<pre><code class="language-text">document structure
+       +
+style rules
+       ↓
+computed style
+       ↓
+layout
+       ↓
+paint
+</code></pre>pre
+<p>Real rendering engines contain more stages and optimizations.</p>
+<p>Do not treat this diagram as one universal internal implementation.</p>
+<p>It is a reasoning model.</p>
+<h2>JavaScript can change the document while it loads</h2>
+<p>Scripts can:</p>
+<ul>
+<li>create or remove elements;</li>
+<li>change attributes;</li>
+<li>trigger new fetches;</li>
+<li>alter styles;</li>
+<li>register event handlers;</li>
+<li>schedule future work.</li>
+</ul>
+<p>This means the final visible page is not simply the HTML response painted once.</p>
+<p>It can be the result of ongoing program execution.</p>
+<p>Some scripts can also delay parsing depending on how they are included and scheduled. Attributes such as <code>defer</code>code and <code>async</code>code change script-fetching and execution relationships for appropriate script types under HTML rules.</p>
+<p>A performance problem that appears to be "slow network" can therefore be CPU work or blocking script behavior after the response has arrived.</p>
+<h2>DOMContentLoaded is not the same as every resource being finished</h2>
+<p>Browsers expose several lifecycle events.</p>
+<p><code>DOMContentLoaded</code>code is associated with the document being parsed and deferred-script processing reaching the relevant state.</p>
+<p>The window <code>load</code>code event occurs later, after additional load-event-delaying resources have completed according to the platform rules.</p>
+<p>Neither event means "the application is now correct."</p>
+<p>A single-page application can continue fetching data and rendering after both.</p>
+<p>This distinction matters when monitoring user experience.</p>
+<h2>The browser applies security policy throughout</h2>
+<p>The browser is not a passive HTTP viewer.</p>
+<p>It enforces rules involving:</p>
+<ul>
+<li>origins;</li>
+<li>mixed content;</li>
+<li>cookies;</li>
+<li>CORS;</li>
+<li>Content Security Policy;</li>
+<li>sandboxing;</li>
+<li>certificate validation;</li>
+<li>permissions.</li>
+</ul>
+<p>Therefore an HTTP response can arrive successfully and still be blocked from being used in the way application code expected.</p>
+<p>The network worked.</p>
+<p>The browser policy rejected the operation.</p>
+<p>Those are different failure domains.</p>
+<h2>Rendering is downstream from application state</h2>
+<p>Imagine a page where the server returns correct HTML and JavaScript.</p>
+<p>The browser fetches everything successfully.</p>
+<p>Then JavaScript throws an exception before updating the page.</p>
+<p>The user can still see a broken interface.</p>
+<p>From the network perspective:</p>
+<pre><code class="language-text">DNS: good
+TLS: good
+HTTP: good
+resources: loaded
+</code></pre>pre
+<p>From the application perspective:</p>
+<pre><code class="language-text">rendering logic: failed
+</code></pre>pre
+<p>This is why a green network waterfall does not prove a healthy page.</p>
+<h2>Practical inspection</h2>
+<p>Open a simple page you are authorized to inspect and use browser developer tools.</p>
+<p>Reload with the network panel open.</p>
+<p>Record:</p>
+<ul>
+<li>the main document request;</li>
+<li>the first stylesheet;</li>
+<li>the first script;</li>
+<li>one image;</li>
+<li>their start times;</li>
+<li>whether any request came from cache;</li>
+<li>the HTTP status of each.</li>
+</ul>
+<p>Then inspect the console for script errors.</p>
+<p>Finally, disable JavaScript temporarily and reload if the page is safe to inspect that way.</p>
+<p>Ask which visible content came from the original HTML and which depended on script execution.</p>
+<p>The goal is not to benchmark the browser. It is to separate protocol delivery from document processing and application execution.</p>
+<h2>Build a small dependency page</h2>
+<p>Create a local HTML file that references:</p>
+<ul>
+<li>one stylesheet;</li>
+<li>one script;</li>
+<li>one image.</li>
+</ul>
+<p>Serve the directory through a local HTTP server.</p>
+<p>Then deliberately remove each dependency one at a time.</p>
+<p>Observe:</p>
+<pre><code class="language-text">missing CSS
+→ content may exist but presentation changes
+
+missing image
+→ document can still load with a failed subresource
+
+missing script
+→ static content can load while behavior fails
+</code></pre>pre
+<p>One page load can therefore contain partial successes.</p>
+<h2>The lesson to carry forward</h2>
+<p>A rendered page is the output of many cooperating systems.</p>
+<p>The browser parses a URL, applies navigation policy, fetches resources, interprets HTTP, parses documents, loads dependencies, executes scripts, applies styles, performs layout, and paints.</p>
+<p>"The website is slow" is therefore not yet a diagnosis.</p>
+<p>The next half of this module moves from loading pages into application state: cookies, sessions, same-origin policy, CORS, APIs, and backend request paths.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

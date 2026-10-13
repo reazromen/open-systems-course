@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="The scheduler decides which runnable work gets CPU time. Fairness, latency, priority, throughput, deadlines, and energy can conflict, so scheduling is policy over a finite resource." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Scheduling: Sharing CPU Time — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-053-scheduling-sharing-cpu-time.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Scheduling: Sharing CPU Time" property="og:title"/><meta content="The scheduler decides which runnable work gets CPU time. Fairness, latency, priority, throughput, deadlines, and energy can conflict, so scheduling is policy over a finite resource." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-053-scheduling-sharing-cpu-time.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Scheduling: Sharing CPU Time</h1><p class="lede">The scheduler decides which runnable work gets CPU time. Fairness, latency, priority, throughput, deadlines, and energy can conflict, so scheduling is policy over a finite resource.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Ten runnable threads.</p>
+<p>Four CPU cores.</p>
+<p>Who runs now?</p>
+<p>That question is scheduling.</p>
+<p>The operating system maintains runnable execution contexts and chooses which get processor time.</p>
+<p>There is no policy that simultaneously maximizes every desirable property.</p>
+<p>Scheduling is a trade-off among fairness, latency, throughput, priority, deadlines, and sometimes energy.</p>
+<h2>Runnable does not mean running</h2>
+<p>A thread can exist in several broad conditions:</p>
+<pre><code>running
+runnable
+waiting
+</code></pre>pre
+<p>Running means a CPU is currently executing it.</p>
+<p>Runnable means it could execute if given a CPU.</p>
+<p>Waiting means it is blocked on some event such as I/O, a lock, or timer.</p>
+<p>The scheduler primarily chooses among runnable work.</p>
+<p>This distinction explains why a machine can have thousands of processes without needing thousands of CPUs.</p>
+<h2>Time slicing creates the illusion of simultaneity</h2>
+<p>On one core, only one ordinary instruction stream executes at an instant.</p>
+<p>The OS can switch among runnable threads rapidly.</p>
+<p>To a human, several applications appear active.</p>
+<p>On multicore machines, some truly execute in parallel while others are time-shared.</p>
+<p>Virtualization of CPU time creates the process abstraction.</p>
+<h2>Fairness is not simply equal milliseconds</h2>
+<p>Suppose two ordinary tasks have equal priority.</p>
+<p>A fair scheduler tries to prevent one from monopolizing the CPU.</p>
+<p>But tasks sleep, wake, block on I/O, and request different latency behaviour.</p>
+<p>Linux's scheduler implementation has evolved over time. Current kernel documentation describes the transition from the older Completely Fair Scheduler design toward EEVDF, which uses virtual runtime, lag, and virtual deadlines to choose eligible work.</p>
+<p>Do not memorize scheduler internals as universal OS theory.</p>
+<p>The general problem is resource allocation over time.</p>
+<h2>Interactive latency matters</h2>
+<p>A compiler can tolerate being delayed by a few milliseconds.</p>
+<p>An audio thread may not.</p>
+<p>A UI thread delayed too long feels frozen.</p>
+<p>A real-time control loop may have explicit deadlines.</p>
+<p>Schedulers therefore support different policy classes and priorities.</p>
+<p>"Fair" background throughput and "respond within this deadline" are different goals.</p>
+<p>Operating systems expose mechanisms so applications with legitimate timing requirements can request different treatment.</p>
+<p>Those mechanisms must be used carefully because high-priority work can starve lower-priority work.</p>
+<h2>Context switches have cost</h2>
+<p>Switching threads may require:</p>
+<ul>
+<li>saving and restoring register state;</li>
+<li>changing memory context;</li>
+<li>updating scheduler bookkeeping;</li>
+<li>disturbing caches and translation state.</li>
+</ul>
+<p>The cost is not only the switch instruction itself.</p>
+<p>A workload with excessive runnable threads can spend time scheduling and contending instead of doing useful work.</p>
+<p>More threads are not automatically more throughput.</p>
+<h2>I/O-bound and CPU-bound tasks behave differently</h2>
+<p>CPU-bound task:</p>
+<pre><code>compute
+compute
+compute
+</code></pre>pre
+<p>I/O-bound task:</p>
+<pre><code>compute briefly
+wait for network
+wake
+compute briefly
+wait again
+</code></pre>pre
+<p>Interactive and I/O-heavy work often needs fast wake-up response despite using little total CPU.</p>
+<p>Schedulers need to account for behaviour across time.</p>
+<p>That is why one snapshot of CPU percentage does not explain latency.</p>
+<h2>Priority creates policy, not capacity</h2>
+<p>Give a task higher priority.</p>
+<p>It may run sooner.</p>
+<p>You did not create extra CPU cycles.</p>
+<p>Something else may receive less.</p>
+<p>Priority is useful when the system knows which work matters more.</p>
+<p>It is dangerous when every service declares itself critical.</p>
+<p>Priority inversion can also occur when a high-priority task waits on a resource held by lower-priority work.</p>
+<p>Synchronization and scheduling interact.</p>
+<h2>Real-time means bounded timing requirements</h2>
+<p>Real-time computing is not simply "very fast."</p>
+<p>A real-time requirement concerns completing work within timing constraints.</p>
+<p>A 1 ms response that occasionally becomes 500 ms may be unacceptable for a hard deadline even if average latency is excellent.</p>
+<p>Operating systems provide real-time scheduling classes for specialized workloads.</p>
+<p>Using them requires understanding resource and starvation consequences.</p>
+<h2>Exercise: schedule five tasks</h2>
+<p>One CPU.</p>
+<p>Five jobs:</p>
+<ul>
+<li>UI input: 1 ms every 20 ms;</li>
+<li>audio processing: 2 ms every 10 ms;</li>
+<li>backup compression: unlimited background work;</li>
+<li>database flush: 4 ms every 100 ms;</li>
+<li>log rotation: 50 ms once.</li>
+</ul>
+<p>Design a policy.</p>
+<p>Which work gets latency priority?</p>
+<p>Which can wait?</p>
+<p>What happens if total required CPU exceeds 100%?</p>
+<p>The last question is unavoidable.</p>
+<p>No scheduler can schedule more CPU time than exists.</p>
+<h2>The lesson to carry forward</h2>
+<p>Scheduling decides who gets a finite execution resource and when.</p>
+<p>It cannot create capacity.</p>
+<p>It can distribute delay.</p>
+<p>Good scheduling policy matches workload requirements:</p>
+<ul>
+<li>fairness;</li>
+<li>responsiveness;</li>
+<li>deadlines;</li>
+<li>throughput;</li>
+<li>energy.</li>
+</ul>
+<p>When a process is slow, do not ask only whether it is running.</p>
+<p>Ask whether it is runnable, waiting, preempted, or blocked.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

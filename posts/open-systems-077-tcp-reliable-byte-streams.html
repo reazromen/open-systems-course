@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="TCP turns an unreliable packet network into an ordered reliable byte-stream abstraction using sequence numbers, acknowledgments, retransmission, flow control, and congestion control." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>TCP: Reliable Byte Streams — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-077-tcp-reliable-byte-streams.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="TCP: Reliable Byte Streams" property="og:title"/><meta content="TCP turns an unreliable packet network into an ordered reliable byte-stream abstraction using sequence numbers, acknowledgments, retransmission, flow control, and congestion control." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-077-tcp-reliable-byte-streams.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>TCP: Reliable Byte Streams</h1><p class="lede">TCP turns an unreliable packet network into an ordered reliable byte-stream abstraction using sequence numbers, acknowledgments, retransmission, flow control, and congestion control.</p><div class="article-meta"><span>Published 2026-10-06</span><span>14 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>An application writes:</p>
+<pre><code>hello world
+</code></pre>pre
+<p>across a TCP socket.</p>
+<p>The network underneath can:</p>
+<ul>
+<li>drop packets;</li>
+<li>duplicate packets;</li>
+<li>reorder packets;</li>
+<li>delay packets.</li>
+</ul>
+<p>Yet the receiving application normally reads an ordered byte stream.</p>
+<p>TCP is the machinery creating that abstraction.</p>
+<p>RFC 9293 is the current consolidated TCP specification.</p>
+<h2>TCP is a byte stream</h2>
+<p>This is the first rule to internalize.</p>
+<p>Application writes:</p>
+<pre><code>write 5 bytes
+write 5 bytes
+</code></pre>pre
+<p>Receiver is not guaranteed to read:</p>
+<pre><code>5 bytes
+5 bytes
+</code></pre>pre
+<p>It may read:</p>
+<pre><code>10 bytes
+</code></pre>pre
+<p>or:</p>
+<pre><code>3 + 7
+</code></pre>pre
+<p>or other segmentations.</p>
+<p>TCP preserves byte order.</p>
+<p>It does not preserve application message boundaries.</p>
+<p>Your protocol must define framing.</p>
+<h2>Sequence numbers order bytes</h2>
+<p>TCP numbers positions in the byte stream.</p>
+<p>The receiver can determine:</p>
+<ul>
+<li>which data arrived;</li>
+<li>what is missing;</li>
+<li>what is duplicate;</li>
+<li>how data should be ordered.</li>
+</ul>
+<p>Acknowledgments tell the sender which stream progress has been received according to TCP semantics.</p>
+<p>When data appears lost, retransmission can occur.</p>
+<p>Reliability is a state machine over sequence space and timers.</p>
+<h2>Connection setup synchronizes state</h2>
+<p>TCP begins with a handshake.</p>
+<p>The familiar simplified form:</p>
+<pre><code>SYN
+SYN-ACK
+ACK
+</code></pre>pre
+<p>establishes connection state and synchronizes initial sequence information.</p>
+<p>The handshake proves transport setup between endpoints.</p>
+<p>It does not prove the application above TCP is healthy.</p>
+<p>A port can accept TCP while the application later returns an error.</p>
+<p>Layer contracts remain separate.</p>
+<h2>Flow control protects the receiver</h2>
+<p>The receiving application may consume data slowly.</p>
+<p>TCP advertises receive-window information so the sender knows how much data the receiver can currently accept.</p>
+<p>This is flow control.</p>
+<p>It protects the receiver.</p>
+<p>Congestion control is different.</p>
+<p>That protects the network path from excessive sending.</p>
+<p>Two different limits.</p>
+<h2>Congestion control adapts to the network</h2>
+<p>Packets are lost or delayed because paths have finite capacity.</p>
+<p>TCP implementations use congestion-control algorithms to adjust sending rate.</p>
+<p>The specific algorithms evolve and vary.</p>
+<p>The architectural principle is stable:</p>
+<p>A sender cannot assume the network can absorb unlimited data.</p>
+<p>Transport must react to congestion evidence.</p>
+<h2>Head-of-line blocking follows ordering</h2>
+<p>Suppose later TCP bytes arrive while one earlier segment is missing.</p>
+<p>The receiver cannot deliver the later bytes as an ordered stream beyond the missing gap.</p>
+<p>It waits for recovery.</p>
+<p>This is head-of-line blocking.</p>
+<p>For many applications, ordered reliability is exactly what they want.</p>
+<p>For multiplexed independent streams, this can become undesirable.</p>
+<p>QUIC addresses some of these constraints differently.</p>
+<h2>A TCP connection is state</h2>
+<p>Each endpoint tracks:</p>
+<ul>
+<li>sequence numbers;</li>
+<li>acknowledgment state;</li>
+<li>windows;</li>
+<li>timers;</li>
+<li>connection state;</li>
+<li>retransmission information.</li>
+</ul>
+<p>A firewall or NAT can also track flow state.</p>
+<p>Restart one endpoint.</p>
+<p>The peer may temporarily believe an old connection still exists.</p>
+<p>TCP is not just packet format.</p>
+<p>It is distributed state between endpoints.</p>
+<h2>Close is a protocol too</h2>
+<p>One side can finish sending while still receiving.</p>
+<p>TCP supports half-close semantics.</p>
+<p>FIN participates in orderly shutdown.</p>
+<p>RST represents abrupt reset conditions.</p>
+<p>Application developers who treat socket close as "connection vanished instantly everywhere" can misread traces.</p>
+<p>Shutdown is another state transition.</p>
+<h2>Exercise: prove TCP has no messages</h2>
+<p>Write a TCP sender that writes:</p>
+<pre><code>ABC
+DEF
+</code></pre>pre
+<p>in separate calls.</p>
+<p>Write a receiver that calls read with different buffer sizes.</p>
+<p>Observe that application write boundaries do not necessarily match receive boundaries.</p>
+<p>Then add explicit framing:</p>
+<pre><code>length + payload
+</code></pre>pre
+<p>Now the application protocol can reconstruct messages.</p>
+<h2>The lesson to carry forward</h2>
+<p>TCP creates a reliable ordered byte-stream abstraction over IP.</p>
+<p>It uses:</p>
+<ul>
+<li>sequence numbers;</li>
+<li>acknowledgments;</li>
+<li>retransmission;</li>
+<li>flow control;</li>
+<li>congestion control;</li>
+<li>connection state.</li>
+</ul>
+<p>That is a lot of machinery so applications can pretend they have one continuous stream.</p>
+<p>Respect the abstraction, but remember what it does not provide: message framing, application success, security, or user-level meaning.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="One browser action can cross URL parsing, DNS, TLS, HTTP, cookies, CORS policy, reverse proxies, application code, caches, databases, and rendering. Following one request end to end connects the entire Web Systems module." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Follow One Web Request End to End — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-100-follow-one-web-request-end-to-end.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Follow One Web Request End to End" property="og:title"/><meta content="One browser action can cross URL parsing, DNS, TLS, HTTP, cookies, CORS policy, reverse proxies, application code, caches, databases, and rendering. Following one request end to end connects the entire Web Systems module." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-100-follow-one-web-request-end-to-end.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Follow One Web Request End to End</h1><p class="lede">One browser action can cross URL parsing, DNS, TLS, HTTP, cookies, CORS policy, reverse proxies, application code, caches, databases, and rendering. Following one request end to end connects the entire Web Systems module.</p><div class="article-meta"><span>Published 2026-10-07</span><span>15 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>We have spent nine lessons separating web-system boundaries.</p>
+<p>Now connect them.</p>
+<p>Consider a constructed example:</p>
+<p>A signed-in user opens:</p>
+<pre><code class="language-text">https://app.example/account
+</code></pre>pre
+<p>The application is fronted by an edge proxy. The user's browser already has a session cookie. The account page needs one database query and one internal API call.</p>
+<p>No real company or provider is being described.</p>
+<p>The goal is to follow one request across the entire stack and ask what each observation proves.</p>
+<h2>0. The browser already has state</h2>
+<p>Before the user clicks anything, the browser may already contain:</p>
+<ul>
+<li>DNS cache;</li>
+<li>HTTP cache;</li>
+<li>TLS session state;</li>
+<li>open or reusable connections;</li>
+<li>cookies;</li>
+<li>local storage;</li>
+<li>service-worker state;</li>
+<li>JavaScript application state.</li>
+</ul>
+<p>The operating system also has:</p>
+<ul>
+<li>interface addresses;</li>
+<li>routes;</li>
+<li>ARP or neighbor-cache entries;</li>
+<li>socket state.</li>
+</ul>
+<p>The server side has:</p>
+<ul>
+<li>proxy configuration;</li>
+<li>connection pools;</li>
+<li>application workers;</li>
+<li>session records;</li>
+<li>database caches;</li>
+<li>deployment state.</li>
+</ul>
+<p>A web request never starts from an abstract empty machine.</p>
+<h2>1. The browser parses the URL</h2>
+<p>The URL gives the browser structured information:</p>
+<pre><code class="language-text">scheme: https
+host:   app.example
+path:   /account
+</code></pre>pre
+<p>The scheme implies HTTPS semantics.</p>
+<p>The host becomes part of DNS resolution, TLS service identity, HTTP authority, and browser-origin calculations.</p>
+<p>The path identifies the target resource within the web application.</p>
+<p>The same string participates in several protocols, but each protocol uses a different part.</p>
+<h2>2. Name resolution finds an address</h2>
+<p>The browser or operating system resolver obtains address data for:</p>
+<pre><code class="language-text">app.example
+</code></pre>pre
+<p>The answer can come from cache.</p>
+<p>If not, the configured recursive resolver may perform DNS resolution.</p>
+<p>Suppose it returns a public edge address.</p>
+<p>That proves only that DNS produced address data.</p>
+<p>It does not prove the edge is reachable or the application is healthy.</p>
+<h2>3. The host selects a route</h2>
+<p>The operating system chooses:</p>
+<ul>
+<li>source address;</li>
+<li>network interface;</li>
+<li>next hop;</li>
+<li>forwarding route.</li>
+</ul>
+<p>The local link then delivers toward the first router.</p>
+<p>Internet routers forward toward the public destination based on installed routing state.</p>
+<p>If IPv4 NAT exists on the user's network, the source address and port can be translated on the way out.</p>
+<p>All of that occurs before the application sees an HTTP request.</p>
+<h2>4. Transport state is established</h2>
+<p>Depending on negotiated protocol behavior, the browser can establish:</p>
+<ul>
+<li>TCP for HTTP/1.1 or HTTP/2;</li>
+<li>QUIC for HTTP/3.</li>
+</ul>
+<p>Assume this example uses TCP.</p>
+<p>The three-way handshake establishes transport state.</p>
+<p>That proves the client can establish TCP with the public edge endpoint.</p>
+<p>It does not prove the requested hostname has been authenticated yet.</p>
+<h2>5. TLS authenticates the public endpoint</h2>
+<p>The browser begins TLS.</p>
+<p>The server presents certificate-based identity information.</p>
+<p>The browser validates:</p>
+<ul>
+<li>an acceptable certificate path;</li>
+<li>trust-anchor policy;</li>
+<li>certificate validity;</li>
+<li>service identity for <code>app.example</code>code.</li>
+</ul>
+<p>If TLS succeeds, protected application traffic can begin.</p>
+<p>This authenticates the TLS endpoint reached by the browser.</p>
+<p>If the edge terminates TLS, the browser is authenticating the edge-facing service identity, not a private origin server hidden behind it.</p>
+<h2>6. HTTP carries the navigation request</h2>
+<p>The browser sends an HTTP request with semantics resembling:</p>
+<pre><code class="language-text">method: GET
+target: /account
+authority: app.example
+</code></pre>pre
+<p>Additional request fields can describe accepted representations, browser context, caching state, and other metadata.</p>
+<p>The browser can also attach matching cookies.</p>
+<p>A simplified conceptual request is:</p>
+<pre><code class="language-http">GET /account
+Host: app.example
+Cookie: session_id=...
+</code></pre>pre
+<p>The exact wire format depends on the negotiated HTTP version.</p>
+<p>Do not copy HTTP/1.1 text formatting onto HTTP/2 or HTTP/3 framing.</p>
+<h2>7. The session cookie carries continuity</h2>
+<p>The cookie value is not automatically the user.</p>
+<p>At the application boundary, the session mechanism might perform:</p>
+<pre><code class="language-text">session_id
+   ↓ lookup
+session record
+   ↓
+authenticated user identity
+</code></pre>pre
+<p>The server then checks whether the session is:</p>
+<ul>
+<li>present;</li>
+<li>valid;</li>
+<li>unexpired;</li>
+<li>not revoked.</li>
+</ul>
+<p>Only after that can application authorization decide what the user is allowed to access.</p>
+<p>A valid session does not mean every operation is permitted.</p>
+<p>Authentication and authorization remain separate.</p>
+<h2>8. The edge or reverse proxy selects an upstream</h2>
+<p>The public edge receives the request and chooses where to send it.</p>
+<p>That decision can depend on:</p>
+<ul>
+<li>hostname;</li>
+<li>path;</li>
+<li>deployment;</li>
+<li>service discovery;</li>
+<li>health state;</li>
+<li>load balancing.</li>
+</ul>
+<p>The proxy creates or reuses a separate upstream connection.</p>
+<p>Now there are two connection contexts:</p>
+<pre><code class="language-text">browser → edge
+edge → application
+</code></pre>pre
+<p>They can have different addresses, timeouts, TLS policies, and connection reuse behavior.</p>
+<p>The user still experiences one page load.</p>
+<h2>9. The application processes the request</h2>
+<p>The application receives the upstream request.</p>
+<p>It may perform:</p>
+<pre><code class="language-text">parse request
+   ↓
+load session
+   ↓
+authorize account access
+   ↓
+validate parameters
+   ↓
+query account data
+   ↓
+call billing/profile service
+   ↓
+render response
+</code></pre>pre
+<p>Each step can fail independently.</p>
+<p>An HTTP 500 from the application can occur after DNS, routing, TCP, TLS, proxying, session lookup, and authorization all succeeded.</p>
+<p>That is why lower-layer success does not prove application correctness.</p>
+<h2>10. The application uses a database connection pool</h2>
+<p>Assume account data is stored in a relational database.</p>
+<p>The application does not necessarily create a new database connection.</p>
+<p>It can borrow one from a pool.</p>
+<p>The request now depends on:</p>
+<pre><code class="language-text">pool has capacity
+        ↓
+database connection is usable
+        ↓
+query executes
+        ↓
+result is returned
+</code></pre>pre
+<p>If the pool is exhausted, the database itself can still be healthy.</p>
+<p>If the query times out, the network to the browser can still be healthy.</p>
+<p>The public request is a graph of dependencies.</p>
+<h2>11. The application calls an internal service</h2>
+<p>Suppose the page also needs billing status.</p>
+<p>The application sends another request:</p>
+<pre><code class="language-text">application
+   ↓
+internal DNS/service discovery
+   ↓
+internal transport/TLS
+   ↓
+billing API
+</code></pre>pre
+<p>That is a new network transaction nested inside the original user request.</p>
+<p>The browser never sees the internal address.</p>
+<p>If the billing call fails, the application must decide whether to:</p>
+<ul>
+<li>fail the whole page;</li>
+<li>show partial data;</li>
+<li>use cached data;</li>
+<li>retry;</li>
+<li>degrade gracefully.</li>
+</ul>
+<p>Those are product and architecture decisions.</p>
+<h2>12. The application creates the response</h2>
+<p>After obtaining its dependencies, the application constructs an HTTP response.</p>
+<p>It might be HTML:</p>
+<pre><code class="language-text">200 OK
+Content-Type: text/html
+</code></pre>pre
+<p>or JSON for a browser application.</p>
+<p>The response can include:</p>
+<ul>
+<li>cache directives;</li>
+<li>ETag;</li>
+<li>updated cookies;</li>
+<li>security fields;</li>
+<li>tracing metadata.</li>
+</ul>
+<p>The proxy receives that response.</p>
+<p>It can forward it, transform permitted metadata, compress it, cache it, or generate another response if upstream handling fails.</p>
+<p>Again, which component produced the final status matters.</p>
+<h2>13. The browser receives a representation, not a finished experience</h2>
+<p>If the response is HTML, the browser parses it.</p>
+<p>It can then discover:</p>
+<ul>
+<li>CSS;</li>
+<li>JavaScript;</li>
+<li>images;</li>
+<li>fonts;</li>
+<li>API calls.</li>
+</ul>
+<p>Each can trigger more fetches.</p>
+<p>The browser applies same-origin policy, CORS rules, cookie rules, and other web-platform security policy.</p>
+<p>Then it executes scripts, computes style, performs layout, and paints.</p>
+<p>The original navigation response can be completely successful while the visible page remains broken because:</p>
+<ul>
+<li>script throws an exception;</li>
+<li>a stylesheet fails;</li>
+<li>a cross-origin API is blocked;</li>
+<li>a later API request returns 401;</li>
+<li>rendering logic is wrong.</li>
+</ul>
+<p>"HTTP 200" is not a user-experience guarantee.</p>
+<h2>14. CORS may appear on later API calls</h2>
+<p>Suppose the rendered page calls:</p>
+<pre><code class="language-text">https://api.example/account/preferences
+</code></pre>pre
+<p>If that is another origin, browser CORS policy applies.</p>
+<p>The API may receive an Origin field.</p>
+<p>A preflight can occur depending on the request.</p>
+<p>The API can respond successfully but fail to grant browser access under CORS policy.</p>
+<p>That failure occurs after the network path works.</p>
+<p>It is a browser security decision.</p>
+<h2>15. Caches can remove parts of the path</h2>
+<p>Suppose the page references:</p>
+<pre><code class="language-text">/app.css
+</code></pre>pre
+<p>A fresh browser cache can reuse the representation without another full transfer.</p>
+<p>A CDN can also serve a cached object without reaching the origin.</p>
+<p>Therefore two resources on the same page can have different effective paths:</p>
+<pre><code class="language-text">HTML:
+browser → edge → application → database
+
+CSS:
+browser → local cache
+</code></pre>pre
+<p>or:</p>
+<pre><code class="language-text">image:
+browser → CDN cache
+</code></pre>pre
+<p>A page load is not one topology.</p>
+<p>It is a set of resource-specific paths.</p>
+<h2>16. Observability should follow the request across boundaries</h2>
+<p>A useful trace can connect:</p>
+<pre><code class="language-text">browser/request timing
+        ↓
+edge request id
+        ↓
+proxy log
+        ↓
+application trace
+        ↓
+database span
+        ↓
+internal API span
+</code></pre>pre
+<p>The goal is to answer:</p>
+<p><strong>Where did time go, and where did the first failure occur?</strong></p>
+<p>Logs answer discrete events.</p>
+<p>Metrics show aggregate behavior.</p>
+<p>Traces connect causally related operations.</p>
+<p>Packet capture reveals network behavior when needed.</p>
+<p>Browser developer tools show the client boundary.</p>
+<p>No single tool is the whole truth.</p>
+<h2>A compact end-to-end evidence table</h2>
+<p>For one request, collect:</p>
+<pre><code class="language-text">Layer                Evidence
+
+URL/browser          requested URL, navigation context
+DNS                  resolved addresses, TTL
+routing              source, interface, next hop
+transport            connection state
+TLS                  version, certificate identity
+HTTP                  method, target, status
+session               session lookup result
+authorization         allow/deny decision
+proxy                 selected upstream
+application           handler/result
+database              pool wait + query result
+internal service      downstream status/latency
+response              content type/cache fields
+browser               subresource/CORS/script/render state
+</code></pre>pre
+<p>The table is not a checklist to run for every normal request.</p>
+<p>It is a map for when something goes wrong.</p>
+<h2>Break one boundary at a time</h2>
+<p>In a local environment you control:</p>
+<ol>
+<li>break DNS;</li>
+<li>restore DNS and stop the public listener;</li>
+<li>restore transport and use an invalid test certificate;</li>
+<li>restore TLS and remove the session;</li>
+<li>restore session state and deny authorization;</li>
+<li>restore authorization and stop the database;</li>
+<li>restore the database and stop an internal API;</li>
+<li>restore the backend and introduce a browser-side script error.</li>
+</ol>
+<p>At every stage, record:</p>
+<ul>
+<li>what the user sees;</li>
+<li>HTTP status if any;</li>
+<li>browser console/network evidence;</li>
+<li>proxy evidence;</li>
+<li>application evidence.</li>
+</ul>
+<p>The visible symptom can remain "page does not work."</p>
+<p>The failure boundary moves completely.</p>
+<h2>What the entire Web Systems module added</h2>
+<p>The previous networking module got bytes to an endpoint.</p>
+<p>This module added:</p>
+<pre><code class="language-text">HTTP semantics
+request/response structure
+methods and status codes
+representations and negotiation
+browser loading and rendering
+cookies and sessions
+same-origin policy and CORS
+API contracts
+reverse proxies and backends
+end-to-end request tracing
+</code></pre>pre
+<p>The web is not one protocol.</p>
+<p>It is a stack of protocols, browser rules, application state, deployment architecture, and data dependencies.</p>
+<h2>The module to carry forward</h2>
+<p>A systems engineer should be able to look at a web failure and ask:</p>
+<pre><code class="language-text">Did the browser construct the request?
+Did browser policy allow it?
+Did DNS resolve?
+Did transport/TLS succeed?
+Which HTTP endpoint answered?
+Which proxy handled it?
+Which application instance ran?
+Was the session valid?
+Was the operation authorized?
+Which backend dependency was used?
+What response was produced?
+What did the browser do with it?
+</code></pre>pre
+<p>That turns "the website is broken" into a sequence of testable contracts.</p>
+<p>Module 11 moves below the application into <strong>Data Systems</strong>: filesystems, relational databases, indexes, transactions, caches, queues, durability, and one complete write path from application state to persistent storage.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Before going deeper, build one map that connects hardware, operating systems, processes, storage, networks, applications, and users without pretending those layers are independent." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>The Map of a Modern Computer System — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-010-map-of-a-modern-computer-system.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="The Map of a Modern Computer System" property="og:title"/><meta content="Before going deeper, build one map that connects hardware, operating systems, processes, storage, networks, applications, and users without pretending those layers are independent." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-010-map-of-a-modern-computer-system.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>The Map of a Modern Computer System</h1><p class="lede">Before going deeper, build one map that connects hardware, operating systems, processes, storage, networks, applications, and users without pretending those layers are independent.</p><div class="article-meta"><span>Published 2026-10-06</span><span>15 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>We have spent nine lessons opening small doors.</p>
+<p>Information. State. Input and output. Abstraction. Digital logic. Binary. Keyboard events. Program launch.</p>
+<p>Now we need a map.</p>
+<p>Not a diagram that claims every computer is identical. Not a certification-style stack to memorize. A map you can use when a real system fails and you need to decide where to look next.</p>
+<p>MIT's Computation Structures course moves from transistors through logic, state machines, processor architecture, memory, operating-system mechanisms, communication, and complete systems. OSTEP approaches operating systems through CPU virtualization, memory virtualization, concurrency, and persistence.</p>
+<p>Those are different teaching structures, but both reveal the same fact:</p>
+<p>A modern computer system is layered, stateful, concurrent, and connected.</p>
+<h2>Start with the physical machine</h2>
+<p>At the bottom of our practical map is hardware.</p>
+<p>A general-purpose computer may contain:</p>
+<ul>
+<li>CPU cores;</li>
+<li>caches;</li>
+<li>RAM;</li>
+<li>storage;</li>
+<li>buses and interconnects;</li>
+<li>network interfaces;</li>
+<li>graphics hardware;</li>
+<li>input controllers;</li>
+<li>timers;</li>
+<li>power-management hardware;</li>
+<li>many specialized controllers.</li>
+</ul>
+<p>An embedded device may have a microcontroller with processor, memory, timers, radio, GPIO, and peripherals integrated into one package.</p>
+<p>The labels differ. The basic systems questions remain familiar:</p>
+<p>What can compute? What can store state? What can communicate? What can observe or affect the outside world?</p>
+<h2>Firmware lives between power-on and higher software</h2>
+<p>When power arrives, application software is not automatically running.</p>
+<p>Machines need a startup path.</p>
+<p>On a PC that may involve platform firmware and a bootloader before the operating-system kernel begins execution.</p>
+<p>On a microcontroller it may involve ROM code, bootloader logic, flash selection, verification, and then application firmware.</p>
+<p>Firmware is software, but its position in the boot and hardware-control chain gives it unusual responsibilities.</p>
+<p>This is why a machine can fail before the operating system even exists as a running system.</p>
+<p>If a device never reaches the kernel, debugging the web application is irrelevant.</p>
+<h2>The operating system creates useful abstractions</h2>
+<p>Once running, an operating system mediates access to hardware and exposes abstractions to software.</p>
+<p>Important abstractions include:</p>
+<ul>
+<li>processes and threads;</li>
+<li>virtual memory;</li>
+<li>files and directories;</li>
+<li>sockets;</li>
+<li>device interfaces;</li>
+<li>permissions and identities;</li>
+<li>timers;</li>
+<li>inter-process communication.</li>
+</ul>
+<p>OSTEP's framing is useful here: the operating system virtualizes resources, manages concurrency, and provides persistent storage abstractions.</p>
+<p>A process can behave as if it has its own address space.</p>
+<p>A program can open a file without issuing raw flash commands.</p>
+<p>An application can use a socket without directly modulating a radio.</p>
+<p>That is abstraction converting complicated mechanisms into interfaces.</p>
+<h2>Applications run inside process and runtime environments</h2>
+<p>An application is not floating above the operating system.</p>
+<p>It executes as one or more processes or equivalent managed execution units.</p>
+<p>Depending on the software, another layer may exist:</p>
+<pre><code>application
+   -&gt; runtime or virtual machine
+   -&gt; operating system
+   -&gt; hardware
+</code></pre>pre
+<p>Examples include Python runtimes, Java virtual machines, JavaScript engines, .NET runtimes, and browser engines.</p>
+<p>These layers can add:</p>
+<ul>
+<li>memory management;</li>
+<li>type systems;</li>
+<li>scheduling;</li>
+<li>just-in-time compilation;</li>
+<li>garbage collection;</li>
+<li>package loading;</li>
+<li>security boundaries.</li>
+</ul>
+<p>When performance or failure crosses these boundaries, understanding the runtime matters.</p>
+<h2>Storage is not just "the disk"</h2>
+<p>Applications persist state through several layers.</p>
+<p>A conceptual path might be:</p>
+<pre><code>application object
+   -&gt; serialization
+   -&gt; database or file interface
+   -&gt; filesystem
+   -&gt; block I/O
+   -&gt; storage driver
+   -&gt; controller
+   -&gt; physical medium
+</code></pre>pre
+<p>A database may add its own cache, transaction log, indexes, locking, and recovery mechanisms.</p>
+<p>A filesystem may buffer writes.</p>
+<p>The operating system may cache pages.</p>
+<p>The storage device may have its own internal cache.</p>
+<p>So when an application reports "saved," the exact durability claim needs definition.</p>
+<p>Did data enter application memory?</p>
+<p>Database memory?</p>
+<p>Kernel page cache?</p>
+<p>A transaction log?</p>
+<p>Stable storage?</p>
+<p>Replicated storage?</p>
+<p>The word saved is an abstraction. Production systems need the semantics behind it.</p>
+<h2>Networking extends the machine beyond itself</h2>
+<p>A modern computer rarely operates alone.</p>
+<p>The network stack creates another layered path.</p>
+<p>At a simplified level:</p>
+<pre><code>application protocol
+   -&gt; transport
+   -&gt; network layer
+   -&gt; link layer
+   -&gt; physical medium
+</code></pre>pre
+<p>For a web request, higher-level layers may include DNS, TCP or QUIC, TLS, HTTP, proxies, load balancers, application servers, and databases.</p>
+<p>For telephony, signaling and media may take different paths.</p>
+<p>For IoT, a device may use Wi-Fi, IP, MQTT, a broker, a processing service, storage, and a dashboard.</p>
+<p>The computer boundary is no longer the box on your desk.</p>
+<p>The system may span countries.</p>
+<h2>The user sees an even higher abstraction</h2>
+<p>A user sees:</p>
+<pre><code>"send message"
+"save photo"
+"call Thomas"
+"open website"
+"turn light on"
+</code></pre>pre
+<p>Each phrase compresses many technical states.</p>
+<p>Consider "call connected."</p>
+<p>A real-time communication system may have separate states for:</p>
+<ul>
+<li>signaling session;</li>
+<li>media negotiation;</li>
+<li>network reachability;</li>
+<li>RTP flow;</li>
+<li>decoder activity;</li>
+<li>audio device state.</li>
+</ul>
+<p>A user hears one thing: silence or speech.</p>
+<p>Architecture exists partly to manage the distance between user-level intention and machine-level mechanisms.</p>
+<h2>A useful seven-layer mental map</h2>
+<p>For this course, use this as a first working map:</p>
+<pre><code>1. Human / physical world
+          |
+          v
+2. Application behaviour
+          |
+          v
+3. Runtime / libraries
+          |
+          v
+4. Operating-system abstractions
+          |
+          v
+5. Drivers / firmware
+          |
+          v
+6. Hardware / physical signals
+          |
+          v
+7. Other systems through I/O and networks
+</code></pre>pre
+<p>This is not an OSI model.</p>
+<p>It is not a formal standard.</p>
+<p>It is a debugging and learning map.</p>
+<p>Real systems cross the layers in complicated ways. Hardware can perform networking work. User-space drivers exist. Applications may access hardware through specialized frameworks. Hypervisors add layers. Containers add isolation without being virtual machines. Cloud platforms add control planes.</p>
+<p>The map is useful because it gives us a place to begin, not because it is universally complete.</p>
+<h2>Add a second dimension: state</h2>
+<p>Layers alone are not enough.</p>
+<p>Every layer has state.</p>
+<p>Hardware:</p>
+<ul>
+<li>register values;</li>
+<li>queue contents;</li>
+<li>device state.</li>
+</ul>
+<p>Operating system:</p>
+<ul>
+<li>process tables;</li>
+<li>memory mappings;</li>
+<li>file descriptors;</li>
+<li>routing tables;</li>
+<li>socket state.</li>
+</ul>
+<p>Application:</p>
+<ul>
+<li>sessions;</li>
+<li>caches;</li>
+<li>database records;</li>
+<li>queues;</li>
+<li>configuration.</li>
+</ul>
+<p>Distributed system:</p>
+<ul>
+<li>replicas;</li>
+<li>leases;</li>
+<li>offsets;</li>
+<li>acknowledgements;</li>
+<li>membership.</li>
+</ul>
+<p>A failure can therefore move vertically across layers or horizontally across stateful components.</p>
+<p>This is why real incidents rarely fit one tidy box.</p>
+<h2>Add a third dimension: time</h2>
+<p>Systems change over time.</p>
+<p>Packets arrive.</p>
+<p>Processes start and stop.</p>
+<p>Caches expire.</p>
+<p>Certificates expire.</p>
+<p>Queues grow.</p>
+<p>Memory pressure changes.</p>
+<p>Devices reconnect.</p>
+<p>Leadership changes.</p>
+<p>Humans click twice.</p>
+<p>A snapshot tells you what the system looks like now.</p>
+<p>A trace or log can tell you how it got there.</p>
+<p>Both matter.</p>
+<p>When a problem is intermittent, time often becomes the missing dimension.</p>
+<h2>Add a fourth dimension: ownership</h2>
+<p>Who owns each part?</p>
+<p>Which team?</p>
+<p>Which process?</p>
+<p>Which service?</p>
+<p>Which device?</p>
+<p>Which data source?</p>
+<p>Which authority is canonical?</p>
+<p>Technical architecture and operational ownership interact.</p>
+<p>If three services can write the same state and no one knows which source is authoritative, that is not merely an organizational problem. It is a consistency problem waiting to happen.</p>
+<h2>One browser request on the map</h2>
+<p>Suppose you type a URL and press Enter.</p>
+<p>A simplified end-to-end path could include:</p>
+<pre><code>keyboard
+  -&gt; OS input
+  -&gt; browser
+  -&gt; DNS
+  -&gt; network stack
+  -&gt; router
+  -&gt; ISP
+  -&gt; remote network
+  -&gt; TLS endpoint
+  -&gt; web server
+  -&gt; application
+  -&gt; database
+  -&gt; response
+  -&gt; browser parser
+  -&gt; layout and rendering
+  -&gt; graphics stack
+  -&gt; display
+</code></pre>pre
+<p>Every arrow is a potential observation point.</p>
+<p>That does not mean you inspect all of them every time.</p>
+<p>You choose based on evidence.</p>
+<p>DNS failure? Start around name resolution.</p>
+<p>HTTP 500? Move higher toward application processing.</p>
+<p>Connection timeout? Inspect reachability and transport.</p>
+<p>Page loads but button does nothing? Stay near browser/application state first.</p>
+<p>Architecture narrows investigation.</p>
+<h2>One ESP32 sensor on the same map</h2>
+<p>Now a device:</p>
+<pre><code>physical temperature
+  -&gt; sensor
+  -&gt; electrical signal
+  -&gt; ADC or digital peripheral
+  -&gt; firmware
+  -&gt; local state
+  -&gt; Wi-Fi
+  -&gt; IP
+  -&gt; MQTT
+  -&gt; broker
+  -&gt; consumer
+  -&gt; database
+  -&gt; API
+  -&gt; dashboard
+</code></pre>pre
+<p>The technology is different.</p>
+<p>The method is the same.</p>
+<p>Follow information across boundaries.</p>
+<p>Ask what state exists at each boundary.</p>
+<p>Ask what evidence proves each transition.</p>
+<h2>One phone call on the same map</h2>
+<p>Now telephony:</p>
+<pre><code>button press
+  -&gt; device UI state
+  -&gt; SIP request
+  -&gt; proxy or PBX
+  -&gt; routing
+  -&gt; remote endpoint
+  -&gt; session negotiation
+  -&gt; media addresses
+  -&gt; RTP
+  -&gt; jitter buffer
+  -&gt; decoder
+  -&gt; audio output
+</code></pre>pre
+<p>Again, the same systems method applies.</p>
+<p>That is why networking, embedded devices, web applications, and telephony belong in the same course.</p>
+<p>They are different technologies built from recurring engineering ideas: state, representation, interfaces, timing, failure, and evidence.</p>
+<h2>The map should change as you learn</h2>
+<p>At the beginning of the course, draw a box called CPU.</p>
+<p>Later we will open it into:</p>
+<pre><code>instruction fetch
+decode
+registers
+ALU
+control
+caches
+memory interface
+</code></pre>pre
+<p>Draw a box called network.</p>
+<p>Later we will open it into:</p>
+<pre><code>link
+IP
+routing
+transport
+DNS
+TLS
+application protocol
+</code></pre>pre
+<p>Draw a box called database.</p>
+<p>Later:</p>
+<pre><code>query
+parser
+planner
+indexes
+pages
+transactions
+log
+storage
+replication
+</code></pre>pre
+<p>Learning is partly the process of deciding which boxes deserve to be opened.</p>
+<h2>Exercise: make your own map</h2>
+<p>Choose one system you use every day.</p>
+<p>Examples:</p>
+<ul>
+<li>WhatsApp message;</li>
+<li>YouTube video;</li>
+<li>mobile payment;</li>
+<li>Linux terminal command;</li>
+<li>smart bulb;</li>
+<li>SIP call.</li>
+</ul>
+<p>Draw at least ten boxes from human action to final result.</p>
+<p>Then mark:</p>
+<ul>
+<li>state;</li>
+<li>network boundary;</li>
+<li>persistent storage;</li>
+<li>physical input or output;</li>
+<li>one place where latency can appear;</li>
+<li>one place where data can be lost;</li>
+<li>one place where security matters.</li>
+</ul>
+<p>You will almost certainly miss something.</p>
+<p>Good.</p>
+<p>The missing pieces become research questions.</p>
+<h2>The lesson to carry forward</h2>
+<p>A modern computer system is not one thing.</p>
+<p>It is a collection of abstractions implemented by lower layers and connected through interfaces.</p>
+<p>The central map is:</p>
+<pre><code>physical mechanisms
+-&gt; digital logic
+-&gt; processor and memory
+-&gt; operating system
+-&gt; runtime and libraries
+-&gt; application
+-&gt; networked services
+-&gt; human outcome
+</code></pre>pre
+<p>But do not treat that as a rigid stack.</p>
+<p>State crosses it.</p>
+<p>Time changes it.</p>
+<p>Networks extend it.</p>
+<p>Failures reveal hidden dependencies.</p>
+<p>For the next modules, we will begin opening the boxes.</p>
+<p>Module 2 starts inside the machine: CPU, instructions, registers, caches, RAM, storage, and buses.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

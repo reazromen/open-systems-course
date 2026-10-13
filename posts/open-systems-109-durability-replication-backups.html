@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Durability, replication, and backup solve different failure classes. A committed write can survive a process crash yet still be vulnerable to node loss, operator error, corruption, or insufficient historical recovery." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Durability, Replication, and Backups — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-109-durability-replication-backups.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Durability, Replication, and Backups" property="og:title"/><meta content="Durability, replication, and backup solve different failure classes. A committed write can survive a process crash yet still be vulnerable to node loss, operator error, corruption, or insufficient historical recovery." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-109-durability-replication-backups.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Durability, Replication, and Backups</h1><p class="lede">Durability, replication, and backup solve different failure classes. A committed write can survive a process crash yet still be vulnerable to node loss, operator error, corruption, or insufficient historical recovery.</p><div class="article-meta"><span>Published 2026-10-07</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>People often compress several promises into one sentence:</p>
+<p>the database is safe.</p>
+<p>Safe from what?</p>
+<p>A process crash, power loss, disk loss, server loss, region loss, accidental DELETE, corrupted application deployment, ransomware, and silent logical corruption are different failures.</p>
+<p>Durability, replication, and backup address different parts of that space.</p>
+<h2>Local durability protects committed state on one system</h2>
+<p>A database can use write-ahead logging so committed changes can be recovered after a crash even if modified data pages were not yet written to final locations.</p>
+<p>PostgreSQL WAL records changes before the corresponding data pages need to be persisted.</p>
+<p>SQLite uses rollback journals or WAL mode depending on configuration.</p>
+<p>The important property is that recovery metadata exists before the database relies on incomplete page updates.</p>
+<h2>fsync is part of the storage contract</h2>
+<p>Databases eventually rely on operating-system and storage-device synchronization semantics.</p>
+<p>If a database is configured not to wait for required durable writes, it may acknowledge transactions earlier while accepting a larger loss window.</p>
+<p>That can be a valid trade-off for some workloads.</p>
+<p>It must be explicit.</p>
+<p>A performance setting that weakens durability is an application-level risk decision even if it lives in a database configuration file.</p>
+<h2>Replication creates another copy of current state</h2>
+<p>A primary database can stream changes to replicas.</p>
+<p>Replication improves availability and can support read scaling or failover.</p>
+<p>But asynchronous replicas can lag.</p>
+<p>A primary can acknowledge a commit before the replica receives it.</p>
+<p>If the primary disappears immediately, promotion of a lagging replica can lose the acknowledged change.</p>
+<p>Synchronous replication can require one or more replicas to confirm progress before commit acknowledgement, strengthening the contract at the cost of latency and potentially availability.</p>
+<h2>Replication faithfully copies mistakes</h2>
+<p>If an application writes the wrong price to every product row, replication distributes that incorrect state.</p>
+<p>If an administrator drops a table, replicas can reproduce the deletion.</p>
+<p>If ransomware encrypts accessible files, replicas connected to the same control plane may also be affected.</p>
+<p>Replication is not history.</p>
+<p>It is another current copy under a replication protocol.</p>
+<h2>Backup creates a recovery point outside current mutation</h2>
+<p>A backup should let you reconstruct an earlier usable state.</p>
+<p>Questions include:</p>
+<ul>
+<li>how frequently are backups taken;</li>
+<li>how long are they retained;</li>
+<li>are they immutable or isolated;</li>
+<li>is encryption managed safely;</li>
+<li>can one table be restored;</li>
+<li>can the entire system be restored;</li>
+<li>has restoration actually been tested?</li>
+</ul>
+<p>A backup that has never been restored is only a backup hypothesis.</p>
+<h2>Point-in-time recovery combines base state and logs</h2>
+<p>PostgreSQL supports continuous archiving where a base backup plus archived WAL can reconstruct the database to a chosen point in time.</p>
+<p>Conceptually:</p>
+<p>base backup at time T0 + WAL after T0 → replay until target time T1</p>
+<p>This can recover to a moment before an accidental destructive operation.</p>
+<p>The retention and integrity of both base backups and log archive matter.</p>
+<h2>RPO and RTO describe different recovery goals</h2>
+<p>Recovery Point Objective, or RPO, describes how much recent data loss the organization is prepared to tolerate.</p>
+<p>Recovery Time Objective, or RTO, describes how long restoration or failover may take.</p>
+<p>These are business requirements translated into technical architecture.</p>
+<p>A nightly backup can imply an RPO approaching 24 hours under some failure models.</p>
+<p>A perfect backup stored offline can still have a poor RTO if restoration takes two days.</p>
+<h2>Checksums detect some corruption, not all wrong data</h2>
+<p>Storage checksums can detect classes of physical or accidental corruption.</p>
+<p>They cannot tell you that an application legitimately wrote the wrong business value.</p>
+<p>Logical validation requires domain checks, invariants, audits, or comparison against other evidence.</p>
+<p>Integrity has several layers.</p>
+<h2>Backups must include dependencies</h2>
+<p>A database may not be the only authoritative state.</p>
+<p>A complete service can depend on:</p>
+<ul>
+<li>object storage;</li>
+<li>encryption keys;</li>
+<li>configuration;</li>
+<li>schema migrations;</li>
+<li>queue state;</li>
+<li>secrets;</li>
+<li>external provider configuration.</li>
+</ul>
+<p>Restoring the SQL database while losing the encryption key can leave the service unusable.</p>
+<p>Recovery planning must follow the whole dependency graph.</p>
+<h2>Practical recovery drill</h2>
+<p>On a local database, create sample data and take a supported backup.</p>
+<p>Then deliberately delete the database or selected rows.</p>
+<p>Restore into a separate location.</p>
+<p>Verify row counts, constraints, application queries, and any checksums you maintain.</p>
+<p>Record how long restoration takes and exactly which commands or tools were required.</p>
+<p>Never make production recovery procedures depend on commands that have only been imagined.</p>
+<h2>The lesson to carry forward</h2>
+<p>Durability keeps committed state through defined failures.</p>
+<p>Replication creates additional current copies.</p>
+<p>Backups preserve recovery history.</p>
+<p>None replaces the others.</p>
+<p>The final lesson of this module follows one application write from HTTP request through transaction, WAL, indexes, cache invalidation, replication, and backup history.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="An interface is a boundary contract: what operations are available, what inputs and outputs mean, what failures exist, and which implementation details remain hidden." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Interfaces: Separating What from How — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-038-interfaces-separating-what-from-how.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Interfaces: Separating What from How" property="og:title"/><meta content="An interface is a boundary contract: what operations are available, what inputs and outputs mean, what failures exist, and which implementation details remain hidden." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-038-interfaces-separating-what-from-how.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Interfaces: Separating What from How</h1><p class="lede">An interface is a boundary contract: what operations are available, what inputs and outputs mean, what failures exist, and which implementation details remain hidden.</p><div class="article-meta"><span>Published 2026-10-06</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A thermostat needs current temperature.</p>
+<p>It should not care whether the value came from:</p>
+<ul>
+<li>local I2C sensor;</li>
+<li>remote MQTT device;</li>
+<li>test simulator;</li>
+<li>database playback.</li>
+</ul>
+<p>If each source can satisfy the same relevant contract, the control logic can depend on an interface instead of one implementation.</p>
+<p>That is the problem interfaces solve.</p>
+<h2>Interface is more than a function name</h2>
+<p>A useful interface defines:</p>
+<ul>
+<li>available operations;</li>
+<li>input meanings;</li>
+<li>output meanings;</li>
+<li>failure behaviour;</li>
+<li>ordering or timing assumptions;</li>
+<li>ownership of state.</li>
+</ul>
+<p>Suppose:</p>
+<pre><code>read_temperature() -&gt; number
+</code></pre>pre
+<p>Too vague.</p>
+<p>Celsius?</p>
+<p>Freshness?</p>
+<p>Can no reading exist?</p>
+<p>Can it block for five seconds?</p>
+<p>A syntactically clean API can still have a terrible contract.</p>
+<h2>Implementation can vary behind the boundary</h2>
+<p>The caller may see:</p>
+<pre><code>TemperatureSource.read()
+</code></pre>pre
+<p>One implementation reads hardware.</p>
+<p>Another makes an HTTP request.</p>
+<p>Another returns synthetic test data.</p>
+<p>This separation allows replacement.</p>
+<p>But replacement works only if implementations preserve the properties callers actually rely on.</p>
+<p>If one returns instantly and another blocks for thirty seconds, the nominal interface matches while operational behaviour changes.</p>
+<p>Nonfunctional properties belong in architecture too.</p>
+<h2>Interfaces reduce knowledge</h2>
+<p>Without a boundary, control logic might know:</p>
+<ul>
+<li>I2C address;</li>
+<li>register layout;</li>
+<li>calibration formula;</li>
+<li>retry timing;</li>
+<li>sensor model.</li>
+</ul>
+<p>With a good sensor interface, those details can remain inside a driver.</p>
+<p>The higher layer works with temperature readings.</p>
+<p>That is abstraction creating smaller reasoning surfaces.</p>
+<h2>An interface can be local or remote</h2>
+<p>A function call is an interface.</p>
+<p>A system call is an interface.</p>
+<p>An HTTP API is an interface.</p>
+<p>A network protocol is an interface.</p>
+<p>A hardware bus protocol is an interface.</p>
+<p>The mechanisms differ.</p>
+<p>The recurring idea is:</p>
+<p>Participants agree how to interact across a boundary.</p>
+<p>Once the boundary crosses a network, failure and latency become much more visible.</p>
+<p>A remote call is not just a slower local function call.</p>
+<h2>Versioning exposes hidden assumptions</h2>
+<p>Change a field name in an API.</p>
+<p>Old clients break.</p>
+<p>Change a function signature.</p>
+<p>Callers fail to compile.</p>
+<p>Change a binary layout.</p>
+<p>ABI compatibility breaks.</p>
+<p>Interfaces create dependencies, so changes need lifecycle rules.</p>
+<p>Compatibility is not accidental kindness.</p>
+<p>It is part of maintaining a contract over time.</p>
+<h2>Mocking reveals the abstraction quality</h2>
+<p>If business logic depends on a small interface, tests can substitute a controlled implementation.</p>
+<p>For example:</p>
+<pre><code>Clock.now()
+MessageSender.send()
+TemperatureSource.read()
+</code></pre>pre
+<p>A test can inject deterministic versions.</p>
+<p>If testing one decision requires booting a whole network stack and database, boundaries may be too tangled.</p>
+<p>Testability is not the only reason to design interfaces.</p>
+<p>It is often evidence of good separation.</p>
+<h2>Interface segregation avoids giant contracts</h2>
+<p>Suppose one Device interface contains 70 operations:</p>
+<ul>
+<li>firmware update;</li>
+<li>audio;</li>
+<li>sensors;</li>
+<li>billing;</li>
+<li>debug;</li>
+<li>user profile.</li>
+</ul>
+<p>A component that only needs battery level now depends conceptually on everything.</p>
+<p>Smaller role-specific interfaces can reduce coupling.</p>
+<p>Do not split mechanically.</p>
+<p>Split where responsibilities and consumers differ.</p>
+<h2>Exercise: design a message sender</h2>
+<p>Define an interface:</p>
+<pre><code>send(message)
+</code></pre>pre
+<p>Now make the contract precise.</p>
+<p>Does return mean:</p>
+<ul>
+<li>queued locally;</li>
+<li>accepted by provider;</li>
+<li>delivered remotely;</li>
+<li>displayed to user?</li>
+</ul>
+<p>Can it return duplicate?</p>
+<p>Can timeout occur after remote success?</p>
+<p>What identifier supports later status checks?</p>
+<p>The questions are more important than the syntax.</p>
+<h2>The lesson to carry forward</h2>
+<p>Interfaces separate what a component promises from how it delivers that promise.</p>
+<p>They let systems evolve, test, substitute, and reason in smaller pieces.</p>
+<p>A good interface does not merely hide implementation.</p>
+<p>It makes semantics explicit.</p>
+<p>Whenever two components meet, ask:</p>
+<p><strong>What exactly are they promising each other?</strong></p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

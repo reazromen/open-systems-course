@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Do not choose arrays, hash tables, trees, queues, or graphs by popularity. Start from operations, scale, ordering, locality, concurrency, persistence, and failure requirements." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Choosing a Data Structure from the Workload — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-050-choosing-data-structure-workload.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Choosing a Data Structure from the Workload" property="og:title"/><meta content="Do not choose arrays, hash tables, trees, queues, or graphs by popularity. Start from operations, scale, ordering, locality, concurrency, persistence, and failure requirements." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-050-choosing-data-structure-workload.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Choosing a Data Structure from the Workload</h1><p class="lede">Do not choose arrays, hash tables, trees, queues, or graphs by popularity. Start from operations, scale, ordering, locality, concurrency, persistence, and failure requirements.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>You now know several structures.</p>
+<p>The dangerous next step is memorizing a lookup table:</p>
+<pre><code>array = fast
+linked list = insertion
+hash table = lookup
+tree = sorted
+queue = jobs
+</code></pre>pre
+<p>Real engineering is messier.</p>
+<p>Choose from the workload.</p>
+<h2>Write operations before structures</h2>
+<p>Suppose we are storing sensor readings.</p>
+<p>Requirements:</p>
+<ul>
+<li>append once per second;</li>
+<li>keep seven days;</li>
+<li>scan recent data in order;</li>
+<li>query time ranges;</li>
+<li>persist across restart.</li>
+</ul>
+<p>Immediately, a plain in-memory linked list is unlikely to be the final answer.</p>
+<p>Persistence and range queries dominate.</p>
+<p>A time-indexed database or append-oriented storage design becomes relevant.</p>
+<p>The data structure exists inside a larger system.</p>
+<h2>Read/write ratio matters</h2>
+<p>Workload A:</p>
+<ul>
+<li>10 million reads per second;</li>
+<li>one update per hour.</li>
+</ul>
+<p>You can spend more work maintaining indexes or caches.</p>
+<p>Workload B:</p>
+<ul>
+<li>constant writes;</li>
+<li>rare reads.</li>
+</ul>
+<p>Heavy indexing may amplify write cost unnecessarily.</p>
+<p>Every optimization chooses which operation pays.</p>
+<h2>Ordering matters</h2>
+<p>Need exact key lookup?</p>
+<p>Hash table.</p>
+<p>Need sorted range queries?</p>
+<p>Balanced tree or ordered index.</p>
+<p>Need newest item first?</p>
+<p>Stack or deque.</p>
+<p>Need oldest waiting item?</p>
+<p>Queue.</p>
+<p>Need arbitrary connectivity?</p>
+<p>Graph.</p>
+<p>These are starting candidates, not automatic answers.</p>
+<h2>Scale matters</h2>
+<p>For 20 configuration entries, a linear list may be simpler and faster enough.</p>
+<p>For 20 billion records, storage layout, distribution, and indexing dominate.</p>
+<p>Do not import "web scale" complexity into a tiny firmware menu.</p>
+<p>Do not use tiny-demo structures for massive production workloads without analysis.</p>
+<p>Scale is a requirement.</p>
+<h2>Hardware locality matters</h2>
+<p>An asymptotically good structure can perform poorly if it jumps through memory unpredictably.</p>
+<p>Compact arrays often exploit cache locality.</p>
+<p>Pointer-heavy structures can pay latency per node.</p>
+<p>Databases design B-trees around storage pages.</p>
+<p>Data structures live on hardware.</p>
+<p>The model and machine interact.</p>
+<h2>Concurrency matters</h2>
+<p>A structure accessed by one thread can be simple.</p>
+<p>Shared across 64 threads?</p>
+<p>Locking, atomic operations, sharding, or concurrent algorithms may be necessary.</p>
+<p>A theoretically fast structure protected by one global lock can become a bottleneck.</p>
+<p>The concurrency model belongs in the choice.</p>
+<h2>Persistence changes everything</h2>
+<p>An in-memory tree disappears on restart.</p>
+<p>A filesystem-backed index needs crash recovery.</p>
+<p>A distributed data structure needs replication and consistency semantics.</p>
+<p>The word "tree" or "hash" describes only part of the system.</p>
+<p>Durable data structures operate under failure.</p>
+<h2>Memory overhead matters</h2>
+<p>A hash table may reserve extra capacity.</p>
+<p>A linked structure stores pointers.</p>
+<p>A tree stores child references and balance metadata.</p>
+<p>An array can be compact.</p>
+<p>On a server with 128 GB RAM, overhead may be acceptable.</p>
+<p>On a microcontroller with 320 KB SRAM, it can decide whether the firmware works.</p>
+<p>Context wins.</p>
+<h2>Build the operation matrix</h2>
+<p>For a candidate system, make a table:</p>
+<pre><code>operation       frequency       latency goal
+lookup ID       very high       low
+insert          medium          moderate
+range query     high            low
+delete          rare            moderate
+ordered scan    high            streaming
+</code></pre>pre
+<p>Then compare candidate structures.</p>
+<p>This is much better than starting:</p>
+<p>"I want to use Redis."</p>
+<p>Technology should follow operations and constraints.</p>
+<h2>Exercise: design a call-history store</h2>
+<p>Requirements:</p>
+<ul>
+<li>append each call;</li>
+<li>lookup by call ID;</li>
+<li>list newest calls;</li>
+<li>filter by user and date;</li>
+<li>survive restart.</li>
+</ul>
+<p>One in-memory hash table solves only exact lookup.</p>
+<p>You need persistent storage plus indexes for query patterns.</p>
+<p>The exercise demonstrates the transition from textbook data structures to data systems.</p>
+<p>Module 11 will return to this at database scale.</p>
+<h2>The lesson to carry forward</h2>
+<p>There is no best data structure.</p>
+<p>There is a best fit under stated assumptions.</p>
+<p>Choose by:</p>
+<ul>
+<li>operations;</li>
+<li>frequency;</li>
+<li>scale;</li>
+<li>ordering;</li>
+<li>locality;</li>
+<li>memory;</li>
+<li>concurrency;</li>
+<li>persistence;</li>
+<li>failure semantics.</li>
+</ul>
+<p>If you cannot describe the workload, choosing the structure is guessing.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

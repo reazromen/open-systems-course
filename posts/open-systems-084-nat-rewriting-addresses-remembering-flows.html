@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="IPv4 NAT often rewrites addresses and ports while maintaining mapping state. That state explains why outbound connections can work while unsolicited inbound connections fail." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>NAT: Rewriting Addresses and Remembering Flows — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-084-nat-rewriting-addresses-remembering-flows.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="NAT: Rewriting Addresses and Remembering Flows" property="og:title"/><meta content="IPv4 NAT often rewrites addresses and ports while maintaining mapping state. That state explains why outbound connections can work while unsolicited inbound connections fail." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-084-nat-rewriting-addresses-remembering-flows.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>NAT: Rewriting Addresses and Remembering Flows</h1><p class="lede">IPv4 NAT often rewrites addresses and ports while maintaining mapping state. That state explains why outbound connections can work while unsolicited inbound connections fail.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A laptop on a private IPv4 network can open a connection to a public service even though its private address is not globally routed.</p>
+<p>Somewhere between the laptop and the public Internet, a translator may rewrite the packet.</p>
+<p>That mechanism is commonly called NAT.</p>
+<p>For everyday home and enterprise IPv4 networks, the form learners encounter most often is address-and-port translation, where many internal connections share one external address by using different transport-port mappings.</p>
+<p>The key mental model is not simply "private IP becomes public IP."</p>
+<p>It is:</p>
+<p><strong>the translator rewrites packet fields and maintains state that connects the inside representation of a flow to the outside representation.</strong></p>
+<h2>Follow one constructed flow</h2>
+<p>Assume an internal host starts a TCP connection.</p>
+<p>Inside:</p>
+<pre><code class="language-text">source      192.168.1.20:50000
+destination 198.51.100.40:443
+</code></pre>pre
+<p>At the NAT, the outbound packet might become:</p>
+<pre><code class="language-text">source      203.0.113.10:62001
+destination 198.51.100.40:443
+</code></pre>pre
+<p>These are documentation addresses.</p>
+<p>The translator records a mapping conceptually similar to:</p>
+<pre><code class="language-text">192.168.1.20:50000
+        ↔
+203.0.113.10:62001
+</code></pre>pre
+<p>When the reply returns to <code>203.0.113.10:62001</code>code, the device can use its translation state to rewrite the destination back toward the internal host.</p>
+<p>Traditional NAT and Network Address Port Translation are described in RFC 3022, while RFC 2663 provides broader NAT terminology.</p>
+<h2>Translation is stateful in the common case</h2>
+<p>The mapping cannot normally live forever.</p>
+<p>A NAT has finite state and behavior for creating, refreshing, and removing mappings. Details differ by transport and implementation.</p>
+<p>For UDP, RFC 4787 defines behavioral terminology and requirements for NAT mappings and filtering. RFC 5382 addresses TCP NAT behavior.</p>
+<p>The systems consequence is important:</p>
+<pre><code class="language-text">packet sent earlier
+        ↓
+mapping exists now
+        ↓
+return traffic can match state
+</code></pre>pre
+<p>If the state expires, the same inbound packet later may no longer have a mapping that tells the translator where to send it.</p>
+<p>Time is part of NAT behavior.</p>
+<h2>Outbound success does not imply inbound reachability</h2>
+<p>When an internal client initiates a connection, the NAT has an event from which it can create mapping state.</p>
+<p>An unsolicited inbound connection has a different problem.</p>
+<p>Suppose a public host sends:</p>
+<pre><code class="language-text">203.0.113.10:9000
+</code></pre>pre
+<p>Which internal machine should receive it?</p>
+<p>Without an existing mapping, static mapping, port-forwarding rule, or another traversal/control mechanism, the translator may have no answer.</p>
+<p>This is why:</p>
+<pre><code class="language-text">internal host can browse outward
+</code></pre>pre
+<p>does not prove:</p>
+<pre><code class="language-text">the same host can accept arbitrary inbound connections
+</code></pre>pre
+<p>The direction in which state was created matters.</p>
+<h2>NAT and firewall are not synonyms</h2>
+<p>Consumer routers often perform NAT and stateful firewalling in the same device.</p>
+<p>That packaging encourages a conceptual mistake.</p>
+<p>Network address translation changes addressing representation. Firewall policy decides which traffic is permitted or denied.</p>
+<p>The two functions can interact, and one device can implement both, but they are not the same mechanism.</p>
+<p>A security policy should therefore not be described merely as "we have NAT."</p>
+<p>If inbound traffic is blocked, identify the actual control:</p>
+<ul>
+<li>absence of translation state;</li>
+<li>NAT filtering behavior;</li>
+<li>explicit firewall policy;</li>
+<li>host firewall;</li>
+<li>application listener state;</li>
+<li>upstream filtering.</li>
+</ul>
+<p>Different causes can produce the same symptom.</p>
+<h2>NAT changes what endpoints can infer</h2>
+<p>Before translation, an internal host sees its local address and port.</p>
+<p>A remote server sees the translated external source.</p>
+<p>Those are two views of one communication path.</p>
+<p>That becomes important for protocols that place addresses or ports inside application messages. Rewriting only the IP and transport headers may be insufficient when a protocol advertises endpoint information in its payload.</p>
+<p>This is one reason real-time communication systems need explicit NAT-traversal mechanisms and why application-layer gateways historically appeared around some protocols.</p>
+<p>We will return to this problem in the telephony and real-time-media module. For now, remember the general rule:</p>
+<p><strong>a middlebox that changes addressing can break assumptions made above the network layer.</strong></p>
+<h2>Carrier-grade NAT adds another administrative boundary</h2>
+<p>Your local router might not be the only translator.</p>
+<p>An ISP can place many subscribers behind a Carrier-Grade NAT, or CGN. RFC 6888 describes common requirements for IPv4 CGNs and defines the CGN as a NAT function in the provider network that shares IPv4 address space among subscribers.</p>
+<p>A path can therefore look like:</p>
+<pre><code class="language-text">device
+  ↓
+home NAT
+  ↓
+ISP CGN
+  ↓
+public Internet
+</code></pre>pre
+<p>Port forwarding on the home router cannot create a mapping on an ISP-controlled CGN.</p>
+<p>That is an ownership boundary as much as a protocol boundary.</p>
+<p>When diagnosing inbound reachability, ask who controls every translator on the path.</p>
+<h2>A public-IP website is only one observation</h2>
+<p>If a browser reports a public address, it tells you the source address observed by that remote service for that request.</p>
+<p>It does not reveal the entire translation chain.</p>
+<p>The value can also differ across IPv4 and IPv6 or across different egress paths.</p>
+<p>Useful evidence combines several views:</p>
+<pre><code class="language-text">host address
+local route
+gateway address
+translator state, if you control it
+remote observed source
+</code></pre>pre
+<p>Do not infer topology from one value when the path can contain multiple boundaries.</p>
+<h2>Inspect a Linux NAT you control</h2>
+<p>On a Linux router or namespace lab that you own, start with configuration.</p>
+<p>Depending on the firewall stack, commands can include:</p>
+<pre><code class="language-bash">sudo nft list ruleset
+ip address
+ip route
+</code></pre>pre
+<p>If conntrack tooling is installed and authorized:</p>
+<pre><code class="language-bash">sudo conntrack -L
+</code></pre>pre
+<p>The exact output is implementation-specific. Your goal is to find evidence connecting an inside flow to translation or connection-tracking state.</p>
+<p>On an endpoint, compare:</p>
+<pre><code class="language-bash">ip address
+ip route
+</code></pre>pre
+<p>with the source address observed by a remote test service you intentionally contact.</p>
+<p>Do not scan or manipulate networks you do not administer.</p>
+<h2>Build a safe namespace experiment</h2>
+<p>A stronger exercise is to create a small Linux network-namespace lab.</p>
+<p>Use:</p>
+<ul>
+<li>one namespace as an inside client;</li>
+<li>one namespace as a translator/router;</li>
+<li>one namespace as an outside service;</li>
+<li>private or documentation-style addressing inside the isolated lab;</li>
+<li>an <code>nftables</code>code masquerade/SNAT rule on the translator.</li>
+</ul>
+<p>Then capture on both sides of the translator.</p>
+<p>The same logical connection will have different packet headers on the two interfaces.</p>
+<p>That is the mechanism made visible.</p>
+<p>Next, wait for state to expire or deliberately remove the lab's state, then observe why an inbound packet no longer maps in the same way.</p>
+<h2>Build a failure ladder</h2>
+<p>For a connection crossing NAT:</p>
+<pre><code class="language-text">Did the internal packet reach the translator?
+        ↓
+Was a mapping created?
+        ↓
+What external tuple was used?
+        ↓
+Did the remote reply reach the translator?
+        ↓
+Did it match translation/filtering state?
+        ↓
+Was it rewritten toward the internal host?
+        ↓
+Did host firewall and application state accept it?
+</code></pre>pre
+<p>That sequence is much more precise than "NAT problem."</p>
+<h2>The lesson to carry forward</h2>
+<p>NAT creates two representations of a communication flow and maintains state that connects them.</p>
+<p>That state has ownership, lifetime, transport-specific behavior, and failure modes.</p>
+<p>Once the path is translated correctly, another question remains: if a client reaches a remote service, how can it protect the conversation and authenticate the service it intended to contact?</p>
+<p>That is the next boundary: TLS.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

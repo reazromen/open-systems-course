@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Slow is not a component. It is an observed delay. CPU saturation, memory pressure, storage latency, network waits, locks, queues, thermal limits, and software work can all produce the same complaint." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Why Computers Become Slow — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-019-why-computers-become-slow.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Why Computers Become Slow" property="og:title"/><meta content="Slow is not a component. It is an observed delay. CPU saturation, memory pressure, storage latency, network waits, locks, queues, thermal limits, and software work can all produce the same complaint." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-019-why-computers-become-slow.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Why Computers Become Slow</h1><p class="lede">Slow is not a component. It is an observed delay. CPU saturation, memory pressure, storage latency, network waits, locks, queues, thermal limits, and software work can all produce the same complaint.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>"My computer is slow" sounds like a diagnosis.</p>
+<p>It is actually an observation.</p>
+<p>The user expected an action to finish sooner.</p>
+<p>That delay could originate in CPU work, memory pressure, storage, networking, synchronization, another service, a device, or the application's own design.</p>
+<p>The first performance skill is refusing to equate a symptom with one resource.</p>
+<h2>Start with the critical path</h2>
+<p>Suppose opening a report takes ten seconds.</p>
+<p>The user-visible path might be:</p>
+<pre><code>click
+  -&gt; application logic
+  -&gt; DNS
+  -&gt; network connection
+  -&gt; API
+  -&gt; database query
+  -&gt; response
+  -&gt; parsing
+  -&gt; rendering
+</code></pre>pre
+<p>Total time is shaped by the work that lies on the critical path.</p>
+<p>A CPU can be mostly idle while the application waits nine seconds for a remote service.</p>
+<p>Buying a faster CPU would barely help.</p>
+<p>Performance starts with the end-to-end path.</p>
+<h2>CPU-bound</h2>
+<p>A workload is CPU-bound when useful progress is primarily limited by processor execution capacity.</p>
+<p>Examples can include:</p>
+<ul>
+<li>video encoding;</li>
+<li>compression;</li>
+<li>cryptographic work;</li>
+<li>scientific computation;</li>
+<li>software compilation.</li>
+</ul>
+<p>Evidence might include sustained CPU utilization and profiling that identifies expensive execution paths.</p>
+<p>But even high CPU usage needs interpretation.</p>
+<p>A busy CPU may be doing necessary work.</p>
+<p>Or repeating work because of a bug.</p>
+<p>Or spinning on contention.</p>
+<p>Usage is evidence, not a verdict.</p>
+<h2>Memory-bound</h2>
+<p>A processor may spend time waiting for data.</p>
+<p>Poor cache locality can increase memory stalls.</p>
+<p>A workload may exceed available memory bandwidth.</p>
+<p>Memory capacity pressure may trigger reclaim or paging.</p>
+<p>These are different problems.</p>
+<p>"Needs more RAM" is only one possible memory diagnosis.</p>
+<p>Sometimes the machine has plenty of capacity but the workload's access pattern fails to use caches effectively.</p>
+<p>Sometimes a container has a smaller memory limit than the host.</p>
+<p>Measure the right boundary.</p>
+<h2>Storage-bound</h2>
+<p>A database may issue many small random I/O operations.</p>
+<p>A backup may saturate a storage device.</p>
+<p>A filesystem may wait on durable writes.</p>
+<p>An SSD may enter garbage-collection or thermal conditions that alter latency.</p>
+<p>A storage path can therefore make an application slow even when CPU and RAM look comfortable.</p>
+<p>Measure latency, queue depth, throughput, and workload pattern—not just storage capacity.</p>
+<p>A disk being "only 50% full" says very little about current I/O performance.</p>
+<h2>Network-bound</h2>
+<p>A remote operation includes propagation, routing, queueing, transport behaviour, encryption, and server processing.</p>
+<p>A user may say:</p>
+<p>"the website is slow."</p>
+<p>Possible reasons include:</p>
+<ul>
+<li>DNS delay;</li>
+<li>packet loss;</li>
+<li>high round-trip time;</li>
+<li>congested link;</li>
+<li>overloaded remote service;</li>
+<li>slow database behind the service;</li>
+<li>large assets;</li>
+<li>browser rendering.</li>
+</ul>
+<p>Network performance is an end-to-end property.</p>
+<p>A speed-test result does not prove one application path is healthy.</p>
+<h2>Lock-bound and queue-bound</h2>
+<p>A machine can have spare CPU and still make work wait.</p>
+<p>Imagine one shared lock protecting a critical resource.</p>
+<p>Twenty threads arrive.</p>
+<p>One enters.</p>
+<p>Nineteen wait.</p>
+<p>Adding more threads can make the situation worse.</p>
+<p>Queues create a related effect.</p>
+<p>If work arrives faster than it can be processed, queue length grows and latency rises.</p>
+<p>Little's Law later gives us a formal relationship among throughput, latency, and work in the system, but the intuition is enough for now:</p>
+<p>If arrival rate persistently exceeds service rate, waiting accumulates.</p>
+<h2>Thermal and power limits matter</h2>
+<p>Modern processors dynamically change frequency and power behaviour.</p>
+<p>A laptop may run a heavy workload quickly for a short burst and then reduce frequency as temperature or power limits are reached.</p>
+<p>Two benchmark runs can differ because the machine starts from different thermal states.</p>
+<p>Battery mode can change policies.</p>
+<p>Cooling problems can change sustained performance.</p>
+<p>Clock frequency is therefore a dynamic system variable, not a permanent sticker value.</p>
+<h2>Background work changes the experiment</h2>
+<p>Antivirus scanning.</p>
+<p>Search indexing.</p>
+<p>Package updates.</p>
+<p>Cloud synchronization.</p>
+<p>Browser tabs.</p>
+<p>Containers.</p>
+<p>A machine is usually running many things.</p>
+<p>If you measure an application without observing competing work, you can attribute shared-resource contention to the wrong component.</p>
+<p>This is why repeatable performance experiments control conditions.</p>
+<h2>Percentages hide latency distributions</h2>
+<p>Suppose an API averages 100 ms.</p>
+<p>That sounds fine.</p>
+<p>But what if:</p>
+<ul>
+<li>90% complete in 20 ms;</li>
+<li>9% complete in 200 ms;</li>
+<li>1% take 8 seconds?</li>
+</ul>
+<p>The mean hides the experience of the slowest requests.</p>
+<p>Production systems often examine percentiles such as p50, p95, p99, along with distributions and traces.</p>
+<p>The correct metric depends on the user experience and workload.</p>
+<p>Performance is not one number.</p>
+<h2>Optimization begins after measurement</h2>
+<p>A dangerous workflow:</p>
+<pre><code>app feels slow
+-&gt; guess CPU
+-&gt; rewrite code
+-&gt; no improvement
+</code></pre>pre
+<p>A better workflow:</p>
+<pre><code>define slow operation
+-&gt; measure end-to-end latency
+-&gt; break into stages
+-&gt; identify dominant wait/work
+-&gt; form hypothesis
+-&gt; change one thing
+-&gt; measure again
+</code></pre>pre
+<p>That is performance engineering.</p>
+<p>The method is more important than any one optimization trick.</p>
+<h2>Exercise: build a waiting budget</h2>
+<p>Pick an action that feels slow.</p>
+<p>Create a table:</p>
+<pre><code>stage                 time
+input handling         ?
+local computation      ?
+network                ?
+server                 ?
+database               ?
+rendering              ?
+</code></pre>pre
+<p>You may not know the values yet.</p>
+<p>That is the point.</p>
+<p>The blank cells tell you what observability is missing.</p>
+<p>A useful system lets you replace question marks with evidence.</p>
+<h2>The lesson to carry forward</h2>
+<p>Computers become slow for many reasons because applications depend on many resources.</p>
+<p>CPU, cache, RAM, storage, network, locks, queues, thermal policy, and remote dependencies can all dominate at different times.</p>
+<p>"Slow" is a symptom.</p>
+<p>Performance engineering asks:</p>
+<p><strong>Where did the time go?</strong></p>
+<p>That question leads naturally to profiling, tracing, metrics, packet capture, and observability later in the course.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

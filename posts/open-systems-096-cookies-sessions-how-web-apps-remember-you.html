@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="HTTP requests are separate messages, but web applications still need continuity. Cookies and session state connect one request to another without making the transport connection itself the user identity." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Cookies and Sessions: How Web Apps Remember You — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-096-cookies-sessions-how-web-apps-remember-you.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Cookies and Sessions: How Web Apps Remember You" property="og:title"/><meta content="HTTP requests are separate messages, but web applications still need continuity. Cookies and session state connect one request to another without making the transport connection itself the user identity." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-096-cookies-sessions-how-web-apps-remember-you.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Cookies and Sessions: How Web Apps Remember You</h1><p class="lede">HTTP requests are separate messages, but web applications still need continuity. Cookies and session state connect one request to another without making the transport connection itself the user identity.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A user signs in, opens another page, and the application still knows who they are.</p>
+<p>That continuity does not come from the TCP connection.</p>
+<p>It does not come from TLS alone.</p>
+<p>It does not come from HTTP remembering every previous request.</p>
+<p>A web application builds continuity by carrying state across otherwise separate requests.</p>
+<p>One of the most common mechanisms is:</p>
+<pre><code class="language-text">browser cookie
+      ↓
+session identifier or token
+      ↓
+server-side or cryptographically protected application state
+</code></pre>pre
+<p>The important lesson is not simply "cookies store sessions."</p>
+<p>It is that <strong>identity continuity is an application protocol layered on top of HTTP</strong>.</p>
+<h2>A cookie is browser-managed state</h2>
+<p>A server can ask a browser to store a cookie using a response field such as:</p>
+<pre><code class="language-http">Set-Cookie: session_id=abc123; Secure; HttpOnly
+</code></pre>pre
+<p>On later requests that match the cookie's scope and policy, the browser can send:</p>
+<pre><code class="language-http">Cookie: session_id=abc123
+</code></pre>pre
+<p>RFC 6265 defines the HTTP state-management mechanism for cookies.</p>
+<p>The value might be:</p>
+<ul>
+<li>an opaque random session identifier;</li>
+<li>a signed token;</li>
+<li>a preference;</li>
+<li>another application-defined value.</li>
+</ul>
+<p>The cookie mechanism does not define what the value means.</p>
+<p>That meaning belongs to the application.</p>
+<h2>A session identifier is not the session itself</h2>
+<p>Suppose the browser stores:</p>
+<pre><code class="language-text">session_id = abc123
+</code></pre>pre
+<p>The server might maintain:</p>
+<pre><code class="language-text">abc123
+  ↓
+user_id = 42
+created_at = ...
+last_seen = ...
+permissions_snapshot = ...
+csrf_state = ...
+</code></pre>pre
+<p>in a database or cache.</p>
+<p>In that design, the cookie contains a handle.</p>
+<p>The actual session state lives on the server.</p>
+<p>A different design can place more state inside a signed or encrypted token sent by the client.</p>
+<p>Those designs have different trade-offs around revocation, storage, size, synchronization, and failure.</p>
+<p>Do not confuse "cookie-based session" with "all session state is inside the cookie."</p>
+<h2>Cookie scope matters</h2>
+<p>Cookies have attributes that control when browsers send them.</p>
+<p>Important concepts include:</p>
+<ul>
+<li>Domain;</li>
+<li>Path;</li>
+<li>Secure;</li>
+<li>HttpOnly;</li>
+<li>expiration or lifetime;</li>
+<li>SameSite behavior in modern browsers.</li>
+</ul>
+<p><code>Secure</code>code restricts cookie transmission to secure contexts according to browser rules.</p>
+<p><code>HttpOnly</code>code prevents ordinary client-side script access to the cookie through document cookie APIs, which helps reduce one class of exposure if script execution is compromised.</p>
+<p>Domain and Path influence which requests receive the cookie.</p>
+<p>These are scope controls, not complete authorization policy.</p>
+<p>A cookie reaching a server does not prove the request is allowed to perform an operation.</p>
+<h2>Session state crosses requests</h2>
+<p>Consider:</p>
+<pre><code class="language-text">POST /login
+  ↓
+credentials verified
+  ↓
+server creates session
+  ↓
+Set-Cookie returned
+  ↓
+browser stores cookie
+  ↓
+GET /account
+  ↓
+Cookie sent
+  ↓
+server loads session
+  ↓
+account response
+</code></pre>pre
+<p>The second request can arrive over another connection.</p>
+<p>It can be processed by another application instance.</p>
+<p>The continuity comes from the session mechanism, not from connection affinity unless the architecture deliberately adds that dependency.</p>
+<p>This is why distributed web applications need shared or otherwise coordinated session state if requests can land on different servers.</p>
+<h2>Authentication and session management are different steps</h2>
+<p>During login, the application authenticates a credential.</p>
+<p>After login, the session mechanism represents continuity of that authenticated state.</p>
+<p>Those are different contracts.</p>
+<p>If an attacker steals a valid session identifier, they may not need the original password for every request. That is why session identifiers must be treated as security-sensitive secrets.</p>
+<p>Good systems also rotate or replace session identifiers at important privilege transitions such as successful authentication.</p>
+<p>The session should not be a permanent identity artifact.</p>
+<p>It should have a lifetime, revocation behavior, and policy.</p>
+<h2>Expiration is more than one timestamp</h2>
+<p>Applications often use several kinds of session lifetime:</p>
+<pre><code class="language-text">absolute lifetime
+idle timeout
+cookie expiration
+server-side record expiration
+token expiration
+</code></pre>pre
+<p>These can disagree.</p>
+<p>For example:</p>
+<pre><code class="language-text">browser still has cookie
+        ↓
+server session expired
+        ↓
+request arrives
+        ↓
+application rejects session
+</code></pre>pre
+<p>The browser retaining a cookie does not guarantee the server still considers the session valid.</p>
+<p>Likewise, deleting a browser cookie does not necessarily destroy server-side state unless the logout path also revokes or expires that state.</p>
+<p>Client state and server state must be reasoned about separately.</p>
+<h2>Logout is a state transition</h2>
+<p>A robust logout operation can involve:</p>
+<ul>
+<li>invalidating server-side session state;</li>
+<li>expiring the browser cookie;</li>
+<li>revoking refresh or access artifacts when the design uses them;</li>
+<li>preventing stale session identifiers from becoming valid again.</li>
+</ul>
+<p>Merely redirecting the user to a login page is not logout.</p>
+<p>The useful question is:</p>
+<p><strong>What server-side state changed so the old session can no longer authorize requests?</strong></p>
+<p>That turns a UI event into an inspectable system transition.</p>
+<h2>Sessions and CSRF are related but not identical</h2>
+<p>Browsers automatically attach matching cookies to requests.</p>
+<p>That convenience creates a security problem: a malicious site can sometimes cause a browser to issue a request to another site while the browser's cookies are still attached.</p>
+<p>SameSite cookie behavior can reduce some cross-site request scenarios, but applications must still understand cross-site request forgery protection for state-changing actions.</p>
+<p>Session authentication proves which session the request carries.</p>
+<p>It does not by itself prove that the user intentionally initiated the request from an authorized application context.</p>
+<p>We will connect this to the same-origin policy and CORS in the next lesson.</p>
+<h2>Inspect session behavior safely</h2>
+<p>Use a local application or one you administer.</p>
+<p>Open the browser's storage or application panel and identify the authentication-related cookie.</p>
+<p>Record:</p>
+<ul>
+<li>cookie name;</li>
+<li>domain;</li>
+<li>path;</li>
+<li>Secure state;</li>
+<li>HttpOnly state;</li>
+<li>expiration;</li>
+<li>SameSite behavior when shown.</li>
+</ul>
+<p>Then sign out.</p>
+<p>Observe whether the cookie disappears or changes.</p>
+<p>If you control the server-side session store, verify that the corresponding session record is also invalidated.</p>
+<p>Do not copy live session values into notes, screenshots, tickets, or chat. Treat them like credentials.</p>
+<h2>Build a small session experiment</h2>
+<p>Create a local application with an in-memory session map:</p>
+<pre><code class="language-text">random session id → username
+</code></pre>pre
+<p>On login:</p>
+<ol>
+<li>generate a high-entropy random session identifier;</li>
+<li>store it server-side;</li>
+<li>set it as a Secure/HttpOnly cookie when using HTTPS;</li>
+<li>require it for a protected endpoint;</li>
+<li>invalidate it on logout.</li>
+</ol>
+<p>Then restart the application.</p>
+<p>If the session map is only in memory, every session disappears.</p>
+<p>That failure teaches an architectural dependency:</p>
+<pre><code class="language-text">session persistence
+depends on
+session storage
+</code></pre>pre
+<p>Move the session store to a shared database or cache and the behavior changes again.</p>
+<h2>The lesson to carry forward</h2>
+<p>Cookies let a browser carry small pieces of state across requests.</p>
+<p>Sessions give applications continuity across those requests.</p>
+<p>The transport connection is not the user.</p>
+<p>The cookie value is not automatically the user.</p>
+<p>The session record is not automatically authorization.</p>
+<p>Each layer needs its own validation and lifetime.</p>
+<p>The next lesson explains the browser boundary that makes many web security rules necessary: origins, same-origin policy, and CORS.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

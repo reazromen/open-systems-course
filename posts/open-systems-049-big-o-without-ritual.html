@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Big O describes how an algorithm's resource requirement grows with input under a model. It is not a stopwatch, not a benchmark, and not permission to ignore constants or hardware." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Big O Without the Ritual — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-049-big-o-without-ritual.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Big O Without the Ritual" property="og:title"/><meta content="Big O describes how an algorithm's resource requirement grows with input under a model. It is not a stopwatch, not a benchmark, and not permission to ignore constants or hardware." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-049-big-o-without-ritual.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Big O Without the Ritual</h1><p class="lede">Big O describes how an algorithm's resource requirement grows with input under a model. It is not a stopwatch, not a benchmark, and not permission to ignore constants or hardware.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Students often memorize:</p>
+<pre><code>O(1)
+O(log n)
+O(n)
+O(n log n)
+O(n²)
+</code></pre>pre
+<p>Then algorithm analysis becomes vocabulary.</p>
+<p>The real question is simpler:</p>
+<p><strong>How does required work grow as the problem grows?</strong></p>
+<p>Big O gives us a mathematical language for that trend.</p>
+<h2>Constant time does not mean one nanosecond</h2>
+<p>An O(1) operation has cost bounded independently of input size under the chosen model.</p>
+<p>It could take:</p>
+<pre><code>1 ns
+1 ms
+1 second
+</code></pre>pre
+<p>If the time does not grow with N, it can still be O(1).</p>
+<p>Complexity describes scaling.</p>
+<p>Benchmarking measures actual performance.</p>
+<p>You need both.</p>
+<h2>Linear means proportional growth</h2>
+<p>A full scan of N items performs work proportional to N.</p>
+<p>Double N.</p>
+<p>Roughly double the number of inspected elements in the simple model.</p>
+<p>That is O(n).</p>
+<p>For 20 items, this may be trivial.</p>
+<p>For 20 billion, it may dominate the system.</p>
+<p>Asymptotic reasoning becomes more valuable as scale grows.</p>
+<h2>Quadratic can hide in nested loops</h2>
+<p>Consider:</p>
+<pre><code>for each user:
+    for each user:
+        compare pair
+</code></pre>pre
+<p>N users create roughly N² comparisons.</p>
+<p>At N = 100:</p>
+<pre><code>10,000
+</code></pre>pre
+<p>At N = 1,000,000:</p>
+<pre><code>10^12
+</code></pre>pre
+<p>Scale transforms acceptable code into impossible code.</p>
+<p>The syntax did not change.</p>
+<p>The workload did.</p>
+<h2>Drop constants carefully</h2>
+<p>An algorithm doing:</p>
+<pre><code>100n
+</code></pre>pre
+<p>is still O(n).</p>
+<p>Another doing:</p>
+<pre><code>n²
+</code></pre>pre
+<p>is asymptotically worse.</p>
+<p>But at small N, 100n can exceed n².</p>
+<p>Big O intentionally ignores constant factors and lower-order terms for growth analysis.</p>
+<p>Engineering still cares about real constants.</p>
+<p>Never use asymptotic notation to dismiss measurements.</p>
+<h2>Worst, average, and amortized differ</h2>
+<p>A hash-table lookup may be O(1) average under assumptions but worse in pathological cases.</p>
+<p>Dynamic-array append may be O(1) amortized even though resize operations are O(n).</p>
+<p>An algorithm can have different best, average, expected, or worst-case complexity.</p>
+<p>Always ask which claim is being made.</p>
+<p>"Hash map is O(1)" without qualifiers is a teaching shortcut.</p>
+<h2>Complexity can measure more than time</h2>
+<p>We can analyze:</p>
+<ul>
+<li>memory;</li>
+<li>network messages;</li>
+<li>disk I/O;</li>
+<li>comparisons;</li>
+<li>allocations.</li>
+</ul>
+<p>A distributed algorithm that saves CPU but sends O(n²) network messages may still be unacceptable.</p>
+<p>Choose the resource model that matters.</p>
+<h2>Hardware can reverse practical winners</h2>
+<p>An array scan is O(n).</p>
+<p>A theoretically more sophisticated pointer-based structure may perform fewer comparisons but suffer poor cache locality.</p>
+<p>For realistic N, the contiguous scan can win.</p>
+<p>This does not make complexity theory wrong.</p>
+<p>It means the theoretical model omitted hardware constants and memory behaviour that matter in practice.</p>
+<p>Use theory to reason.</p>
+<p>Use measurement to decide.</p>
+<h2>Exercise: predict before benchmarking</h2>
+<p>Two functions:</p>
+<p>A:</p>
+<pre><code>scan every element once
+</code></pre>pre
+<p>B:</p>
+<pre><code>compare every pair
+</code></pre>pre
+<p>Predict scaling when N changes:</p>
+<pre><code>1,000 -&gt; 10,000
+</code></pre>pre
+<p>A increases about 10×.</p>
+<p>B increases about 100×.</p>
+<p>Now benchmark if you can.</p>
+<p>The prediction is what complexity gives you before running the larger experiment.</p>
+<h2>The lesson to carry forward</h2>
+<p>Big O is a model of growth.</p>
+<p>It helps identify algorithms that cannot scale even if they look fine on tiny examples.</p>
+<p>It does not tell you:</p>
+<ul>
+<li>exact runtime;</li>
+<li>hardware effects;</li>
+<li>constants;</li>
+<li>latency distribution;</li>
+<li>implementation quality.</li>
+</ul>
+<p>The mature workflow is:</p>
+<p>analyze growth, measure reality, understand both.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

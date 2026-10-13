@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="BGP exchanges reachability information between autonomous systems. The resulting Internet path is shaped by policy and routing state, not simply by physical distance." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>How Internet Routing Finds a Path — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-087-how-internet-routing-finds-a-path.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="How Internet Routing Finds a Path" property="og:title"/><meta content="BGP exchanges reachability information between autonomous systems. The resulting Internet path is shaped by policy and routing state, not simply by physical distance." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-087-how-internet-routing-finds-a-path.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>How Internet Routing Finds a Path</h1><p class="lede">BGP exchanges reachability information between autonomous systems. The resulting Internet path is shaped by policy and routing state, not simply by physical distance.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Your laptop has a default route.</p>
+<p>That gets a packet to a nearby router.</p>
+<p>It does not explain how thousands of independently operated networks decide where an Internet prefix should be reached.</p>
+<p>The global Internet is not one centrally controlled router.</p>
+<p>It is an interconnection of networks with separate administration and policy. At the boundaries between those networks, the Border Gateway Protocol, or BGP, is the dominant mechanism for exchanging inter-domain reachability information.</p>
+<p>RFC 4271 specifies BGP-4.</p>
+<h2>Start with autonomous systems</h2>
+<p>An <strong>Autonomous System</strong>, or AS, is a routing domain identified by an AS number for inter-domain routing purposes.</p>
+<p>A simplified Internet path can look like:</p>
+<pre><code class="language-text">your host
+   ↓
+access router
+   ↓
+ISP AS
+   ↓
+transit or peer AS
+   ↓
+destination AS
+   ↓
+service network
+</code></pre>pre
+<p>The arrows do not imply one router per AS.</p>
+<p>Each AS can contain a large internal network with its own routing protocols, topology, and policies.</p>
+<p>BGP operates at the boundary where networks exchange reachability.</p>
+<h2>BGP advertises prefixes, not application services</h2>
+<p>A BGP speaker can advertise reachability to IP prefixes.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">203.0.113.0/24 reachable through this BGP path
+</code></pre>pre
+<p>The example prefix is documentation space.</p>
+<p>That route does not say:</p>
+<ul>
+<li>the web server is healthy;</li>
+<li>DNS points to the prefix;</li>
+<li>TCP port 443 is listening;</li>
+<li>the TLS certificate is valid;</li>
+<li>the application returned correct data.</li>
+</ul>
+<p>BGP's claim is narrower: routing information about network reachability.</p>
+<p>Again, protocol success at one layer is not end-to-end application success.</p>
+<h2>AS_PATH records inter-domain path information</h2>
+<p>One important BGP attribute is AS_PATH.</p>
+<p>As an advertisement crosses external BGP boundaries, AS path information records the autonomous systems through which the route advertisement has passed under the protocol's rules.</p>
+<p>A conceptual advertisement might contain:</p>
+<pre><code class="language-text">prefix: 198.51.100.0/24
+AS_PATH: 64496 64497 64498
+</code></pre>pre
+<p>The AS numbers shown are from the range reserved for documentation in RFC 5398.</p>
+<p>AS_PATH supports loop detection and participates in routing policy.</p>
+<p>But do not translate it into "physical routers the packet will cross."</p>
+<p>An AS path is inter-domain control-plane information. Inside each AS, the actual data-plane path can include many routers.</p>
+<h2>NEXT_HOP connects BGP to forwarding</h2>
+<p>RFC 4271 defines NEXT_HOP as a mandatory path attribute that identifies the IP address to use as a next hop toward advertised destinations under the relevant rules.</p>
+<p>BGP information eventually contributes to a router's selected route and forwarding state.</p>
+<p>The distinction is:</p>
+<pre><code class="language-text">control plane:
+learn and select reachability information
+
+data plane:
+forward actual packets using installed forwarding state
+</code></pre>pre
+<p>A BGP session can be healthy while a forwarding problem exists elsewhere.</p>
+<p>A forwarding path can also continue temporarily based on installed state while a routing-control event is changing.</p>
+<p>Troubleshooting should know which plane it is observing.</p>
+<h2>"Shortest path" is an incomplete mental model</h2>
+<p>BGP policy is not equivalent to geographic shortest path.</p>
+<p>Networks make routing decisions based on attributes, policy, commercial relationships, local preference, engineering goals, and implementation configuration.</p>
+<p>AS_PATH length can matter in route selection, but it is not a physical-distance meter and is not the only decision input.</p>
+<p>A path with fewer AS numbers can be physically longer.</p>
+<p>A route selected for policy reasons can differ from what a map suggests.</p>
+<p>The Internet is an economic and administrative system implemented with routing protocols, not only a geometry problem.</p>
+<h2>Forward and return paths can differ</h2>
+<p>IP routing decisions are made independently along the path.</p>
+<p>The route from A to B does not have to be the exact reverse of the route from B to A.</p>
+<p>This is called asymmetric routing.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">A → B:
+AS 64496 → 64497 → 64498
+
+B → A:
+AS 64498 → 64499 → 64496
+</code></pre>pre
+<p>Asymmetry can be completely normal.</p>
+<p>It becomes important when debugging:</p>
+<ul>
+<li>stateful firewalls;</li>
+<li>packet captures taken at only one boundary;</li>
+<li>latency;</li>
+<li>path-specific loss;</li>
+<li>source-address policy.</li>
+</ul>
+<p>Never infer the return path solely from the forward path.</p>
+<h2>Routing state changes over time</h2>
+<p>Prefixes can be announced, withdrawn, or learned through different peers.</p>
+<p>Routers then process those changes and update selected routes according to protocol state and policy.</p>
+<p>This means Internet reachability has a temporal dimension.</p>
+<p>A routing incident can affect some networks before others.</p>
+<p>Different observers can select different paths to the same prefix.</p>
+<p>"Works from my network" and "fails from another region" can both be true because the observers are not attached to the same routing state or data path.</p>
+<h2>BGP policy needs protection</h2>
+<p>Because BGP exchanges routing information between administrative domains, incorrect advertisements can cause large effects.</p>
+<p>RFC 7454 documents BGP operational and security practices including prefix filtering, AS-path filtering, session protection, and other controls.</p>
+<p>RFC 8212 recommends that external BGP speakers require explicit import and export policy so routes are not accidentally propagated merely because a session exists.</p>
+<p>The broad systems lesson is familiar:</p>
+<p><strong>a protocol session is not the same thing as authorization to accept every state update it carries.</strong></p>
+<p>Connectivity and policy are different contracts.</p>
+<h2>traceroute is not a BGP decoder</h2>
+<p>A tool such as <code>traceroute</code>code or <code>tracepath</code>code can provide useful data-plane observations.</p>
+<p>For example:</p>
+<pre><code class="language-bash">tracepath example.com
+</code></pre>pre
+<p>or:</p>
+<pre><code class="language-bash">traceroute example.com
+</code></pre>pre
+<p>depending on the system.</p>
+<p>The output may reveal responding routers along one path for that probe.</p>
+<p>It does not directly print the BGP AS_PATH that produced the forwarding state.</p>
+<p>Some routers do not answer probes. Load balancing can change which hops are observed. ICMP handling can differ from application traffic.</p>
+<p>Use traceroute as evidence about probe behavior, not as perfect topology truth.</p>
+<h2>Inspect the local decision first</h2>
+<p>Before thinking globally, ask what your own machine will do:</p>
+<pre><code class="language-bash">ip route get 1.1.1.1
+</code></pre>pre
+<p>Replace the destination with an address you are intentionally testing.</p>
+<p>This can show the selected local next hop, interface, and source-address decision on Linux.</p>
+<p>Then move outward.</p>
+<p>The first route lookup is local. BGP may not exist anywhere on the endpoint itself.</p>
+<h2>Build a local BGP model safely</h2>
+<p>If you want to observe BGP mechanics directly, do not experiment with public Internet announcements.</p>
+<p>Use an isolated virtual lab with open-source routing software such as FRRouting or BIRD.</p>
+<p>Create three virtual routers with private or documentation prefixes and private-use AS numbers. RFC 6996 reserves AS-number ranges for private use; use those inside an isolated lab rather than announcing them to the public Internet.</p>
+<p>Then:</p>
+<ol>
+<li>establish BGP sessions;</li>
+<li>advertise one test prefix;</li>
+<li>inspect the learned AS path;</li>
+<li>change import policy;</li>
+<li>withdraw the prefix;</li>
+<li>watch the selected route disappear or change.</li>
+</ol>
+<p>This exposes the control plane without touching real Internet routing.</p>
+<h2>Build a failure ladder</h2>
+<p>For an Internet-path problem:</p>
+<pre><code class="language-text">Does the endpoint have a local route?
+        ↓
+Can it reach the first-hop router?
+        ↓
+Does the provider have forwarding state?
+        ↓
+Is the destination prefix being advertised?
+        ↓
+Are policies accepting and propagating it?
+        ↓
+Does forwarding follow the selected route?
+        ↓
+Does the transport succeed?
+        ↓
+Does TLS/application behavior succeed?
+</code></pre>pre
+<p>Not every operator can observe every rung.</p>
+<p>That is why cross-network incidents require evidence from multiple administrative domains.</p>
+<h2>The lesson to carry forward</h2>
+<p>The Internet is not one route table.</p>
+<p>BGP lets autonomous systems exchange reachability information under policy. Routers turn selected control-plane state into forwarding behavior.</p>
+<p>The path can be asymmetric, dynamic, and administratively shaped.</p>
+<p>The next lesson adds another kind of intermediary: proxies, reverse proxies, caches, and CDN edges. They can change where a connection terminates even when DNS and routing are working exactly as designed.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

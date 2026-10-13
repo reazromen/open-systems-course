@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Digital logic is built from physical signals. The trick is not that voltage becomes magically binary, but that circuits interpret ranges robustly as discrete symbols." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>From Physical Signals to Digital Logic — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-006-physical-signals-to-digital-logic.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="From Physical Signals to Digital Logic" property="og:title"/><meta content="Digital logic is built from physical signals. The trick is not that voltage becomes magically binary, but that circuits interpret ranges robustly as discrete symbols." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-006-physical-signals-to-digital-logic.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>From Physical Signals to Digital Logic</h1><p class="lede">Digital logic is built from physical signals. The trick is not that voltage becomes magically binary, but that circuits interpret ranges robustly as discrete symbols.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>"Computers use zeros and ones" is true in the same way that "books use letters" is true.</p>
+<p>It describes a representation, not the complete physical mechanism.</p>
+<p>Inside real electronic systems, voltages and currents vary continuously. Transistors respond to physical electrical conditions. Timing is finite. Noise exists. Yet digital logic lets engineers reason with discrete states such as 0 and 1.</p>
+<p>How?</p>
+<p>By creating an abstraction boundary.</p>
+<p>MIT's Computation Structures material introduces exactly this move: concrete encoding of information, analog signaling, using voltages digitally, and then combinational devices.</p>
+<h2>A wire does not contain a philosophical zero</h2>
+<p>Imagine a digital input pin.</p>
+<p>The physical quantity at the pin may be a voltage such as 0.03 V, 0.17 V, 1.42 V, or 3.26 V.</p>
+<p>The voltage is not itself zero or one.</p>
+<p>The receiving circuit interprets ranges of voltage according to its electrical specification.</p>
+<p>A simplified imaginary system might say:</p>
+<pre><code>0.0 V to 0.8 V  -&gt; LOW
+2.0 V to 3.3 V  -&gt; HIGH
+</code></pre>pre
+<p>What about 1.4 V?</p>
+<p>In this invented example, it lies between the guaranteed ranges. We should not pretend the receiver is required to interpret it as a stable logical value.</p>
+<p>Real logic families and devices define their own input and output thresholds. Always use the relevant datasheet rather than copying these invented numbers into a circuit design.</p>
+<p>The important principle is:</p>
+<p>Continuous physical values can be mapped onto discrete logical categories.</p>
+<h2>Why ranges matter</h2>
+<p>Suppose a transmitter produced exactly 3.300000 V to represent HIGH and a receiver accepted only exactly 3.300000 V.</p>
+<p>The system would be extremely fragile.</p>
+<p>Real circuits need tolerance for noise, component variation, temperature, supply variation, and signal degradation.</p>
+<p>So digital interfaces are designed around regions.</p>
+<p>The transmitter is expected to produce outputs within certain guarantees. The receiver is expected to recognize corresponding input ranges. The gap between those guarantees can provide noise margin.</p>
+<p>This is one reason digital systems are robust: they often care about which region a signal belongs to rather than reproducing an exact analog value.</p>
+<p>That does not make them immune to analog physics.</p>
+<p>It makes the abstraction useful within specified conditions.</p>
+<h2>A transistor is not binary in the everyday sense</h2>
+<p>Transistors are physical devices whose behaviour depends on voltages, geometry, materials, temperature, and other conditions.</p>
+<p>Digital circuit design uses them to build structures that implement logical behaviour.</p>
+<p>At a higher level, we may describe an AND gate:</p>
+<pre><code>A  B | AND
+0  0 |  0
+0  1 |  0
+1  0 |  0
+1  1 |  1
+</code></pre>pre
+<p>That truth table is an abstraction.</p>
+<p>It says what logical relationship we expect.</p>
+<p>It does not describe transistor dimensions, propagation delay, current consumption, switching thresholds, or signal integrity.</p>
+<p>This is enormously valuable.</p>
+<p>A designer can combine gates into larger logical functions without reopening device physics for every operation.</p>
+<h2>Logic is about relationships between symbols</h2>
+<p>Consider NOT:</p>
+<pre><code>0 -&gt; 1
+1 -&gt; 0
+</code></pre>pre
+<p>AND:</p>
+<pre><code>0 AND 0 -&gt; 0
+0 AND 1 -&gt; 0
+1 AND 0 -&gt; 0
+1 AND 1 -&gt; 1
+</code></pre>pre
+<p>OR:</p>
+<pre><code>0 OR 0 -&gt; 0
+0 OR 1 -&gt; 1
+1 OR 0 -&gt; 1
+1 OR 1 -&gt; 1
+</code></pre>pre
+<p>From simple logical relationships, much larger digital functions can be built.</p>
+<p>But do not jump from truth tables to "therefore a modern CPU is simple."</p>
+<p>Scale changes the engineering problem.</p>
+<p>Real systems must deal with timing, fan-out, power, clock distribution, memory, synchronization, interconnect, fabrication constraints, and enormous numbers of devices.</p>
+<p>The abstraction helps us build upward without claiming the lower-level problem disappeared.</p>
+<h2>Timing is part of the physical reality</h2>
+<p>A logic gate does not respond infinitely fast.</p>
+<p>An input changes.</p>
+<p>Some finite time later, the output settles.</p>
+<p>This propagation delay matters.</p>
+<p>Imagine two paths through a circuit:</p>
+<pre><code>input -&gt; gate -&gt; output
+</code></pre>pre
+<p>and:</p>
+<pre><code>input -&gt; gate -&gt; gate -&gt; gate -&gt; output
+</code></pre>pre
+<p>The paths may settle at different times.</p>
+<p>If another part of the system samples the outputs at the wrong moment, transient values can matter.</p>
+<p>Later, when we study clocks and sequential logic, we will see how systems create timing discipline around changing signals.</p>
+<p>For now, remember:</p>
+<p>Logical correctness and timing correctness are separate requirements.</p>
+<p>A Boolean equation may be right while a physical implementation fails at a chosen clock speed.</p>
+<h2>Digital does not mean there are only two voltages</h2>
+<p>Another common misconception is that digital electronics contains only two physical voltage values.</p>
+<p>No.</p>
+<p>The physical signals vary continuously.</p>
+<p>The interpretation is discrete.</p>
+<p>This distinction also explains why oscilloscopes are useful when debugging digital systems. A logic analyzer may show a clean sequence of zeros and ones because it applies thresholds. An oscilloscope can reveal ringing, slow edges, overshoot, noise, or voltage levels that make those logical decisions unreliable.</p>
+<p>Both instruments are observing the same physical system through different abstractions.</p>
+<h2>Where does software enter?</h2>
+<p>A CPU instruction such as an integer addition eventually causes physical circuits to switch.</p>
+<p>But software engineers normally do not reason directly from a Python expression to transistor transitions.</p>
+<p>They use intermediate abstractions:</p>
+<pre><code>source code
+  -&gt; language or runtime
+  -&gt; machine instructions
+  -&gt; processor datapath and control
+  -&gt; digital logic
+  -&gt; transistors
+  -&gt; electrical behaviour
+</code></pre>pre
+<p>Each layer gives us a vocabulary appropriate to a different problem.</p>
+<p>A bug in an algorithm is usually solved near the software layer.</p>
+<p>A timing failure in a high-speed digital interface may require going much lower.</p>
+<p>The ability to move between layers is more valuable than pretending one layer explains everything.</p>
+<h2>An embedded example: reading a button</h2>
+<p>Consider a button connected to an ESP32-class microcontroller.</p>
+<p>At the physical layer, switch position changes a circuit.</p>
+<p>At the electrical layer, pin voltage changes.</p>
+<p>At the digital input layer, voltage is interpreted as LOW or HIGH.</p>
+<p>At the register layer, input state becomes visible to the processor.</p>
+<p>At the firmware layer, the program might represent that state as:</p>
+<pre><code>pressed = true
+</code></pre>pre
+<p>At the application layer, that may trigger an action such as starting a call.</p>
+<p>A learner who sees only the final function call misses most of the system.</p>
+<p>A learner who sees only transistor physics also misses why the system exists.</p>
+<p>We need both directions.</p>
+<h2>Exercise: find the abstraction boundary</h2>
+<p>Take a digital GPIO input.</p>
+<p>Draw two columns.</p>
+<p>Physical observations:</p>
+<ul>
+<li>voltage;</li>
+<li>rise time;</li>
+<li>noise;</li>
+<li>timing.</li>
+</ul>
+<p>Logical observations:</p>
+<ul>
+<li>LOW;</li>
+<li>HIGH;</li>
+<li>transition;</li>
+<li>sampled value.</li>
+</ul>
+<p>Now ask:</p>
+<ol>
+<li>What rule maps the left column into the right?</li>
+<li>Where is that rule specified?</li>
+<li>What happens when the physical signal violates the assumptions?</li>
+</ol>
+<p>Do not guess the voltage thresholds for a real board. Look them up in the device datasheet when you do a real design.</p>
+<p>That habit, moving from generic concept to device-specific evidence, is part of engineering accuracy.</p>
+<h2>The lesson to carry forward</h2>
+<p>Digital logic is powerful because it lets us build discrete reasoning on top of continuous physical systems.</p>
+<p>The useful statement is not "electricity becomes binary."</p>
+<p>It is:</p>
+<p>Circuits are designed so that physical signal ranges can be interpreted as stable logical symbols under specified conditions.</p>
+<p>Once we have those symbols, we can build gates.</p>
+<p>From gates, storage.</p>
+<p>From storage and combinational logic, state machines.</p>
+<p>From state machines and datapaths, processors.</p>
+<p>From processors and memory, programmable computers.</p>
+<p>The abstraction is astonishing enough without turning it into magic.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

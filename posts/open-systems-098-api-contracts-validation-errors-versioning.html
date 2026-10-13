@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="An HTTP API is more than routes and JSON. A durable contract defines resources, schemas, validation, error semantics, compatibility, idempotency, and how change is introduced." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>API Contracts: Resources, Validation, Errors, and Versioning — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-098-api-contracts-validation-errors-versioning.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="API Contracts: Resources, Validation, Errors, and Versioning" property="og:title"/><meta content="An HTTP API is more than routes and JSON. A durable contract defines resources, schemas, validation, error semantics, compatibility, idempotency, and how change is introduced." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-098-api-contracts-validation-errors-versioning.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>API Contracts: Resources, Validation, Errors, and Versioning</h1><p class="lede">An HTTP API is more than routes and JSON. A durable contract defines resources, schemas, validation, error semantics, compatibility, idempotency, and how change is introduced.</p><div class="article-meta"><span>Published 2026-10-07</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>An API can return valid JSON and still be a bad interface.</p>
+<p>Why?</p>
+<p>Because syntax is only one layer of the contract.</p>
+<p>A useful API contract answers questions such as:</p>
+<ul>
+<li>what resources exist;</li>
+<li>which operations are allowed;</li>
+<li>what fields mean;</li>
+<li>which values are required;</li>
+<li>how errors are represented;</li>
+<li>what retries are safe;</li>
+<li>how pagination works;</li>
+<li>how clients discover change;</li>
+<li>what remains compatible across versions.</li>
+</ul>
+<p>HTTP gives us a transport and semantic foundation.</p>
+<p>The application still has to define the domain contract.</p>
+<h2>Start from resources and operations</h2>
+<p>Consider a message service.</p>
+<p>A weak design starts with routes:</p>
+<pre><code class="language-text">POST /doThing
+POST /getThing
+POST /updateThing
+</code></pre>pre
+<p>A stronger design asks what the resources are and how HTTP semantics fit them.</p>
+<p>For example:</p>
+<pre><code class="language-text">GET    /messages/784
+POST   /messages
+DELETE /messages/784
+</code></pre>pre
+<p>That does not mean every API must be perfectly REST-shaped.</p>
+<p>The point is to make the protocol semantics and domain model reinforce each other rather than fight each other.</p>
+<p>A resource-oriented design can make caching, idempotency, observability, authorization, and documentation easier to reason about.</p>
+<h2>A schema is part of the contract</h2>
+<p>Suppose a client sends:</p>
+<pre><code class="language-json">{
+  "recipient": "user-42",
+  "text": "hello"
+}
+</code></pre>pre
+<p>The server needs rules for:</p>
+<ul>
+<li>required fields;</li>
+<li>allowed types;</li>
+<li>length limits;</li>
+<li>enum values;</li>
+<li>nested structures;</li>
+<li>unknown fields;</li>
+<li>default behavior.</li>
+</ul>
+<p>Without an explicit schema, clients discover the contract by trial and error.</p>
+<p>JSON Schema is one standardized way to describe JSON structure and validation constraints.</p>
+<p>OpenAPI can describe HTTP API operations, parameters, schemas, responses, and other interface details.</p>
+<p>The specification is not the implementation.</p>
+<p>But it can make the intended contract inspectable.</p>
+<h2>Parsing and validation are different stages</h2>
+<p>A request can be syntactically valid JSON and still be invalid for the application.</p>
+<p>For example:</p>
+<pre><code class="language-json">{
+  "recipient": "",
+  "text": "hello"
+}
+</code></pre>pre
+<p>The parser can succeed.</p>
+<p>The application validator can reject the empty recipient.</p>
+<p>A useful processing model is:</p>
+<pre><code class="language-text">bytes
+  ↓
+HTTP framing
+  ↓
+media-type parsing
+  ↓
+schema validation
+  ↓
+business validation
+  ↓
+authorization
+  ↓
+state transition
+</code></pre>pre
+<p>Different systems can order some policy checks differently, but the distinction remains valuable.</p>
+<p>"Invalid JSON" is not the same failure as "valid JSON with an invalid business value."</p>
+<h2>Error responses need stable structure</h2>
+<p>If every endpoint invents its own error shape, clients become fragile.</p>
+<p>One endpoint returns:</p>
+<pre><code class="language-json">{"error":"bad request"}
+</code></pre>pre
+<p>another:</p>
+<pre><code class="language-json">{"message":"failed"}
+</code></pre>pre
+<p>another:</p>
+<pre><code class="language-json">{"code":17,"detail":"recipient missing"}
+</code></pre>pre
+<p>A consistent error model helps clients distinguish machine-readable categories from human-readable details.</p>
+<p>RFC 9457 defines Problem Details for HTTP APIs.</p>
+<p>A problem response can contain standardized members such as:</p>
+<ul>
+<li>type;</li>
+<li>title;</li>
+<li>status;</li>
+<li>detail;</li>
+<li>instance;</li>
+</ul>
+<p>and can be extended with application-specific fields.</p>
+<p>The goal is not to make every API use one exact error body.</p>
+<p>The goal is to make errors part of the documented contract rather than ad-hoc strings.</p>
+<h2>HTTP status and application error should agree</h2>
+<p>If validation fails, returning HTTP 200 with:</p>
+<pre><code class="language-json">{"success":false}
+</code></pre>pre
+<p>throws away useful HTTP semantics.</p>
+<p>Sometimes application protocols deliberately define such behavior, but it should be an explicit decision.</p>
+<p>Usually, a client benefits when the HTTP status represents the request outcome class and the body provides richer detail.</p>
+<p>For example:</p>
+<pre><code class="language-text">400
+request syntax/structure invalid
+
+401
+authentication required or failed
+
+403
+identity known but operation forbidden
+
+404
+target resource unavailable/not disclosed
+
+409
+request conflicts with current state
+
+422
+content understood but semantically invalid
+
+429
+rate limit exceeded
+
+500
+unexpected server failure
+</code></pre>pre
+<p>The exact choice depends on the contract and current HTTP semantics.</p>
+<p>Do not select status codes based only on English wording.</p>
+<h2>Validation errors should point to the failing field</h2>
+<p>For a structured request, a useful error can identify:</p>
+<ul>
+<li>field or path;</li>
+<li>error code;</li>
+<li>human-readable message;</li>
+<li>expected constraint.</li>
+</ul>
+<p>Constructed example:</p>
+<pre><code class="language-json">{
+  "type": "https://api.example/problems/validation",
+  "title": "Request validation failed",
+  "status": 422,
+  "errors": [
+    {
+      "path": "recipient",
+      "code": "required",
+      "message": "recipient must not be empty"
+    }
+  ]
+}
+</code></pre>pre
+<p>The URL and content are constructed.</p>
+<p>The important property is stability.</p>
+<p>Client code can reason about <code>code</code>code and <code>path</code>code without parsing prose.</p>
+<h2>Idempotency belongs in the API contract</h2>
+<p>A payment, job submission, or message-send API can receive the same operation more than once because of retries.</p>
+<p>The API must define whether repeated delivery can create repeated effects.</p>
+<p>Some operations fit naturally with idempotent HTTP methods.</p>
+<p>Others use application-level idempotency keys.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">client operation id
+      ↓
+server remembers completed/requested operation
+      ↓
+duplicate delivery
+      ↓
+same logical outcome instead of duplicate effect
+</code></pre>pre
+<p>This is not free.</p>
+<p>The server needs storage, expiration policy, conflict handling, and a definition of what counts as "the same operation."</p>
+<p>Retry semantics belong in the contract, not in a hidden client library assumption.</p>
+<h2>Pagination is also protocol state</h2>
+<p>A list endpoint can become enormous.</p>
+<p>Pagination needs a contract around:</p>
+<ul>
+<li>page size;</li>
+<li>ordering;</li>
+<li>continuation;</li>
+<li>consistency under concurrent changes.</li>
+</ul>
+<p>Offset pagination:</p>
+<pre><code class="language-text">?page=5&amp;limit=20
+</code></pre>pre
+<p>is easy to understand but can shift when records are inserted or deleted.</p>
+<p>Cursor pagination can represent continuation based on ordered state.</p>
+<p>Neither is universally better.</p>
+<p>The API should define the ordering and what a cursor means.</p>
+<p>A cursor should be treated as an opaque token unless the API explicitly documents its structure.</p>
+<h2>Versioning is a change-management problem</h2>
+<p>Teams often jump directly to:</p>
+<pre><code class="language-text">/v1/
+/v2/
+</code></pre>pre
+<p>But versioning is not fundamentally about the URL.</p>
+<p>It is about compatibility.</p>
+<p>A change can be:</p>
+<ul>
+<li>backward compatible;</li>
+<li>additive;</li>
+<li>conditionally compatible;</li>
+<li>breaking.</li>
+</ul>
+<p>Examples of often-compatible changes include adding an optional response field when clients are required to ignore unknown fields.</p>
+<p>Examples of breaking changes include changing a field's meaning or removing a required property that clients depend on.</p>
+<p>Versioning strategies can include:</p>
+<ul>
+<li>URL versions;</li>
+<li>media-type versions;</li>
+<li>header-based versions;</li>
+<li>date-based compatibility contracts;</li>
+<li>separate endpoints or products.</li>
+</ul>
+<p>No single strategy solves bad compatibility discipline.</p>
+<h2>Deprecation needs a lifecycle</h2>
+<p>A mature API needs a path from:</p>
+<pre><code class="language-text">supported
+  ↓
+deprecated
+  ↓
+migration window
+  ↓
+retired
+</code></pre>pre
+<p>Clients need enough information to migrate.</p>
+<p>That can include:</p>
+<ul>
+<li>documentation;</li>
+<li>change logs;</li>
+<li>response metadata;</li>
+<li>usage telemetry;</li>
+<li>explicit deadlines.</li>
+</ul>
+<p>Removing an endpoint without knowing who still uses it is an operational failure, not merely a versioning decision.</p>
+<h2>Contract tests protect both sides</h2>
+<p>An API implementation can pass unit tests while breaking clients.</p>
+<p>Contract tests can verify:</p>
+<ul>
+<li>required fields remain present;</li>
+<li>response types remain compatible;</li>
+<li>error shapes remain stable;</li>
+<li>documented status codes are used;</li>
+<li>authentication requirements remain correct;</li>
+<li>schemas match actual output.</li>
+</ul>
+<p>If an OpenAPI description exists, CI can compare it against implementation behavior or detect breaking schema changes.</p>
+<p>The contract becomes executable evidence.</p>
+<h2>Practical inspection</h2>
+<p>Choose one API you operate.</p>
+<p>For a single endpoint, write down:</p>
+<pre><code class="language-text">method
+path
+authentication
+request schema
+success status
+success schema
+validation errors
+authorization errors
+retry behavior
+rate-limit behavior
+pagination, if any
+versioning rule
+</code></pre>pre
+<p>Then compare the written contract with the actual implementation and logs.</p>
+<p>Every mismatch is technical debt.</p>
+<p>Do not start by generating documentation automatically.</p>
+<p>First verify the contract you intend to preserve.</p>
+<h2>Break it safely</h2>
+<p>On a test API:</p>
+<ol>
+<li>omit a required field;</li>
+<li>send the wrong type;</li>
+<li>send an unknown field;</li>
+<li>send a duplicate operation;</li>
+<li>request an unknown resource;</li>
+<li>trigger a known conflict;</li>
+<li>exceed a test rate limit.</li>
+</ol>
+<p>Record both:</p>
+<pre><code class="language-text">HTTP status
+error representation
+</code></pre>pre
+<p>The goal is to make failure as predictable as success.</p>
+<h2>The lesson to carry forward</h2>
+<p>An API contract is a compatibility boundary.</p>
+<p>HTTP provides methods, statuses, fields, and representations.</p>
+<p>The application adds schemas, validation, domain semantics, authorization, retries, pagination, and change policy.</p>
+<p>The next lesson places that API inside a deployment: web server, reverse proxy, application process, database, cache, queue, and upstream services.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

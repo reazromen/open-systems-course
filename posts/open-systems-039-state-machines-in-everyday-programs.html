@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Many messy programs become understandable when hidden modes are made explicit as states and allowed events as transitions." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>State Machines in Everyday Programs — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-039-state-machines-in-everyday-programs.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="State Machines in Everyday Programs" property="og:title"/><meta content="Many messy programs become understandable when hidden modes are made explicit as states and allowed events as transitions." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-039-state-machines-in-everyday-programs.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>State Machines in Everyday Programs</h1><p class="lede">Many messy programs become understandable when hidden modes are made explicit as states and allowed events as transitions.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A login form can be:</p>
+<pre><code>idle
+submitting
+authenticated
+rejected
+locked
+</code></pre>pre
+<p>A phone call can be:</p>
+<pre><code>idle
+dialing
+ringing
+connected
+ending
+</code></pre>pre
+<p>A firmware updater can be:</p>
+<pre><code>checking
+downloading
+verifying
+installing
+rebooting
+confirmed
+rollback
+</code></pre>pre
+<p>These are state machines hiding inside ordinary software.</p>
+<h2>State plus event produces transition</h2>
+<p>A state machine can be expressed as:</p>
+<pre><code>current state + event -&gt; next state
+</code></pre>pre
+<p>Example:</p>
+<pre><code>RINGING + answer -&gt; CONNECTED
+</code></pre>pre
+<p>But:</p>
+<pre><code>IDLE + answer -&gt; ?
+</code></pre>pre
+<p>Maybe invalid.</p>
+<p>Maybe ignored.</p>
+<p>Maybe interpreted differently.</p>
+<p>The model forces us to define which events make sense in which states.</p>
+<p>That precision is why state machines are useful.</p>
+<h2>Boolean flags can hide impossible combinations</h2>
+<p>Suppose code contains:</p>
+<pre><code>is_connected
+is_ringing
+is_ended
+</code></pre>pre
+<p>Now what does this mean?</p>
+<pre><code>true, true, true
+</code></pre>pre
+<p>Probably an impossible state.</p>
+<p>Three Booleans create eight combinations whether the domain allows them or not.</p>
+<p>One explicit enum:</p>
+<pre><code>IDLE
+RINGING
+CONNECTED
+ENDED
+</code></pre>pre
+<p>can make invalid combinations unrepresentable.</p>
+<p>Data modeling simplifies control flow.</p>
+<h2>Transitions can have guards</h2>
+<p>A firmware update can move from downloaded to installing only if signature verification succeeds.</p>
+<p>Conceptually:</p>
+<pre><code>DOWNLOADED
+   |
+   | signature valid
+   v
+VERIFIED
+   |
+   v
+INSTALLING
+</code></pre>pre
+<p>If verification fails, transition elsewhere.</p>
+<p>The guard is a condition attached to a state transition.</p>
+<p>This is often clearer than scattered if statements checking unrelated flags.</p>
+<h2>Transitions can produce effects</h2>
+<p>State machines do not only change labels.</p>
+<p>Entering CONNECTED may start media.</p>
+<p>Entering RETRY_WAIT may schedule a timer.</p>
+<p>Entering FAILED may emit an alert.</p>
+<p>Be careful to distinguish:</p>
+<ul>
+<li>state change;</li>
+<li>side effect caused by transition.</li>
+</ul>
+<p>If side effects fail, the state machine may need additional states.</p>
+<p>Reality is sometimes more detailed than the first diagram.</p>
+<h2>Time can be an event</h2>
+<p>No response for five seconds.</p>
+<p>That is a timeout event.</p>
+<p>Now:</p>
+<pre><code>CONNECTING + timeout -&gt; RETRY_WAIT
+</code></pre>pre
+<p>After backoff:</p>
+<pre><code>RETRY_WAIT + timer -&gt; CONNECTING
+</code></pre>pre
+<p>Distributed systems are full of state machines driven by messages and timers.</p>
+<p>Once you see this, protocols become easier to read.</p>
+<h2>Persistence makes restart behaviour explicit</h2>
+<p>Suppose an OTA updater crashes in INSTALLING.</p>
+<p>After reboot, what state does it believe?</p>
+<p>If state existed only in RAM, the process may forget.</p>
+<p>If critical transition progress is persisted, recovery can resume or rollback safely.</p>
+<p>State-machine design therefore connects to storage and durability.</p>
+<h2>Multiple machines create multiple state machines</h2>
+<p>In a phone call:</p>
+<p>caller has state.</p>
+<p>PBX has state.</p>
+<p>callee has state.</p>
+<p>Media relay has state.</p>
+<p>They exchange messages trying to coordinate.</p>
+<p>They may temporarily disagree.</p>
+<p>That is why distributed protocol debugging requires following state at each participant rather than drawing one global magical state.</p>
+<h2>Exercise: model a download</h2>
+<p>States:</p>
+<pre><code>IDLE
+DOWNLOADING
+VERIFYING
+READY
+FAILED
+</code></pre>pre
+<p>Events:</p>
+<pre><code>start
+bytes complete
+hash valid
+hash invalid
+timeout
+cancel
+</code></pre>pre
+<p>Create a transition table.</p>
+<p>Then ask:</p>
+<p>Which states persist after restart?</p>
+<p>Which events are valid twice?</p>
+<p>Which transitions have side effects?</p>
+<p>You have designed more than control flow.</p>
+<p>You have designed behaviour over time.</p>
+<h2>The lesson to carry forward</h2>
+<p>State machines turn hidden modes into explicit models.</p>
+<p>They are useful whenever behaviour depends on history.</p>
+<p>Instead of asking only:</p>
+<p>What line runs next?</p>
+<p>ask:</p>
+<p>What state are we in?</p>
+<p>Which events are valid here?</p>
+<p>What transition occurs?</p>
+<p>What side effects accompany it?</p>
+<p>This model will return in networking, telephony, devices, distributed systems, and security.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

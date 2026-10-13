@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="HTTP methods describe request semantics, while safety and idempotency help clients, caches, retries, and intermediaries reason about consequences. Status codes report protocol-level outcomes." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>HTTP Methods, Safety, Idempotency, and Status Codes — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-093-http-methods-safety-idempotency-status-codes.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="HTTP Methods, Safety, Idempotency, and Status Codes" property="og:title"/><meta content="HTTP methods describe request semantics, while safety and idempotency help clients, caches, retries, and intermediaries reason about consequences. Status codes report protocol-level outcomes." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-093-http-methods-safety-idempotency-status-codes.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>HTTP Methods, Safety, Idempotency, and Status Codes</h1><p class="lede">HTTP methods describe request semantics, while safety and idempotency help clients, caches, retries, and intermediaries reason about consequences. Status codes report protocol-level outcomes.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A method name is not merely a verb chosen for style.</p>
+<p>HTTP methods carry semantics that clients, servers, proxies, caches, retry logic, and operators can reason about. If an API uses methods carelessly, the system can still appear to work while losing useful protocol guarantees.</p>
+<p>RFC 9110 defines the semantics of the core HTTP methods.</p>
+<h2>GET means retrieval</h2>
+<p>A GET request asks for a representation of the selected resource.</p>
+<p>That does not mean the server must read a static file. The resource could be computed, database-backed, proxied, or generated.</p>
+<p>What matters is the semantic contract: GET is a retrieval method and is defined as safe.</p>
+<p>A safe method is one whose defined semantics are essentially read-only from the client's perspective. Servers may still perform logging, metrics, cache updates, or other incidental work.</p>
+<p>So "safe" does not mean "nothing anywhere changes."</p>
+<p>It means the client is not requesting a state-changing operation as the purpose of the request.</p>
+<h2>POST is intentionally broad</h2>
+<p>POST asks the target resource to process the enclosed representation according to the resource's own semantics.</p>
+<p>That can mean:</p>
+<ul>
+<li>create something;</li>
+<li>submit a form;</li>
+<li>trigger processing;</li>
+<li>append an event;</li>
+<li>ask a service to perform an operation.</li>
+</ul>
+<p>POST is not defined as safe or idempotent.</p>
+<p>Repeating the same POST can therefore create a second effect unless the application adds its own idempotency mechanism.</p>
+<p>This becomes critical when clients retry after timeouts.</p>
+<h2>PUT and DELETE are idempotent by definition</h2>
+<p>An idempotent method can be repeated with the same intended effect as making it once.</p>
+<p>PUT is idempotent. DELETE is idempotent.</p>
+<p>That does not mean repeated requests produce byte-for-byte identical responses. Timestamps, audit records, version counters, or representation details can change. The important property is the requested effect on the target resource.</p>
+<p>If a client sends the same PUT twice because the first response was lost, the second request is not supposed to create a second independent resource as a consequence of the method semantics.</p>
+<p>Idempotency is therefore a systems property that helps with retries.</p>
+<h2>PATCH is different</h2>
+<p>PATCH is commonly used for partial modification, but its semantics are defined separately from the core methods in RFC 5789.</p>
+<p>A PATCH operation may or may not be idempotent depending on the patch document and application semantics.</p>
+<p>For example:</p>
+<pre><code class="language-text">set counter to 10
+</code></pre>pre
+<p>can be idempotent.</p>
+<p>But:</p>
+<pre><code class="language-text">increment counter by 1
+</code></pre>pre
+<p>is not.</p>
+<p>Do not infer idempotency from the word "update."</p>
+<h2>Status codes describe the HTTP result</h2>
+<p>HTTP status codes are grouped into classes:</p>
+<ul>
+<li>1xx — informational;</li>
+<li>2xx — successful;</li>
+<li>3xx — redirection;</li>
+<li>4xx — client error;</li>
+<li>5xx — server error.</li>
+</ul>
+<p>The class gives broad meaning. The specific code provides more precise semantics.</p>
+<p>Examples:</p>
+<ul>
+<li>200 OK — successful response under the method's semantics;</li>
+<li>201 Created — successful creation with additional creation semantics;</li>
+<li>204 No Content — success with no response content;</li>
+<li>304 Not Modified — conditional request result used with caching;</li>
+<li>400 Bad Request — request could not be processed as a valid request;</li>
+<li>401 Unauthorized — authentication is required or has failed under the relevant challenge scheme;</li>
+<li>403 Forbidden — request understood but refused;</li>
+<li>404 Not Found — target resource not found or not disclosed;</li>
+<li>409 Conflict — request conflicts with current resource state;</li>
+<li>429 Too Many Requests — rate limiting or request throttling;</li>
+<li>500 Internal Server Error — unexpected server condition;</li>
+<li>502 Bad Gateway — gateway/proxy received an invalid upstream response;</li>
+<li>503 Service Unavailable — service temporarily unable to handle the request;</li>
+<li>504 Gateway Timeout — gateway/proxy timed out waiting for upstream.</li>
+</ul>
+<p>A 4xx code does not mean "the user's laptop is broken." It means the server is classifying the request as a client-side protocol/application problem at that boundary.</p>
+<p>A 5xx code does not necessarily mean the process that returned it is itself the failing component. A gateway can report an upstream failure.</p>
+<h2>Retries must respect semantics</h2>
+<p>Suppose a client times out after sending a request.</p>
+<p>It does not know whether:</p>
+<ul>
+<li>the request never reached the server;</li>
+<li>the server received it but did not complete;</li>
+<li>the server completed it but the response was lost.</li>
+</ul>
+<p>For idempotent methods, automatic retry is easier to reason about.</p>
+<p>For non-idempotent operations, an application may need a request identifier or idempotency key so that a repeated delivery does not create a duplicate business effect.</p>
+<p>That is an application-level mechanism layered on top of HTTP method semantics.</p>
+<h2>Practical inspection</h2>
+<p>On a test API you control, create one endpoint for GET and one for POST.</p>
+<p>Record a server-side request counter.</p>
+<p>Call GET repeatedly. Then call POST repeatedly with the same body.</p>
+<p>Observe whether the business state changes.</p>
+<p>Next, simulate a client timeout after the server has already processed the POST. Retry the request manually.</p>
+<p>The goal is to distinguish:</p>
+<pre><code class="language-text">message delivered twice
+</code></pre>pre
+<p>from:</p>
+<pre><code class="language-text">business effect applied twice
+</code></pre>pre
+<p>Those are not the same system property.</p>
+<h2>Status codes are evidence, not prose</h2>
+<p>When diagnosing a failed request, preserve:</p>
+<pre><code class="language-text">method
+target
+status
+response fields
+response content
+which component returned it
+</code></pre>pre
+<p>A <code>502</code>code from an edge proxy and a <code>500</code>code from the origin application are different failure boundaries.</p>
+<p>Do not rewrite every non-200 response into "API down."</p>
+<h2>The lesson to carry forward</h2>
+<p>Methods tell the server what kind of operation the client is requesting. Safety and idempotency constrain what clients and intermediaries can assume. Status codes report the HTTP-level outcome.</p>
+<p>The next lesson adds representation metadata, headers, content negotiation, and caching-related fields.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

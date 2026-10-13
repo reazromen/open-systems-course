@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Processes give stronger isolation boundaries; threads give cheaper shared-memory coordination inside one process. The choice is about failure, ownership, communication, and scheduling—not fashion." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Processes vs Threads — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-054-processes-vs-threads.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Processes vs Threads" property="og:title"/><meta content="Processes give stronger isolation boundaries; threads give cheaper shared-memory coordination inside one process. The choice is about failure, ownership, communication, and scheduling—not fashion." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-054-processes-vs-threads.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Processes vs Threads</h1><p class="lede">Processes give stronger isolation boundaries; threads give cheaper shared-memory coordination inside one process. The choice is about failure, ownership, communication, and scheduling—not fashion.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>You want two pieces of work to happen concurrently.</p>
+<p>Should they be threads in one process?</p>
+<p>Or separate processes?</p>
+<p>There is no universal answer.</p>
+<p>The difference is primarily about what state is shared and what failures are isolated.</p>
+<h2>Processes separate address spaces</h2>
+<p>Two ordinary processes have separate virtual address spaces.</p>
+<p>One cannot normally read or write the other's memory directly.</p>
+<p>Communication requires an explicit mechanism:</p>
+<ul>
+<li>pipe;</li>
+<li>socket;</li>
+<li>shared memory;</li>
+<li>file;</li>
+<li>message queue;</li>
+<li>OS-specific IPC.</li>
+</ul>
+<p>That boundary creates overhead.</p>
+<p>It also creates isolation.</p>
+<p>One process can crash without directly corrupting the other's heap.</p>
+<h2>Threads share the process address space</h2>
+<p>Threads in one process share:</p>
+<ul>
+<li>heap;</li>
+<li>global data;</li>
+<li>open descriptors;</li>
+<li>much process state.</li>
+</ul>
+<p>Each thread has its own execution context and stack.</p>
+<p>Communication can be as simple as reading the same object.</p>
+<p>That is fast.</p>
+<p>It also creates races.</p>
+<p>Shared mutable memory is convenient precisely because the boundary is weak.</p>
+<h2>Failure boundaries differ</h2>
+<p>Suppose one thread performs invalid memory access that terminates the process.</p>
+<p>All threads in that process disappear.</p>
+<p>Suppose one worker process crashes.</p>
+<p>A supervisor can often restart that process while others continue.</p>
+<p>This is one reason browsers and servers sometimes split responsibilities across processes.</p>
+<p>Isolation can be a reliability feature.</p>
+<h2>IPC makes contracts explicit</h2>
+<p>A process boundary forces you to serialize or otherwise define communication.</p>
+<p>That can feel cumbersome.</p>
+<p>It can also improve architecture.</p>
+<p>Instead of arbitrary shared pointers, components exchange messages through a defined interface.</p>
+<p>The cost is latency and complexity.</p>
+<p>The benefit is clearer ownership and independent lifecycle.</p>
+<h2>Threads can coordinate at finer granularity</h2>
+<p>Shared memory allows small data structures to be updated efficiently.</p>
+<p>A thread pool can process tasks without serializing every object.</p>
+<p>For compute-heavy workloads on shared data, threads may fit naturally.</p>
+<p>But locking and cache contention can erase the expected performance gain.</p>
+<p>Benchmark the workload.</p>
+<h2>Languages add another layer</h2>
+<p>An OS thread is not always the same as a language-level concurrency construct.</p>
+<p>Runtimes may provide:</p>
+<ul>
+<li>coroutines;</li>
+<li>async tasks;</li>
+<li>green threads;</li>
+<li>fibers;</li>
+<li>actor systems.</li>
+</ul>
+<p>Many such tasks may run on fewer OS threads.</p>
+<p>The source abstraction and scheduler layer differ.</p>
+<p>Always ask who schedules the unit:</p>
+<p>language runtime or kernel?</p>
+<h2>Process creation can be cheap enough</h2>
+<p>Modern systems optimize process creation using copy-on-write, shared libraries, and efficient IPC mechanisms.</p>
+<p>Do not assume a process always means duplicating all memory immediately.</p>
+<p>Likewise, do not assume threads are "free."</p>
+<p>Thread stacks, scheduler entries, runtime state, synchronization, and cache effects all cost resources.</p>
+<p>Architecture needs measurement, not folklore.</p>
+<h2>Security favors boundaries</h2>
+<p>If untrusted plugin code runs inside the same process as secrets, memory-safety bugs can expose everything in that address space.</p>
+<p>Moving untrusted work to a restricted process can create a stronger boundary enforced by the OS.</p>
+<p>Sandboxes build on this idea.</p>
+<p>The trade-off is more communication infrastructure.</p>
+<p>Security changes what "cheap" means.</p>
+<h2>Exercise: choose the boundary</h2>
+<p>Scenario A:</p>
+<p>Image-processing workers occasionally crash due to third-party native libraries.</p>
+<p>Process isolation may be attractive.</p>
+<p>Scenario B:</p>
+<p>Eight CPU workers update a shared in-memory numeric array.</p>
+<p>Threads may be attractive if synchronization is manageable.</p>
+<p>Scenario C:</p>
+<p>Untrusted document parser handles files from the Internet.</p>
+<p>Stronger process sandboxing is worth considering.</p>
+<p>For each, state what you are optimizing:</p>
+<p>speed?</p>
+<p>isolation?</p>
+<p>simplicity?</p>
+<p>security?</p>
+<h2>The lesson to carry forward</h2>
+<p>Processes and threads are both execution structures.</p>
+<p>Processes emphasize isolation and explicit communication.</p>
+<p>Threads emphasize shared state and cheap coordination.</p>
+<p>The choice should follow:</p>
+<ul>
+<li>failure boundary;</li>
+<li>security boundary;</li>
+<li>communication volume;</li>
+<li>state ownership;</li>
+<li>runtime model;</li>
+<li>workload.</li>
+</ul>
+<p>"Threads are faster" and "processes are safer" are useful starting intuitions, not complete designs.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

@@ -1,0 +1,10 @@
+/* Open Systems Course preview fix: legacy dark pre styling conflicted with the light article theme. */
+.article .prose pre {
+  background: var(--surface) !important;
+  color: var(--text-strong) !important;
+  border-color: var(--line) !important;
+}
+.article .prose pre code {
+  color: inherit !important;
+  background: transparent !important;
+}

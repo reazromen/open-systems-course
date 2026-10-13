@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="One application write can cross validation, transaction logic, indexes, WAL, page cache, storage devices, cache invalidation, replication, queues, and backup history. Following the write reveals what commit actually proves." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Follow One Write to Durable Storage — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-110-follow-one-write-durable-storage.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Follow One Write to Durable Storage" property="og:title"/><meta content="One application write can cross validation, transaction logic, indexes, WAL, page cache, storage devices, cache invalidation, replication, queues, and backup history. Following the write reveals what commit actually proves." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-110-follow-one-write-durable-storage.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Follow One Write to Durable Storage</h1><p class="lede">One application write can cross validation, transaction logic, indexes, WAL, page cache, storage devices, cache invalidation, replication, queues, and backup history. Following the write reveals what commit actually proves.</p><div class="article-meta"><span>Published 2026-10-07</span><span>15 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>We have separated filesystems, databases, schemas, indexes, transactions, isolation, caches, queues, replication, and backups.</p>
+<p>Now follow one write through all of them.</p>
+<p>Consider a constructed example: a signed-in user changes the display name on their profile from R to Reaz.</p>
+<p>The application uses PostgreSQL as the source of truth, Redis as a cache, and an asynchronous queue for a search-index update.</p>
+<p>No real deployment is being described.</p>
+<h2>1. The HTTP request reaches the application</h2>
+<p>The browser sends an authenticated request.</p>
+<p>Before storage is involved, the application has already crossed DNS, transport, TLS, HTTP, session, authorization, and API validation boundaries from the previous module.</p>
+<p>The application now has an intended state transition:</p>
+<p>user 42 display_name should become Reaz.</p>
+<p>That is still only intent.</p>
+<h2>2. Validation checks the requested value</h2>
+<p>The application verifies length, allowed characters, authorization, and any domain rules.</p>
+<p>Validation success proves the request is structurally acceptable.</p>
+<p>It does not prove the database write has happened.</p>
+<h2>3. The application starts a transaction</h2>
+<p>The application acquires a database connection from its pool and begins a transaction.</p>
+<p>That introduces more state:</p>
+<ul>
+<li>connection-pool capacity;</li>
+<li>transaction ID or snapshot state;</li>
+<li>database timeout;</li>
+<li>lock/conflict behavior.</li>
+</ul>
+<p>If no connection is available, the write can fail before SQL reaches the database.</p>
+<h2>4. The UPDATE finds the target row</h2>
+<p>The database receives an UPDATE for user 42.</p>
+<p>An index on the primary key can help locate the row efficiently.</p>
+<p>The index is not a separate source of truth. It is a maintained access structure pointing toward table data.</p>
+<p>If the row does not exist, the application must decide whether that means not found, conflict, or another domain result.</p>
+<h2>5. Constraints validate the new database state</h2>
+<p>The database checks relevant constraints.</p>
+<p>If display_name is NOT NULL, a NULL value is rejected.</p>
+<p>If a uniqueness rule exists, conflicting state is rejected.</p>
+<p>Application validation and database constraints are separate layers.</p>
+<p>The application can be buggy while the database still protects declared invariants.</p>
+<h2>6. MVCC creates a new visible version</h2>
+<p>In PostgreSQL, an update participates in MVCC rather than simply overwriting one universally visible row image.</p>
+<p>Concurrent transactions can continue seeing row versions appropriate to their snapshots.</p>
+<p>The new version becomes visible according to transaction commit and isolation rules.</p>
+<p>That means storage contains concurrency metadata in addition to the business columns.</p>
+<h2>7. Indexes may also change</h2>
+<p>If display_name is indexed, the database must update index state as part of the transaction.</p>
+<p>One logical UPDATE can therefore create work in:</p>
+<ul>
+<li>table storage;</li>
+<li>one or more indexes;</li>
+<li>WAL;</li>
+<li>buffer cache;</li>
+<li>visibility metadata.</li>
+</ul>
+<p>The SQL statement is small. The storage work can be larger.</p>
+<h2>8. WAL records the change before final page placement</h2>
+<p>PostgreSQL records the change in WAL before relying on changed data pages as durable.</p>
+<p>A simplified commit path is:</p>
+<p>change buffers → generate WAL → persist required WAL → record commit → acknowledge according to policy.</p>
+<p>Data pages can be flushed later.</p>
+<p>This is why commit does not require every modified table page to be in its final disk location before the client gets success.</p>
+<p>Recovery can replay WAL.</p>
+<h2>9. COMMIT establishes the database boundary</h2>
+<p>When COMMIT succeeds under the configured durability policy, the database has accepted the transaction as committed.</p>
+<p>That is a strong claim.</p>
+<p>It is still not every claim.</p>
+<p>It does not necessarily mean:</p>
+<ul>
+<li>every replica has received the write;</li>
+<li>Redis has been invalidated;</li>
+<li>the search index has been updated;</li>
+<li>a backup already contains the change;</li>
+<li>the browser has rendered the new value.</li>
+</ul>
+<p>Commit proves the database transaction contract.</p>
+<h2>10. Cache invalidation follows</h2>
+<p>The application may delete user:42 from Redis or update the cached representation.</p>
+<p>Suppose database commit succeeds but cache invalidation fails.</p>
+<p>Now:</p>
+<p>PostgreSQL = Reaz</p>
+<p>Redis = R</p>
+<p>The source of truth is correct while reads through the cache can be stale.</p>
+<p>This is why cache invalidation is a separate state transition and needs retry or bounded TTL behavior.</p>
+<h2>11. A message is published for asynchronous work</h2>
+<p>The application may enqueue an event such as profile.updated.</p>
+<p>A search worker processes it later.</p>
+<p>If publishing happens after database commit, the application can crash between commit and publish.</p>
+<p>Then the database is correct but no event exists.</p>
+<p>This is the classic reason to use patterns such as a transactional outbox when reliable event publication must be coupled to the database transaction.</p>
+<h2>12. Replication happens on another timeline</h2>
+<p>WAL or logical change information moves toward replicas according to the replication design.</p>
+<p>With asynchronous replication, a replica can temporarily still show R while the primary shows Reaz.</p>
+<p>A read routed to that replica can therefore appear stale immediately after a successful write.</p>
+<p>Read-after-write consistency is an architecture property, not an automatic consequence of replication.</p>
+<h2>13. Background storage catches up</h2>
+<p>Dirty database pages are eventually written from memory to storage according to checkpoint and background-write behavior.</p>
+<p>Old MVCC row versions eventually become reclaimable when no active snapshot needs them.</p>
+<p>Indexes and statistics may also need maintenance over time.</p>
+<p>The write's operational footprint continues after the user request is finished.</p>
+<h2>14. Backup history eventually includes the change</h2>
+<p>A base backup taken later contains the state.</p>
+<p>With continuous WAL archiving, the change can also be represented in the recovery log stream used for point-in-time recovery.</p>
+<p>That gives the write a place in recovery history.</p>
+<p>But a backup is useful only if restore procedures can reconstruct a valid system.</p>
+<h2>15. Observability should name each boundary</h2>
+<p>For one write, useful evidence includes:</p>
+<ul>
+<li>HTTP request ID;</li>
+<li>application validation result;</li>
+<li>database connection wait;</li>
+<li>transaction duration;</li>
+<li>SQL rows affected;</li>
+<li>commit success/failure;</li>
+<li>cache invalidation result;</li>
+<li>queue publication result;</li>
+<li>replica lag;</li>
+<li>backup/archive health.</li>
+</ul>
+<p>A single application log saying profile updated hides too much.</p>
+<h2>Break one layer at a time</h2>
+<p>In a local test environment:</p>
+<ol>
+<li>reject the request in validation;</li>
+<li>violate a database constraint;</li>
+<li>force a transaction conflict;</li>
+<li>commit successfully but disable cache invalidation;</li>
+<li>restore invalidation but stop the queue broker;</li>
+<li>restore the broker and pause the replica;</li>
+<li>restore everything and test backup recovery.</li>
+</ol>
+<p>Record which system contains the authoritative value at every step.</p>
+<p>The visible user operation stays the same.</p>
+<p>The failed state transition moves.</p>
+<h2>What this module added</h2>
+<p>Data Systems gave us a new stack:</p>
+<p>application state → schema → indexes → transaction → concurrency control → WAL/journal → filesystem/device → cache/queue → replica → backup.</p>
+<p>Every layer stores or derives state under a different contract.</p>
+<h2>The module to carry forward</h2>
+<p>A systems engineer should be able to ask:</p>
+<p>Where is the authority?</p>
+<p>What has committed?</p>
+<p>What is only cached?</p>
+<p>What can be stale?</p>
+<p>What can be redelivered?</p>
+<p>What survives a crash?</p>
+<p>What survives node loss?</p>
+<p>What survives operator error?</p>
+<p>How do we restore?</p>
+<p>Those questions turn data architecture from product names into explicit guarantees.</p>
+<p>Module 12 moves into Embedded Systems: microcontrollers, GPIO, interrupts, timers, buses, memory, firmware structure, RTOS behavior, watchdogs, power, and one complete sensor-to-output path.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

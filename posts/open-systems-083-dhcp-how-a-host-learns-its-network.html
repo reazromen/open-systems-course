@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="An IPv4 host can begin without a usable address and obtain a lease plus network parameters through DHCP. The lease, route, DNS configuration, and actual reachability remain separate pieces of evidence." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>DHCP: How a Host Learns Its Network — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-083-dhcp-how-a-host-learns-its-network.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="DHCP: How a Host Learns Its Network" property="og:title"/><meta content="An IPv4 host can begin without a usable address and obtain a lease plus network parameters through DHCP. The lease, route, DNS configuration, and actual reachability remain separate pieces of evidence." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-083-dhcp-how-a-host-learns-its-network.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>DHCP: How a Host Learns Its Network</h1><p class="lede">An IPv4 host can begin without a usable address and obtain a lease plus network parameters through DHCP. The lease, route, DNS configuration, and actual reachability remain separate pieces of evidence.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A newly connected IPv4 host has a bootstrapping problem.</p>
+<p>To communicate normally, it needs network configuration. But obtaining that configuration may itself require network communication.</p>
+<p>DHCP is one solution to that problem.</p>
+<p>It can provide an IPv4 address and other parameters without requiring someone to type them into every host manually.</p>
+<p>The important idea is not the four-letter mnemonic.</p>
+<p>It is how a machine with incomplete network state acquires enough state to participate in the network.</p>
+<h2>What the host needs</h2>
+<p>A useful IPv4 configuration often includes several independent facts:</p>
+<pre><code class="language-text">interface address
+subnet mask or prefix
+default router
+DNS resolver addresses
+lease lifetime
+possibly other site-specific options
+</code></pre>pre
+<p>An address alone is not a complete network configuration.</p>
+<p>A host can have a valid local address but no default route. It can have a route but broken DNS configuration. It can have all three and still be blocked by a firewall farther along the path.</p>
+<p>DHCP distributes configuration. It does not prove that every dependency described by that configuration is healthy.</p>
+<h2>The DORA model</h2>
+<p>For an IPv4 client starting without a remembered usable lease, the familiar sequence is:</p>
+<pre><code class="language-text">DHCPDISCOVER
+     ↓
+DHCPOFFER
+     ↓
+DHCPREQUEST
+     ↓
+DHCPACK
+</code></pre>pre
+<p>This is often remembered as <strong>DORA</strong>.</p>
+<p>RFC 2131 defines these DHCP messages and the client-server interaction.</p>
+<p>The mnemonic is useful, but do not turn it into a law saying every DHCP exchange always contains exactly those four packets in exactly that situation. Renewal, reboot, rebinding, rejection, and other states use different parts of the protocol.</p>
+<p>Treat DORA as a model for initial IPv4 allocation.</p>
+<h2>Discovery begins with incomplete knowledge</h2>
+<p>At the start, the client may not yet have a usable IPv4 address and may not know the DHCP server's address.</p>
+<p>That is why DHCP includes broadcast-based discovery behavior on the local network.</p>
+<p>A DHCP relay can forward client messages to a server on another network, so the DHCP server does not have to live on every physical subnet.</p>
+<p>This creates another useful boundary:</p>
+<pre><code class="language-text">client link
+   ↓
+relay, if used
+   ↓
+DHCP server
+</code></pre>pre
+<p>If discovery packets leave the client but no offer returns, the failure could be local link policy, relay configuration, server availability, address-pool exhaustion, or filtering. "DHCP is down" is not yet a diagnosis.</p>
+<h2>The offer is not the final commitment</h2>
+<p>A server can answer a discovery with an offer containing an available address and configuration parameters.</p>
+<p>The client then sends DHCPREQUEST to indicate the selected offer or to perform other request/renewal behavior defined by the protocol.</p>
+<p>DHCPACK confirms the parameters and committed network address for the successful allocation case.</p>
+<p>The distinction matters because seeing DHCPOFFER in a packet capture does not prove that the client completed configuration.</p>
+<p>Evidence should follow the state transition:</p>
+<pre><code class="language-text">discover seen
+offer seen
+request seen
+ack seen
+address installed
+route installed
+resolver configuration installed
+</code></pre>pre
+<p>Every line proves something different.</p>
+<h2>DHCP options carry much of the useful configuration</h2>
+<p>DHCP is extensible through options.</p>
+<p>RFC 2132 defines many IPv4 DHCP options, including a router option and a Domain Name Server option.</p>
+<p>A client can therefore learn, for example:</p>
+<pre><code class="language-text">address:        192.0.2.100
+mask:           255.255.255.0
+router:         192.0.2.1
+DNS resolver:   192.0.2.53
+lease:          finite lifetime
+</code></pre>pre
+<p>These are documentation addresses.</p>
+<p>The server is describing configuration to the client. The client and operating system still need to install and use that configuration correctly.</p>
+<h2>A lease is time-bounded state</h2>
+<p>DHCP address assignment is normally leased rather than treated as permanent ownership.</p>
+<p>The client has state associated with:</p>
+<ul>
+<li>the assigned address;</li>
+<li>the server;</li>
+<li>the lease lifetime;</li>
+<li>renewal and rebinding behavior.</li>
+</ul>
+<p>Before the lease expires, the client can attempt to renew it. If the original server cannot be reached, later rebinding behavior can allow broader attempts to maintain valid configuration as defined by the protocol.</p>
+<p>That is why a machine can continue working for some time after a DHCP server becomes unavailable.</p>
+<p>Existing clients may still have valid leases while new clients fail immediately.</p>
+<p>Operationally:</p>
+<pre><code class="language-text">DHCP server unreachable
+≠
+all configured clients instantly lose networking
+</code></pre>pre
+<p>Time is part of the system.</p>
+<h2>DHCP does not own every network fact</h2>
+<p>A successful DHCP exchange can provide a default-router address.</p>
+<p>It does not prove the router forwards traffic.</p>
+<p>It can provide a DNS resolver address.</p>
+<p>It does not prove the resolver answers correctly.</p>
+<p>It can provide an IP address.</p>
+<p>It does not prove the address is free from every implementation or configuration mistake beyond the mechanisms in use.</p>
+<p>Configuration and service health are different layers.</p>
+<h2>IPv6 bootstrapping is not just DHCPv4 with larger addresses</h2>
+<p>Do not copy the IPv4 DORA model onto IPv6.</p>
+<p>IPv6 hosts create link-local addressing and use Neighbor Discovery and Router Advertisements as part of basic operation. Stateless Address Autoconfiguration, or SLAAC, can allow a host to form addresses from information advertised by routers.</p>
+<p>DHCPv6 is a separate protocol defined by RFC 8415. It can provide configuration parameters and can perform stateful address or prefix assignment. It can operate alongside or instead of parts of stateless configuration depending on the network design.</p>
+<p>So the correct high-level statement is:</p>
+<p><strong>DHCP is one family of configuration mechanisms, not a universal prerequisite for IP networking.</strong></p>
+<h2>Inspect the resulting state first</h2>
+<p>On a Linux system you own or administer, inspect what the machine actually installed:</p>
+<pre><code class="language-bash">ip address
+ip route
+resolvectl status
+</code></pre>pre
+<p>If NetworkManager is in use, this can also help:</p>
+<pre><code class="language-bash">nmcli device show
+</code></pre>pre
+<p>Look for the relationship among:</p>
+<ul>
+<li>interface;</li>
+<li>assigned address and prefix;</li>
+<li>default route;</li>
+<li>DNS resolver;</li>
+<li>lease-related information exposed by your network manager.</li>
+</ul>
+<p>Do not start by restarting networking. First preserve the state that explains what the machine believes.</p>
+<h2>Observe DHCP safely</h2>
+<p>On your own lab network, a packet analyzer can make the bootstrap sequence visible.</p>
+<p>For example, on an interface you are authorized to capture:</p>
+<pre><code class="language-bash">sudo tcpdump -ni &lt;interface&gt; 'udp port 67 or udp port 68'
+</code></pre>pre
+<p>Then reconnect a test client or renew a lease using the supported controls for that machine.</p>
+<p>Identify:</p>
+<pre><code class="language-text">DISCOVER
+OFFER
+REQUEST
+ACK
+</code></pre>pre
+<p>If the sequence differs, explain why rather than forcing the evidence into the mnemonic.</p>
+<p>Do not disrupt a shared production network merely to produce a capture.</p>
+<h2>Build a failure ladder</h2>
+<p>When a client says "connected but no Internet," separate configuration from reachability:</p>
+<pre><code class="language-text">Does the link exist?
+      ↓
+Did DHCP complete?
+      ↓
+Is an address installed?
+      ↓
+Is the expected route installed?
+      ↓
+Can the default router be reached?
+      ↓
+Is a DNS resolver configured?
+      ↓
+Can that resolver be reached?
+      ↓
+Can remote IP paths be reached?
+</code></pre>pre
+<p>This prevents a DNS failure from being misdiagnosed as DHCP, or a missing route from being blamed on "Wi-Fi."</p>
+<h2>The lesson to carry forward</h2>
+<p>DHCP turns network configuration into leased distributed state.</p>
+<p>A server can offer parameters. A client can accept them. The operating system can install them. Routers and DNS services can then succeed or fail independently.</p>
+<p>The next lesson follows another stateful boundary commonly encountered after a host is configured: address and port translation at a NAT.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

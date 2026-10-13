@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="An Internet request can terminate at an intermediary before it reaches an origin. Proxies, gateways, caches, and CDN edges create additional connections, trust boundaries, and failure domains." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Proxies, Reverse Proxies, and CDNs — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-088-proxies-reverse-proxies-and-cdns.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Proxies, Reverse Proxies, and CDNs" property="og:title"/><meta content="An Internet request can terminate at an intermediary before it reaches an origin. Proxies, gateways, caches, and CDN edges create additional connections, trust boundaries, and failure domains." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-088-proxies-reverse-proxies-and-cdns.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Proxies, Reverse Proxies, and CDNs</h1><p class="lede">An Internet request can terminate at an intermediary before it reaches an origin. Proxies, gateways, caches, and CDN edges create additional connections, trust boundaries, and failure domains.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A client resolves a service name, reaches an IP address, establishes TLS, and receives a response.</p>
+<p>It is tempting to conclude:</p>
+<p><strong>the client connected directly to the application's origin server.</strong></p>
+<p>That conclusion may be wrong.</p>
+<p>Modern Internet services commonly place intermediaries between users and origins. A proxy can be selected by a client. A reverse proxy can accept requests on behalf of backends. A CDN edge can terminate connections near users, cache some responses, and create separate upstream connections.</p>
+<p>The path is no longer one socket from browser to application process.</p>
+<h2>Proxy and reverse proxy describe different viewpoints</h2>
+<p>RFC 9110 defines several HTTP intermediary roles.</p>
+<p>A <strong>proxy</strong> is selected by the client, usually through configuration, to receive requests and forward or satisfy them.</p>
+<p>A <strong>gateway</strong>, commonly called a <strong>reverse proxy</strong>, acts as an origin server toward the client-facing side and forwards requests inward toward another server or servers.</p>
+<p>A simplified picture:</p>
+<pre><code class="language-text">forward proxy:
+
+client
+  ↓
+proxy chosen by client
+  ↓
+remote service
+
+
+reverse proxy:
+
+client
+  ↓
+public gateway / reverse proxy
+  ↓
+private origin or backend
+</code></pre>pre
+<p>Both are intermediaries.</p>
+<p>The direction of trust and configuration is different.</p>
+<h2>One user request can create multiple network connections</h2>
+<p>Suppose a client talks to a reverse proxy over TLS.</p>
+<p>The reverse proxy may then create a separate connection to an origin.</p>
+<pre><code class="language-text">client
+  │
+  │ TCP + TLS connection A
+  ↓
+edge / reverse proxy
+  │
+  │ separate connection B
+  ↓
+origin
+</code></pre>pre
+<p>Connection A and connection B can have:</p>
+<ul>
+<li>different IP endpoints;</li>
+<li>different TCP state;</li>
+<li>different TLS sessions;</li>
+<li>different certificates;</li>
+<li>different timeouts;</li>
+<li>different failure modes.</li>
+</ul>
+<p>A successful client-to-edge TLS handshake proves nothing by itself about edge-to-origin TLS.</p>
+<p>This is one of the most useful architectural facts in production web systems.</p>
+<h2>A CDN is a deployment architecture, not one protocol</h2>
+<p>"CDN" does not define one universal wire protocol or topology.</p>
+<p>A content-delivery network can combine mechanisms such as:</p>
+<ul>
+<li>DNS-based endpoint selection;</li>
+<li>anycast routing;</li>
+<li>geographically distributed edge sites;</li>
+<li>reverse proxying;</li>
+<li>HTTP caching;</li>
+<li>connection reuse;</li>
+<li>origin shielding;</li>
+<li>load balancing.</li>
+</ul>
+<p>Different providers and deployments make different choices.</p>
+<p>So avoid statements such as:</p>
+<pre><code class="language-text">all CDNs work by changing DNS
+</code></pre>pre
+<p>or:</p>
+<pre><code class="language-text">a CDN always serves content from cache
+</code></pre>pre
+<p>An edge can receive a request and still need to contact the origin.</p>
+<p>The useful abstraction is:</p>
+<p><strong>the edge becomes an additional system boundary between the client and origin.</strong></p>
+<h2>Caching can shorten the request chain</h2>
+<p>HTTP caching allows a stored response to satisfy a later equivalent request when the protocol's caching rules permit it.</p>
+<p>RFC 9111 defines HTTP caching semantics and distinguishes shared caches from private caches.</p>
+<p>A cache hit can change the effective path:</p>
+<pre><code class="language-text">client → edge cache
+</code></pre>pre
+<p>instead of:</p>
+<pre><code class="language-text">client → edge → origin
+</code></pre>pre
+<p>That reduces work and can reduce latency.</p>
+<p>But it also creates state.</p>
+<p>A cached representation can be:</p>
+<ul>
+<li>fresh;</li>
+<li>stale;</li>
+<li>revalidated;</li>
+<li>invalidated by deployment-specific mechanisms;</li>
+<li>bypassed for a particular request.</li>
+</ul>
+<p>"Origin is healthy" and "users see the new content" are therefore separate claims.</p>
+<h2>TLS termination creates a trust boundary</h2>
+<p>If the edge terminates client TLS, it receives the application data after TLS decryption for that connection.</p>
+<p>The edge may then protect the origin leg with another TLS connection.</p>
+<p>This means the architecture contains at least two cryptographic relationships:</p>
+<pre><code class="language-text">client trusts edge identity
+       ↓
+edge makes independent origin connection
+       ↓
+edge applies origin trust policy
+</code></pre>pre
+<p>The client does not directly validate the certificate on the private origin leg unless the system uses an end-to-end design that preserves that relationship differently.</p>
+<p>This is not automatically insecure.</p>
+<p>It is an architectural boundary that must be explicit.</p>
+<h2>Reverse proxies can do more than forward bytes</h2>
+<p>A reverse proxy can perform functions such as:</p>
+<ul>
+<li>TLS termination;</li>
+<li>routing requests to multiple backends;</li>
+<li>load balancing;</li>
+<li>authentication checks;</li>
+<li>header manipulation;</li>
+<li>compression;</li>
+<li>caching;</li>
+<li>rate limiting;</li>
+<li>observability.</li>
+</ul>
+<p>Each feature adds policy and state.</p>
+<p>That means a backend can be healthy while the public service fails because the reverse proxy is misconfigured.</p>
+<p>The opposite can also happen: the edge can remain reachable and return a generated error while the origin is down.</p>
+<p>An HTTP response from the edge is proof that <strong>some</strong> application-layer component responded, not proof that every backend succeeded.</p>
+<h2>Origin addresses can be intentionally hidden from the client</h2>
+<p>A public DNS name may point only to edge addresses.</p>
+<p>The origin can live:</p>
+<ul>
+<li>on private addressing;</li>
+<li>behind a firewall;</li>
+<li>on another provider;</li>
+<li>behind a tunnel;</li>
+<li>on a separate network reachable only by the edge.</li>
+</ul>
+<p>The client's route therefore ends at the edge endpoint.</p>
+<p>The edge has its own route to the origin.</p>
+<p>Treat them as separate paths:</p>
+<pre><code class="language-text">client path:
+user network → Internet → edge
+
+origin path:
+edge network → origin network → backend
+</code></pre>pre
+<p>A traceroute from the client cannot reveal the private origin path if packets never travel that path.</p>
+<h2>Inspect without over-interpreting headers</h2>
+<p>For a public service you own or are authorized to inspect:</p>
+<pre><code class="language-bash">curl -vI https://example.com/
+</code></pre>pre
+<p>You can inspect:</p>
+<ul>
+<li>resolved addresses;</li>
+<li>connection endpoint;</li>
+<li>TLS certificate;</li>
+<li>response status;</li>
+<li>response headers.</li>
+</ul>
+<p>Headers such as <code>Via</code>code, cache-related fields, or provider-specific diagnostics can reveal intermediaries when present.</p>
+<p>Absence of a provider-specific header is not proof that no intermediary exists.</p>
+<p>Architecture should be confirmed from configuration and controlled observations, not guessed from one response.</p>
+<h2>Build a local reverse-proxy experiment</h2>
+<p>You can make the boundary visible on one computer.</p>
+<p>Run a local origin:</p>
+<pre><code class="language-bash">python3 -m http.server 8080 --bind 127.0.0.1
+</code></pre>pre
+<p>Then configure an open-source reverse proxy such as Caddy or nginx to listen on another local port and forward to <code>127.0.0.1:8080</code>code.</p>
+<p>Request the proxy endpoint rather than the origin directly.</p>
+<p>Observe:</p>
+<pre><code class="language-text">client socket → reverse proxy socket
+reverse proxy socket → origin socket
+</code></pre>pre
+<p>Use <code>ss -tnp</code>code or local packet capture if authorized.</p>
+<p>Then stop only the origin.</p>
+<p>The reverse proxy can remain listening while upstream requests fail.</p>
+<p>That is a concrete demonstration that listener health and dependency health are different states.</p>
+<h2>Add caching carefully</h2>
+<p>If your chosen reverse proxy supports caching, configure it only in the test environment.</p>
+<p>Request the same static object repeatedly.</p>
+<p>Record whether the proxy contacts the origin each time.</p>
+<p>Then stop the origin and test again.</p>
+<p>Depending on the explicit cache policy and object state, some content might still be served while uncached content fails.</p>
+<p>Do not generalize from one product configuration to every CDN.</p>
+<p>The point is to observe how cached state changes dependency on the origin.</p>
+<h2>Build a failure ladder</h2>
+<p>For an edge-mediated service:</p>
+<pre><code class="language-text">Can the client resolve the public name?
+        ↓
+Can it reach the edge address?
+        ↓
+Can it establish client-facing TLS?
+        ↓
+Does the edge accept the request?
+        ↓
+Can the edge select an upstream?
+        ↓
+Can the edge resolve/reach the origin?
+        ↓
+Does origin-side TLS succeed if used?
+        ↓
+Does the origin application respond?
+        ↓
+Does the edge return the intended response?
+</code></pre>pre
+<p>A single "502" often lives in the middle of that ladder, not at the client's local network.</p>
+<h2>The lesson to carry forward</h2>
+<p>Proxies and CDN edges split an apparently simple request into multiple connections and administrative boundaries.</p>
+<p>That can improve performance, availability, security, and operational control.</p>
+<p>It also creates more places where state can disagree.</p>
+<p>The next lesson builds a disciplined failure model across DNS, routing, transport, TLS, intermediaries, and applications so that "the Internet is down" becomes a set of testable hypotheses.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

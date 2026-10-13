@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A host can be busy for very different reasons. Profiling attributes resource consumption to code paths and waiting states so high CPU, memory pressure, lock contention, disk latency, and scheduler delay are not conflated." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Profiling: CPU, Memory, I/O, and Saturation — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-156-profiling-cpu-memory-io-and-saturation.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Profiling: CPU, Memory, I/O, and Saturation" property="og:title"/><meta content="A host can be busy for very different reasons. Profiling attributes resource consumption to code paths and waiting states so high CPU, memory pressure, lock contention, disk latency, and scheduler delay are not conflated." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-156-profiling-cpu-memory-io-and-saturation.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Profiling: CPU, Memory, I/O, and Saturation</h1><p class="lede">A host can be busy for very different reasons. Profiling attributes resource consumption to code paths and waiting states so high CPU, memory pressure, lock contention, disk latency, and scheduler delay are not conflated.</p><div class="article-meta"><span>Published 2026-10-07</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>CPU is 95 percent.</p>
+<p>Is that bad?</p>
+<p>Maybe.</p>
+<p>A CPU-bound worker can be healthy at 95 percent.</p>
+<p>A latency-sensitive service with a saturated run queue may be unhealthy at 70 percent.</p>
+<p>Resource numbers need workload context.</p>
+<h2>Utilization and saturation differ</h2>
+<p>Utilization asks how busy a resource is.</p>
+<p>Saturation asks whether work is waiting because the resource has no capacity.</p>
+<p>For CPU, saturation can appear as runnable tasks waiting.</p>
+<p>For disk, it can appear as I/O queueing.</p>
+<p>For a connection pool, it can appear as requests waiting for a slot.</p>
+<p>Saturation often predicts latency better than utilization alone.</p>
+<h2>CPU profiling attributes execution</h2>
+<p>A sampling profiler periodically records where CPU is executing.</p>
+<p>Aggregated samples show hot functions and call stacks.</p>
+<p>Flame graphs visualize stack distributions.</p>
+<p>A hot function means CPU time is spent there.</p>
+<p>It does not automatically mean the function is wrong.</p>
+<p>Maybe that is the intended workload.</p>
+<p>Compare with expectations and baseline.</p>
+<h2>Off-CPU time matters too</h2>
+<p>A slow request may spend little CPU.</p>
+<p>It can be waiting on:</p>
+<p>mutex;
+disk;
+network;
+condition variable;
+scheduler;
+database connection pool.</p>
+<p>Off-CPU profiling and tracing can reveal these waits.</p>
+<p>If you profile only on-CPU execution, waiting systems can look mysteriously idle.</p>
+<h2>Memory pressure has several forms</h2>
+<p>RSS shows resident process memory.</p>
+<p>Heap profiles can show allocation ownership.</p>
+<p>The kernel also uses memory for page cache, slabs, buffers, and networking.</p>
+<p>A process can leak objects.</p>
+<p>A host can also be healthy while using most RAM for reclaimable cache.</p>
+<p>Do not diagnose memory from one “used percent” value.</p>
+<h2>GC creates latency behavior</h2>
+<p>Managed runtimes allocate and reclaim memory through garbage collection.</p>
+<p>GC pauses or concurrent collector CPU can affect latency.</p>
+<p>Useful evidence includes:</p>
+<p>allocation rate;
+heap size;
+pause duration;
+collection frequency.</p>
+<p>Increasing heap can reduce collection frequency while increasing memory footprint and sometimes pause cost.</p>
+<p>Measure rather than guessing.</p>
+<h2>Disk latency propagates upward</h2>
+<p>A slow filesystem operation can stall:</p>
+<p>database fsync;
+log writer;
+container runtime;
+application file access.</p>
+<p>Block-device metrics and I/O traces can identify queueing and latency.</p>
+<p>The application symptom may be HTTP timeout.</p>
+<p>The root resource is storage.</p>
+<h2>Lock contention looks like low useful CPU</h2>
+<p>Many threads can exist while one lock serializes progress.</p>
+<p>Symptoms:</p>
+<p>high context switching;
+many blocked threads;
+low throughput;
+one critical section.</p>
+<p>Thread dumps, mutex profiling, and scheduler traces can expose the bottleneck.</p>
+<p>Parallel code is not necessarily parallel execution.</p>
+<h2>eBPF provides powerful kernel-level observation</h2>
+<p>On Linux, eBPF-based tools can observe syscalls, scheduling, networking, block I/O, and application probes with relatively low overhead when used carefully.</p>
+<p>Tools such as bpftrace and BCC make kernel instrumentation accessible.</p>
+<p>Production use still requires permissions, overhead awareness, and precise probes.</p>
+<h2>Practical exercise</h2>
+<p>Take one local workload.</p>
+<p>Profile it under:</p>
+<p>CPU-heavy mode;
+sleep/I/O-heavy mode;
+lock-contention mode.</p>
+<p>Compare:</p>
+<p>CPU utilization;
+run queue;
+wall-clock latency;
+on-CPU profile;
+blocked/wait state.</p>
+<p>The same slow response can have completely different resource signatures.</p>
+<h2>The lesson to carry forward</h2>
+<p>Profiling attributes cost and waiting to concrete code and resources.</p>
+<p>The next lesson asks how to turn all this telemetry into user-centered reliability targets and alerts.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

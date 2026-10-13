@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="HTTP defines request and response semantics between components. The web is a much larger system containing browsers, URLs, DNS, TLS, caches, scripts, servers, storage, and application state." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>HTTP Is a Message Protocol, Not the Web — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-091-http-is-a-message-protocol-not-the-web.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="HTTP Is a Message Protocol, Not the Web" property="og:title"/><meta content="HTTP defines request and response semantics between components. The web is a much larger system containing browsers, URLs, DNS, TLS, caches, scripts, servers, storage, and application state." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-091-http-is-a-message-protocol-not-the-web.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>HTTP Is a Message Protocol, Not the Web</h1><p class="lede">HTTP defines request and response semantics between components. The web is a much larger system containing browsers, URLs, DNS, TLS, caches, scripts, servers, storage, and application state.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A browser opens a page and we casually say, "HTTP loaded the website."</p>
+<p>That sentence compresses too much.</p>
+<p>HTTP is one protocol family inside a larger web system. It defines semantics for requests and responses: methods, status codes, fields, representations, caching rules, and related behavior. It does not define DNS, routing, TLS certificates, HTML rendering, JavaScript execution, database queries, or user sessions by itself.</p>
+<p>The first useful correction for this module is:</p>
+<p><strong>HTTP is not the web. HTTP is one set of contracts used by web systems.</strong></p>
+<h2>Put HTTP above the network path</h2>
+<p>The previous module ended with a working Internet path.</p>
+<p>A common HTTPS path can be modeled as:</p>
+<pre><code class="language-text">browser or API client
+        ↓
+HTTP semantics
+        ↓
+HTTP message framing
+        ↓
+TLS, usually for HTTPS
+        ↓
+TCP or QUIC
+        ↓
+IP
+</code></pre>pre
+<p>That stack already reveals an important detail.</p>
+<p>The HTTP semantics can stay mostly the same while the message transport changes.</p>
+<p>RFC 9110 defines HTTP semantics independently from one specific version's framing.</p>
+<p>HTTP/1.1 messaging is defined by RFC 9112.</p>
+<p>HTTP/2 uses binary framing and multiplexing while preserving HTTP semantics.</p>
+<p>HTTP/3 maps HTTP semantics onto QUIC rather than TCP.</p>
+<p>So:</p>
+<pre><code class="language-text">GET /status
+</code></pre>pre
+<p>can mean the same kind of operation across HTTP/1.1, HTTP/2, and HTTP/3 even though the bytes on the wire are not encoded the same way.</p>
+<h2>HTTP is request-response</h2>
+<p>At the semantic level, a client sends a request.</p>
+<p>A server sends a response.</p>
+<p>A request has concepts such as:</p>
+<ul>
+<li>method;</li>
+<li>target resource;</li>
+<li>fields;</li>
+<li>optional content.</li>
+</ul>
+<p>A response has:</p>
+<ul>
+<li>status code;</li>
+<li>fields;</li>
+<li>optional content.</li>
+</ul>
+<p>A simplified HTTP/1.1 example looks like:</p>
+<pre><code class="language-http">GET /status HTTP/1.1
+Host: example.com
+Accept: application/json
+
+</code></pre>pre
+<p>Response:</p>
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 15
+
+{"status":"ok"}
+</code></pre>pre
+<p>This textual form is useful because HTTP/1.1 exposes the structure directly.</p>
+<p>Do not copy the visual form onto HTTP/2 or HTTP/3 and assume those protocols transmit identical text lines. Their framing is different.</p>
+<p>The semantics are the transferable mental model.</p>
+<h2>A resource is not necessarily a file</h2>
+<p>The request target:</p>
+<pre><code class="language-text">/users/42
+</code></pre>pre
+<p>does not prove that a file named <code>42</code>code exists on disk.</p>
+<p>A server can map that target to:</p>
+<ul>
+<li>a static file;</li>
+<li>a database record;</li>
+<li>generated HTML;</li>
+<li>an API handler;</li>
+<li>a proxy upstream;</li>
+<li>a cached representation;</li>
+<li>a function;</li>
+<li>an object in another service.</li>
+</ul>
+<p>HTTP deals with resources and representations at the protocol level, while the server decides how those resources are implemented.</p>
+<p>That distinction matters because many beginner mental models assume:</p>
+<pre><code class="language-text">URL path = filesystem path
+</code></pre>pre
+<p>Sometimes that is true.</p>
+<p>Often it is not.</p>
+<h2>HTTP does not require a browser</h2>
+<p>A browser is one HTTP user agent.</p>
+<p>Other clients include:</p>
+<ul>
+<li><code>curl</code>code;</li>
+<li>package managers;</li>
+<li>mobile applications;</li>
+<li>service-to-service clients;</li>
+<li>monitoring probes;</li>
+<li>embedded devices;</li>
+<li>command-line SDKs.</li>
+</ul>
+<p>If you make this request:</p>
+<pre><code class="language-bash">curl -i https://example.com/
+</code></pre>pre
+<p>you are using HTTP without a browser UI.</p>
+<p>This is important for debugging.</p>
+<p>If the browser fails but <code>curl</code>code succeeds, the difference may involve browser policy, cookies, JavaScript, CORS, service workers, extensions, or rendering rather than basic HTTP reachability.</p>
+<h2>HTTP is not automatically stateless in the whole-system sense</h2>
+<p>HTTP request semantics do not require a server to remember every previous request in a connection-specific application session.</p>
+<p>But real web applications often maintain state through mechanisms such as:</p>
+<ul>
+<li>cookies;</li>
+<li>bearer tokens;</li>
+<li>database session records;</li>
+<li>server-side caches;</li>
+<li>browser storage;</li>
+<li>application state.</li>
+</ul>
+<p>So the phrase "HTTP is stateless" should be handled carefully.</p>
+<p>A more precise statement is:</p>
+<p><strong>HTTP messages can be interpreted independently at the protocol level, but web applications frequently build stateful behavior above them.</strong></p>
+<p>We will study sessions in Lesson 96.</p>
+<h2>The connection and the request are not the same object</h2>
+<p>In HTTP/1.1, several HTTP exchanges can use one persistent TCP connection.</p>
+<p>In HTTP/2, many request-response streams can be multiplexed concurrently over one connection.</p>
+<p>In HTTP/3, HTTP streams are carried over QUIC.</p>
+<p>Therefore:</p>
+<pre><code class="language-text">one request
+≠
+one TCP connection
+</code></pre>pre
+<p>and:</p>
+<pre><code class="language-text">one connection
+≠
+one request
+</code></pre>pre
+<p>That distinction becomes important when measuring latency, connection reuse, failures, and load.</p>
+<p>A server can keep a connection open after sending a response.</p>
+<p>A client can reuse it for later requests.</p>
+<h2>HTTP defines meaning, not the business rule</h2>
+<p>Suppose a server responds:</p>
+<pre><code class="language-http">HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"payment":"rejected"}
+</code></pre>pre
+<p>HTTP says the request received a successful 2xx response at the protocol/application-interface level.</p>
+<p>The business operation represented in the body can still be rejected.</p>
+<p>Likewise, an HTTP 500 indicates server-side failure for the request, but it does not tell you whether the root cause was:</p>
+<ul>
+<li>application code;</li>
+<li>database failure;</li>
+<li>dependency timeout;</li>
+<li>configuration;</li>
+<li>exhausted resource;</li>
+<li>another backend.</li>
+</ul>
+<p>Status codes are evidence, not full incident reports.</p>
+<h2>HTTP can cross intermediaries</h2>
+<p>The client might believe it is communicating with <code>api.example.com</code>code.</p>
+<p>The actual path can be:</p>
+<pre><code class="language-text">client
+  ↓
+CDN edge
+  ↓
+reverse proxy
+  ↓
+application server
+  ↓
+backend dependency
+</code></pre>pre
+<p>HTTP allows intermediaries such as proxies and gateways.</p>
+<p>That means headers, caching, connection state, and errors can be produced at different boundaries.</p>
+<p>The machine that sends the final response to the client may not be the machine that stores the business data.</p>
+<p>This is why server-side troubleshooting needs request identity and logs across boundaries.</p>
+<h2>HTTP does not make content safe</h2>
+<p>Receiving:</p>
+<pre><code class="language-text">Content-Type: text/html
+</code></pre>pre
+<p>does not mean the content is trustworthy.</p>
+<p>A browser still applies security policies and parsing rules.</p>
+<p>JavaScript still executes under a browser security model.</p>
+<p>The server still needs authorization.</p>
+<p>The user still needs protection from untrusted content.</p>
+<p>HTTP transports metadata and representations. It does not replace the security model of the software using them.</p>
+<h2>Observe HTTP directly</h2>
+<p>Use a service you own or a public site you are normally allowed to access.</p>
+<p>Start with:</p>
+<pre><code class="language-bash">curl -i https://example.com/
+</code></pre>pre
+<p>Then add verbosity:</p>
+<pre><code class="language-bash">curl -v https://example.com/
+</code></pre>pre
+<p>Separate what you observe:</p>
+<pre><code class="language-text">DNS resolution
+TCP or QUIC connection behavior
+TLS
+HTTP request
+HTTP response
+</code></pre>pre
+<p>Depending on the build, <code>curl</code>code may negotiate HTTP/2.</p>
+<p>You can inspect the reported version rather than assuming it.</p>
+<p>If your curl supports it, compare explicit versions against a test service you control:</p>
+<pre><code class="language-bash">curl --http1.1 -I https://example.com/
+curl --http2   -I https://example.com/
+</code></pre>pre
+<p>The response semantics should still be recognizable even though the transport framing changes.</p>
+<h2>Build a tiny local HTTP service</h2>
+<p>On a local machine:</p>
+<pre><code class="language-bash">python3 -m http.server 8080 --bind 127.0.0.1
+</code></pre>pre
+<p>Then:</p>
+<pre><code class="language-bash">curl -i http://127.0.0.1:8080/
+</code></pre>pre
+<p>Observe:</p>
+<ul>
+<li>method;</li>
+<li>target;</li>
+<li>response status;</li>
+<li>response fields;</li>
+<li>body.</li>
+</ul>
+<p>Now request a missing path:</p>
+<pre><code class="language-bash">curl -i http://127.0.0.1:8080/does-not-exist
+</code></pre>pre
+<p>The network connection can succeed while the HTTP result changes from a success response to a not-found response.</p>
+<p>That is the protocol boundary made visible.</p>
+<h2>The lesson to carry forward</h2>
+<p>The web is a system of systems.</p>
+<p>HTTP contributes a request-response contract that can run over several protocol versions and transports.</p>
+<p>A request has semantics.</p>
+<p>A response has semantics.</p>
+<p>Connections, caches, browsers, proxies, servers, databases, and sessions add more state around those messages.</p>
+<p>The next lesson opens the HTTP message itself and examines request targets, fields, content, response status, and how message framing differs from semantics.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

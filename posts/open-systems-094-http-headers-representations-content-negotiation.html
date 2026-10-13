@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="HTTP fields describe requests, responses, representations, caching, authentication, and routing context. Content negotiation lets one resource have multiple representations without changing its identity." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>HTTP Headers, Representations, and Content Negotiation — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-094-http-headers-representations-content-negotiation.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="HTTP Headers, Representations, and Content Negotiation" property="og:title"/><meta content="HTTP fields describe requests, responses, representations, caching, authentication, and routing context. Content negotiation lets one resource have multiple representations without changing its identity." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-094-http-headers-representations-content-negotiation.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>HTTP Headers, Representations, and Content Negotiation</h1><p class="lede">HTTP fields describe requests, responses, representations, caching, authentication, and routing context. Content negotiation lets one resource have multiple representations without changing its identity.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A URL identifies a resource. The bytes returned for that resource are a representation.</p>
+<p>That distinction lets one resource have more than one useful form.</p>
+<p>A server might represent the same underlying resource as:</p>
+<ul>
+<li>HTML;</li>
+<li>JSON;</li>
+<li>plain text;</li>
+<li>an image format;</li>
+<li>compressed or uncompressed content;</li>
+<li>one natural language or another.</li>
+</ul>
+<p>HTTP fields carry the metadata that lets clients and servers reason about those forms.</p>
+<h2>Fields are part of the protocol contract</h2>
+<p>HTTP fields can describe many different things.</p>
+<p>Examples include:</p>
+<ul>
+<li>representation metadata;</li>
+<li>authentication credentials or challenges;</li>
+<li>cache directives;</li>
+<li>conditional request validators;</li>
+<li>routing context;</li>
+<li>content preferences;</li>
+<li>origin information.</li>
+</ul>
+<p>A field name is not meaningful merely because it appears in a request. Its specification defines where it can appear and what it means.</p>
+<p>RFC 9110 defines HTTP field semantics and common fields.</p>
+<h2>Content-Type describes the selected representation</h2>
+<p>A response might include:</p>
+<pre><code class="language-http">Content-Type: application/json
+</code></pre>pre
+<p>That tells the recipient how the enclosed representation is identified.</p>
+<p>A different response for the same conceptual resource might use:</p>
+<pre><code class="language-http">Content-Type: text/html; charset=utf-8
+</code></pre>pre
+<p>The resource can remain the same while the representation changes.</p>
+<p>This distinction is useful for APIs that support both machine-readable and human-readable forms.</p>
+<h2>Accept expresses a client preference</h2>
+<p>A request can say:</p>
+<pre><code class="language-http">Accept: application/json
+</code></pre>pre
+<p>or:</p>
+<pre><code class="language-http">Accept: text/html,application/xhtml+xml
+</code></pre>pre
+<p>The client is expressing preferences about acceptable response media types.</p>
+<p>The server can use those preferences when selecting a representation.</p>
+<p>It is still the server's responsibility to decide what it can provide.</p>
+<p>Content negotiation is not a command that forces a representation into existence.</p>
+<p>If no acceptable representation can be produced, <code>406 Not Acceptable</code>code exists for that class of outcome, though deployments often choose other behaviors.</p>
+<p>Likewise, if a request body uses a media type the server does not support, <code>415 Unsupported Media Type</code>code is the relevant status.</p>
+<p>Those are different failures:</p>
+<pre><code class="language-text">406:
+response representation negotiation failed
+
+415:
+request content type is unsupported
+</code></pre>pre
+<h2>Content-Encoding is not Content-Type</h2>
+<p>Compression adds another layer.</p>
+<p>A response can say:</p>
+<pre><code class="language-http">Content-Type: text/html
+Content-Encoding: gzip
+</code></pre>pre
+<p>The media type is HTML.</p>
+<p>The transfer representation has additionally been encoded with gzip.</p>
+<p>After decoding the content encoding, the recipient still has HTML.</p>
+<p>This is why compression does not change a PNG into "gzip data" at the semantic level. Gzip describes an encoding applied to the representation.</p>
+<h2>Vary tells caches which request fields mattered</h2>
+<p>Suppose a server returns different representations based on:</p>
+<pre><code class="language-http">Accept-Language
+</code></pre>pre
+<p>A shared cache needs to know that two requests for the same URL can legitimately receive different selected responses based on that field.</p>
+<p>The <code>Vary</code>code response field communicates which request fields influenced representation selection.</p>
+<p>For example:</p>
+<pre><code class="language-http">Vary: Accept-Language
+</code></pre>pre
+<p>Caching semantics are defined in RFC 9111.</p>
+<p>Without the correct variation metadata, a cache can reuse a response for a request that should have selected a different representation.</p>
+<p>That turns a header detail into a correctness issue.</p>
+<h2>Validators reduce unnecessary transfers</h2>
+<p>A response can include validators such as:</p>
+<pre><code class="language-http">ETag: "abc123"
+</code></pre>pre
+<p>or:</p>
+<pre><code class="language-http">Last-Modified: Tue, 06 Oct 2026 10:00:00 GMT
+</code></pre>pre
+<p>A client can later make a conditional request.</p>
+<p>If the selected representation has not changed according to the validator semantics, the server can respond with <code>304 Not Modified</code>code instead of sending the full representation again.</p>
+<p>The important model is:</p>
+<pre><code class="language-text">resource
+  ↓
+selected representation
+  ↓
+validator for that representation
+  ↓
+conditional request
+</code></pre>pre
+<p>Do not treat an ETag as a universal database version number unless your application explicitly defines it that way.</p>
+<h2>Authorization fields do not equal authorization policy</h2>
+<p>An HTTP request can carry credentials through mechanisms such as the <code>Authorization</code>code field.</p>
+<p>The presence of that field does not prove the credential is valid.</p>
+<p>The server still needs to authenticate the credential and apply authorization policy.</p>
+<p>Similarly, a proxy can forward or remove authentication-related fields according to its configuration and trust boundary.</p>
+<p>Protocol metadata and access-control decisions are different layers.</p>
+<h2>Practical inspection</h2>
+<p>On a service you control, return the same logical object as HTML and JSON depending on the <code>Accept</code>code field.</p>
+<p>For example, make requests that prefer:</p>
+<pre><code class="language-text">text/html
+application/json
+</code></pre>pre
+<p>Record:</p>
+<ul>
+<li>request <code>Accept</code>code;</li>
+<li>response <code>Content-Type</code>code;</li>
+<li>status;</li>
+<li>response body;</li>
+<li>any <code>Vary</code>code field.</li>
+</ul>
+<p>Then add an ETag and perform a conditional request.</p>
+<p>The goal is to see that one resource can have multiple representations and that caches need metadata describing how the representation was selected.</p>
+<h2>The lesson to carry forward</h2>
+<p>HTTP fields are not decoration around a body. They carry protocol state about representation, caching, authentication, conditional requests, and more.</p>
+<p>Content negotiation separates the identity of a resource from the format chosen for a particular exchange.</p>
+<p>The next lesson moves into the browser itself: what happens after a user enters a URL, from navigation and fetching through parsing, subresource discovery, script execution, layout, and painting.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

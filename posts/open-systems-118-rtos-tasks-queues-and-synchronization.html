@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="An RTOS lets embedded software divide work into scheduled tasks, but concurrency introduces priorities, blocking, queues, mutexes, deadlocks, stack limits, and timing dependencies." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>RTOS Tasks, Queues, and Synchronization — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-118-rtos-tasks-queues-and-synchronization.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="RTOS Tasks, Queues, and Synchronization" property="og:title"/><meta content="An RTOS lets embedded software divide work into scheduled tasks, but concurrency introduces priorities, blocking, queues, mutexes, deadlocks, stack limits, and timing dependencies." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-118-rtos-tasks-queues-and-synchronization.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>RTOS Tasks, Queues, and Synchronization</h1><p class="lede">An RTOS lets embedded software divide work into scheduled tasks, but concurrency introduces priorities, blocking, queues, mutexes, deadlocks, stack limits, and timing dependencies.</p><div class="article-meta"><span>Published 2026-10-07</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A simple firmware loop can do everything:</p>
+<p>read sensor, update display, check network, blink LED, repeat.</p>
+<p>That architecture works until different activities need different timing and blocking behavior.</p>
+<p>An RTOS introduces tasks and a scheduler so independent activities can wait, run, and communicate under explicit rules.</p>
+<h2>A task is an execution context</h2>
+<p>An RTOS task typically has its own stack, saved CPU context, state, and priority.</p>
+<p>At any moment a task may be running, ready, blocked, suspended, or waiting for time or an event.</p>
+<p>The scheduler chooses which ready task runs according to the RTOS policy.</p>
+<p>This is not parallelism by itself on a single core. It is controlled interleaving.</p>
+<p>On multicore MCUs, tasks can also execute truly in parallel depending on the RTOS port and affinity rules.</p>
+<h2>Blocking is better than busy waiting</h2>
+<p>A task that continuously checks whether data arrived wastes CPU time and power.</p>
+<p>A better design blocks on a queue, semaphore, notification, timer, or event and becomes ready only when useful work exists.</p>
+<p>This creates a central embedded pattern:</p>
+<p>peripheral/ISR produces event → task wakes → task processes event → task blocks again.</p>
+<p>CPU time becomes available for other work or low-power idle states.</p>
+<h2>Queues transfer ownership and data</h2>
+<p>RTOS queues can move fixed-size messages between tasks or from ISR to task using interrupt-safe APIs.</p>
+<p>A queue creates a clear boundary:</p>
+<p>producer owns data before send; consumer owns the received copy or referenced object according to the design.</p>
+<p>If pointers are queued instead of copied data, buffer lifetime becomes critical.</p>
+<p>A pointer to a stack variable that disappears before the consumer uses it is a bug even if the queue itself works perfectly.</p>
+<h2>Mutexes protect shared resources</h2>
+<p>If two tasks use the same I2C bus, filesystem, or data structure, they may need mutual exclusion.</p>
+<p>A mutex ensures one owner enters the protected critical section at a time.</p>
+<p>That solves one problem and can create others:</p>
+<ul>
+<li>deadlock;</li>
+<li>priority inversion;</li>
+<li>long blocking;</li>
+<li>hidden coupling.</li>
+</ul>
+<p>Keep critical sections short and define lock ordering.</p>
+<h2>Priority inversion is a scheduling interaction</h2>
+<p>Imagine a low-priority task holds a mutex needed by a high-priority task.</p>
+<p>A medium-priority task runs repeatedly and prevents the low-priority owner from releasing the mutex.</p>
+<p>The high-priority task is indirectly delayed by medium-priority work.</p>
+<p>Priority inheritance can temporarily raise the mutex owner's effective priority to reduce this problem.</p>
+<p>FreeRTOS mutexes provide priority-inheritance behavior for this reason.</p>
+<h2>Semaphores and notifications represent events, not ownership</h2>
+<p>A binary semaphore or task notification can signal that an event occurred.</p>
+<p>A counting semaphore can represent a count of available events or resources.</p>
+<p>These are not interchangeable with mutex ownership semantics.</p>
+<p>Use the primitive that expresses the contract.</p>
+<h2>Real-time scheduling is about deadlines</h2>
+<p>Giving everything high priority does not make a system real-time.</p>
+<p>Priorities should reflect timing constraints and blocking relationships.</p>
+<p>A high-priority task that performs long blocking I/O can still damage system latency.</p>
+<p>Measure worst-case execution and blocking paths for time-critical work.</p>
+<h2>Tick timing is not exact hardware timing</h2>
+<p>Task delays are scheduler-level timing.</p>
+<p>If a task delays for 10 ms, it becomes eligible according to tick and scheduling rules. Execution can happen later if a higher-priority task occupies the CPU.</p>
+<p>For precise waveforms or capture, use hardware peripherals.</p>
+<p>Use the RTOS for scheduling software work around those events.</p>
+<h2>Stack size belongs to each task</h2>
+<p>Every task stack consumes RAM.</p>
+<p>Too large wastes scarce memory.</p>
+<p>Too small risks corruption.</p>
+<p>RTOS diagnostics can expose stack high-water marks and overflow detection depending on configuration.</p>
+<p>Production sizing should come from measurement under representative paths, not a copied number from an example.</p>
+<h2>Practical experiment</h2>
+<p>Build three tasks on a development board:</p>
+<ul>
+<li>one periodic sensor-like task;</li>
+<li>one logging task;</li>
+<li>one command task.</li>
+</ul>
+<p>Move samples through a queue rather than a shared global variable.</p>
+<p>Then deliberately slow the logging task and observe queue depth.</p>
+<p>Next, protect a shared resource with a mutex and instrument how long each task waits.</p>
+<p>The goal is to see scheduler state, not merely that all tasks print messages.</p>
+<h2>The lesson to carry forward</h2>
+<p>An RTOS converts one firmware control flow into interacting scheduled contexts.</p>
+<p>Queues, mutexes, semaphores, priorities, and notifications make concurrency explicit.</p>
+<p>The next lesson asks what happens when the system stops making progress: watchdogs, reset reasons, brownouts, sleep, and power.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

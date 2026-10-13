@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Types constrain interpretation and operations. They help a program distinguish a temperature from text, a byte buffer from an integer, and a user ID from a quantity that only happens to use the same bits." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Why Types Exist — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-032-why-types-exist.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Why Types Exist" property="og:title"/><meta content="Types constrain interpretation and operations. They help a program distinguish a temperature from text, a byte buffer from an integer, and a user ID from a quantity that only happens to use the same bits." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-032-why-types-exist.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Why Types Exist</h1><p class="lede">Types constrain interpretation and operations. They help a program distinguish a temperature from text, a byte buffer from an integer, and a user ID from a quantity that only happens to use the same bits.</p><div class="article-meta"><span>Published 2026-10-06</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>The bit pattern does not tell you what it means.</p>
+<p>We established that in Lesson 2.</p>
+<p>Programming languages face the same problem at a higher layer.</p>
+<p>Is this value:</p>
+<ul>
+<li>an integer?</li>
+<li>text?</li>
+<li>a network address?</li>
+<li>a temperature?</li>
+<li>a list?</li>
+<li>a function?</li>
+<li>a user record?</li>
+</ul>
+<p>A type gives the language and programmer rules for interpretation and allowed operations.</p>
+<h2>Same representation, different meaning</h2>
+<p>Suppose the number is:</p>
+<pre><code>65
+</code></pre>pre
+<p>You could interpret it as:</p>
+<ul>
+<li>count;</li>
+<li>percentage;</li>
+<li>ASCII code;</li>
+<li>identifier;</li>
+<li>temperature.</li>
+</ul>
+<p>A primitive integer type distinguishes it from text or floating-point data.</p>
+<p>But domain meaning can require stronger structure.</p>
+<p>Two values can both be integers while representing incompatible concepts:</p>
+<pre><code>user_id = 65
+temperature_c = 65
+</code></pre>pre
+<p>Adding them is syntactically possible in many languages.</p>
+<p>It is conceptually nonsense.</p>
+<p>Type systems can catch some categories of such mistakes when the programmer models the domain explicitly.</p>
+<h2>Types define operations</h2>
+<p>Text supports concatenation.</p>
+<p>Numbers support arithmetic.</p>
+<p>A socket object supports network operations.</p>
+<p>A file object supports reads and writes.</p>
+<p>A type tells software which operations make sense and what results they produce.</p>
+<p>This is not merely compiler bureaucracy.</p>
+<p>It prevents one representation from being used under the wrong contract.</p>
+<h2>Static and dynamic typing move checks</h2>
+<p>In a statically typed language, many type relationships are checked before execution.</p>
+<p>In a dynamically typed language, values carry or participate in type behaviour at runtime.</p>
+<p>The distinction is not:</p>
+<p>static = safe
+dynamic = unsafe</p>
+<p>Both families can produce robust or broken software.</p>
+<p>The trade-offs include tooling, flexibility, runtime checks, expressiveness, language design, and error timing.</p>
+<p>Do not turn programming-language categories into ideology.</p>
+<h2>Machine types and language types differ</h2>
+<p>A CPU may provide integer and floating-point instructions of certain widths.</p>
+<p>A language may define richer types:</p>
+<ul>
+<li>strings;</li>
+<li>arrays;</li>
+<li>classes;</li>
+<li>algebraic data types;</li>
+<li>interfaces;</li>
+<li>generics.</li>
+</ul>
+<p>A runtime maps these abstractions onto lower-level memory and machine operations.</p>
+<p>So the source-level type is not always a direct hardware type.</p>
+<p>A Python integer, for example, is a runtime object with semantics different from one fixed-width machine integer.</p>
+<p>Layers again.</p>
+<h2>Width matters</h2>
+<p>An 8-bit unsigned integer can represent 256 patterns.</p>
+<p>A 32-bit unsigned integer represents many more.</p>
+<p>Fixed-width values can overflow.</p>
+<p>Signed representations have different ranges.</p>
+<p>Floating point represents a huge range but with finite precision and special values.</p>
+<p>Choosing a type can therefore encode capacity assumptions.</p>
+<p>If a counter can exceed its representation, the bug is architectural even though the syntax is valid.</p>
+<h2>Type conversions deserve suspicion</h2>
+<p>Suppose a 64-bit value is converted to 16 bits.</p>
+<p>Information may be lost.</p>
+<p>Convert floating point to integer.</p>
+<p>Fractional information may be lost.</p>
+<p>Interpret signed data as unsigned.</p>
+<p>The numeric meaning can change dramatically.</p>
+<p>Convert bytes to text using the wrong encoding.</p>
+<p>The representation is misinterpreted.</p>
+<p>Every conversion asks:</p>
+<p>What information or guarantees are being changed?</p>
+<h2>Domain types can make systems clearer</h2>
+<p>Instead of:</p>
+<pre><code>send(int, int)
+</code></pre>pre
+<p>consider:</p>
+<pre><code>send(UserId recipient, MessageId message)
+</code></pre>pre
+<p>Even if both IDs are represented as integers underneath, distinct domain types can prevent accidental argument swaps.</p>
+<p>This is a powerful architecture principle:</p>
+<p>Make invalid states harder to represent.</p>
+<p>A good type model reduces the number of runtime checks and human assumptions needed later.</p>
+<h2>Types do not replace validation</h2>
+<p>A string type can guarantee something is text.</p>
+<p>It cannot guarantee the text is a valid email address.</p>
+<p>An integer type cannot guarantee a port number lies within a permitted range.</p>
+<p>A User object cannot prove the user is authorized for the current action.</p>
+<p>Types express some invariants.</p>
+<p>Validation and business rules express others.</p>
+<p>Know the boundary.</p>
+<h2>Exercise: strengthen a sensor message</h2>
+<p>Start with:</p>
+<pre><code>value = 31.7
+</code></pre>pre
+<p>Now design a richer representation containing:</p>
+<pre><code>value
+unit
+timestamp
+sensor_id
+quality
+</code></pre>pre
+<p>Which fields have different types?</p>
+<p>Which need constrained ranges?</p>
+<p>Which could be missing?</p>
+<p>Which should be immutable?</p>
+<p>The exercise shows how types emerge from domain questions.</p>
+<h2>The lesson to carry forward</h2>
+<p>Types exist because bits and values need interpretation rules.</p>
+<p>They help define valid operations, catch mismatches, communicate intent, and encode invariants.</p>
+<p>The useful question is not:</p>
+<p>Which typing philosophy wins?</p>
+<p>It is:</p>
+<p><strong>What mistakes should this representation make impossible or obvious?</strong></p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

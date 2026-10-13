@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="An operating system turns shared hardware into controlled abstractions: processes, address spaces, files, sockets, devices, identities, and time." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Why Operating Systems Exist — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-051-why-operating-systems-exist.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Why Operating Systems Exist" property="og:title"/><meta content="An operating system turns shared hardware into controlled abstractions: processes, address spaces, files, sockets, devices, identities, and time." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-051-why-operating-systems-exist.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Why Operating Systems Exist</h1><p class="lede">An operating system turns shared hardware into controlled abstractions: processes, address spaces, files, sockets, devices, identities, and time.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Imagine giving every application direct control of the CPU, RAM, storage controller, network card, keyboard, and display.</p>
+<p>Two applications want the CPU at once.</p>
+<p>Both choose the same memory address.</p>
+<p>One writes to the disk while another assumes the data is unchanged.</p>
+<p>A browser reads a password manager's memory because nothing stops it.</p>
+<p>A text editor reprograms the network interface by mistake.</p>
+<p>This is not a usable general-purpose system.</p>
+<p>An operating system exists partly to turn shared physical resources into controlled abstractions.</p>
+<h2>The OS is a resource manager</h2>
+<p>Hardware is finite.</p>
+<p>CPU time must be shared.</p>
+<p>RAM must be allocated.</p>
+<p>Devices must be coordinated.</p>
+<p>Storage needs names and permissions.</p>
+<p>Network interfaces need multiplexing.</p>
+<p>The operating system manages these resources and decides who may use them.</p>
+<p>OSTEP describes operating systems through three broad themes: virtualization, concurrency, and persistence.</p>
+<p>That framing is powerful because it explains what the OS gives programs rather than treating the OS as a desktop skin.</p>
+<h2>The OS virtualizes the CPU</h2>
+<p>One machine may have eight CPU cores while hundreds of processes exist.</p>
+<p>The OS scheduler switches runnable work across available CPUs.</p>
+<p>Each process can behave as if it has an execution context of its own.</p>
+<p>It does not literally own a CPU continuously.</p>
+<p>The abstraction is:</p>
+<pre><code>process -&gt; appears to execute
+</code></pre>pre
+<p>The mechanism includes:</p>
+<pre><code>scheduling
+context switching
+timers
+interrupts
+processor privilege
+</code></pre>pre
+<p>The illusion is useful enough that most application code can ignore the exact schedule.</p>
+<h2>The OS virtualizes memory</h2>
+<p>A process sees a virtual address space.</p>
+<p>Another process sees another.</p>
+<p>Both may use the same numerical addresses while the kernel and hardware map them differently.</p>
+<p>This creates isolation and flexible placement.</p>
+<p>The application writes pointers.</p>
+<p>It usually does not select physical DRAM rows.</p>
+<p>The abstraction is an address space.</p>
+<p>The mechanism includes page tables, permissions, translation caches, faults, and physical page management.</p>
+<h2>The OS gives storage names</h2>
+<p>An SSD exposes persistent blocks through a device interface.</p>
+<p>Applications generally want:</p>
+<pre><code>/home/user/report.txt
+</code></pre>pre
+<p>not:</p>
+<pre><code>block 98122, offset 4096
+</code></pre>pre
+<p>A filesystem turns storage into names, directories, metadata, permissions, and file operations.</p>
+<p>The kernel can then expose a common file interface even when underlying filesystems differ.</p>
+<p>The name is an abstraction over storage layout.</p>
+<h2>The OS mediates devices</h2>
+<p>A camera, network adapter, GPU, disk, keyboard, and USB device have different hardware protocols.</p>
+<p>Device drivers translate between OS interfaces and hardware-specific operations.</p>
+<p>Applications can use higher-level interfaces instead of reimplementing every controller protocol.</p>
+<p>This creates a valuable separation:</p>
+<pre><code>application
+  -&gt; OS interface
+  -&gt; driver
+  -&gt; hardware
+</code></pre>pre
+<p>When a device fails, the investigation can move through those layers.</p>
+<h2>The OS is a protection boundary</h2>
+<p>The kernel runs with privileges ordinary applications do not have.</p>
+<p>Applications run in user space with restricted authority.</p>
+<p>System calls let programs request protected operations.</p>
+<p>The kernel checks identity, permissions, arguments, and resource state.</p>
+<p>This does not make software automatically secure.</p>
+<p>It creates an enforcement point.</p>
+<p>Without protection boundaries, one ordinary application bug could compromise the whole machine far more easily.</p>
+<h2>The OS provides common mechanisms, not every policy</h2>
+<p>A kernel can provide process scheduling.</p>
+<p>A service manager can decide which services start.</p>
+<p>A desktop environment decides how windows look.</p>
+<p>A package manager installs software.</p>
+<p>A shell interprets commands.</p>
+<p>People casually call all of these "the operating system."</p>
+<p>That can be fine in ordinary conversation.</p>
+<p>For engineering, separate the layers.</p>
+<p>Linux is a kernel.</p>
+<p>A Linux distribution combines that kernel with user-space software, libraries, tools, package management, init/service management, and often a desktop.</p>
+<p>That distinction will matter in Module 7.</p>
+<h2>The OS is not always large</h2>
+<p>A microcontroller firmware can run without a general-purpose operating system.</p>
+<p>One main loop may control everything.</p>
+<p>A real-time operating system may provide tasks, queues, timers, and synchronization with much smaller scope.</p>
+<p>An embedded Linux system may run a full kernel and user space.</p>
+<p>"Needs an OS" is therefore a system-design question.</p>
+<p>If one program controls one simple device, direct firmware may be enough.</p>
+<p>If many isolated applications share hardware, operating-system abstractions become increasingly valuable.</p>
+<h2>Exercise: remove the OS mentally</h2>
+<p>Take a browser.</p>
+<p>Without an OS, what would the browser need to implement itself?</p>
+<ul>
+<li>storage drivers;</li>
+<li>network drivers;</li>
+<li>memory allocation over physical RAM;</li>
+<li>keyboard input;</li>
+<li>graphics output;</li>
+<li>scheduling with other programs;</li>
+<li>permissions;</li>
+<li>timers.</li>
+</ul>
+<p>The list becomes absurd quickly.</p>
+<p>That is the value of the operating-system boundary.</p>
+<h2>The lesson to carry forward</h2>
+<p>An operating system is not mainly icons, settings panels, or a boot logo.</p>
+<p>It is the software layer that manages shared hardware and exposes protected abstractions such as:</p>
+<ul>
+<li>processes;</li>
+<li>threads;</li>
+<li>virtual memory;</li>
+<li>files;</li>
+<li>sockets;</li>
+<li>devices;</li>
+<li>identities;</li>
+<li>clocks.</li>
+</ul>
+<p>The rest of this module opens those mechanisms one by one.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

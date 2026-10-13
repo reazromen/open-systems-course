@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Failure is part of the program contract. Return codes, exceptions, timeouts, retries, and partial success are different mechanisms for representing what did not happen as expected." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Errors, Exceptions, and Failure Paths — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-037-errors-exceptions-failure-paths.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Errors, Exceptions, and Failure Paths" property="og:title"/><meta content="Failure is part of the program contract. Return codes, exceptions, timeouts, retries, and partial success are different mechanisms for representing what did not happen as expected." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-037-errors-exceptions-failure-paths.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Errors, Exceptions, and Failure Paths</h1><p class="lede">Failure is part of the program contract. Return codes, exceptions, timeouts, retries, and partial success are different mechanisms for representing what did not happen as expected.</p><div class="article-meta"><span>Published 2026-10-06</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>The network is unavailable.</p>
+<p>A file does not exist.</p>
+<p>A user enters invalid data.</p>
+<p>Memory allocation fails.</p>
+<p>A remote API returns an error.</p>
+<p>A program that models only the success path is incomplete.</p>
+<p>Failures are states the design must represent.</p>
+<h2>Not every failure is exceptional</h2>
+<p>A user entering the wrong password is normal application behaviour.</p>
+<p>A requested file being absent may be expected.</p>
+<p>A network timeout can occur in any distributed system.</p>
+<p>A programmer invariant becoming impossible may indicate a bug.</p>
+<p>Different failure categories deserve different handling.</p>
+<p>Calling everything an exception does not make the system clearer.</p>
+<h2>Return values are one representation</h2>
+<p>A function can return:</p>
+<pre><code>success / failure
+</code></pre>pre
+<p>or:</p>
+<pre><code>value / error
+</code></pre>pre
+<p>This makes failure explicit in the ordinary control flow.</p>
+<p>But callers can ignore return codes.</p>
+<p>Languages and libraries differ in how strongly they encourage checking.</p>
+<p>The mechanism is less important than the contract:</p>
+<p>Can the operation fail, and how must the caller know?</p>
+<h2>Exceptions separate normal return from failure transfer</h2>
+<p>Exception mechanisms let a function signal a condition that transfers control to a handler.</p>
+<p>This can remove repetitive manual checks.</p>
+<p>It can also hide control flow if overused.</p>
+<p>A good exception boundary answers:</p>
+<ul>
+<li>what can be thrown;</li>
+<li>where it is caught;</li>
+<li>what cleanup is required;</li>
+<li>whether operation can retry;</li>
+<li>whether state is still valid.</li>
+</ul>
+<p>An exception is not a substitute for failure design.</p>
+<h2>Partial success is harder</h2>
+<p>Suppose:</p>
+<ol>
+<li>charge payment;</li>
+<li>create booking;</li>
+<li>send confirmation.</li>
+</ol>
+<p>Payment succeeds.</p>
+<p>Booking fails.</p>
+<p>What does the function return?</p>
+<p>The system cannot simply pretend "operation failed" and forget the successful charge.</p>
+<p>Distributed and multi-step operations create partial state.</p>
+<p>Recovery may require:</p>
+<ul>
+<li>compensation;</li>
+<li>retry;</li>
+<li>reconciliation;</li>
+<li>manual intervention.</li>
+</ul>
+<p>This is why real systems need state machines around workflows.</p>
+<h2>Timeouts represent uncertainty</h2>
+<p>You send a request.</p>
+<p>No response arrives before 5 seconds.</p>
+<p>Did the server fail?</p>
+<p>Maybe.</p>
+<p>Did the request reach it and complete, while the response was lost?</p>
+<p>Also possible.</p>
+<p>A timeout tells you:</p>
+<p><strong>I do not know the result within the allowed time.</strong></p>
+<p>That uncertainty is different from a definitive rejection.</p>
+<p>Retry logic must account for it.</p>
+<h2>Retrying can duplicate effects</h2>
+<p>Suppose:</p>
+<pre><code>transfer $100
+</code></pre>pre
+<p>times out.</p>
+<p>Client retries.</p>
+<p>If the first operation succeeded, the second may transfer another $100.</p>
+<p>Safe retry therefore depends on operation semantics and mechanisms such as idempotency keys.</p>
+<p>An error handler can create a new failure if it assumes too much.</p>
+<h2>Cleanup must survive failure</h2>
+<p>Open file.</p>
+<p>Acquire lock.</p>
+<p>Allocate resource.</p>
+<p>Then an error occurs.</p>
+<p>Who releases them?</p>
+<p>Languages provide mechanisms such as finally blocks, context managers, destructors, defer statements, or RAII patterns.</p>
+<p>The syntax varies.</p>
+<p>The invariant is universal:</p>
+<p>Resources need defined ownership and cleanup on both success and failure paths.</p>
+<h2>Logs are not error handling</h2>
+<p>Writing:</p>
+<pre><code>ERROR: database failed
+</code></pre>pre
+<p>does not recover the operation.</p>
+<p>Logging creates evidence.</p>
+<p>Handling determines system behaviour.</p>
+<p>Sometimes the correct handling is to fail fast after logging.</p>
+<p>Sometimes retry.</p>
+<p>Sometimes degrade.</p>
+<p>Sometimes queue work.</p>
+<p>Separate observability from recovery policy.</p>
+<h2>Exercise: write the failure table</h2>
+<p>For:</p>
+<pre><code>fetch_weather()
+</code></pre>pre
+<p>list:</p>
+<ul>
+<li>DNS failure;</li>
+<li>connection timeout;</li>
+<li>HTTP 500;</li>
+<li>HTTP 404;</li>
+<li>malformed response;</li>
+<li>stale response;</li>
+<li>success.</li>
+</ul>
+<p>For each decide:</p>
+<p>Retry?</p>
+<p>Return error?</p>
+<p>Use cached data?</p>
+<p>Alert?</p>
+<p>Do nothing?</p>
+<p>Now you are designing failure semantics instead of adding try/catch after the fact.</p>
+<h2>The lesson to carry forward</h2>
+<p>Failures are first-class system states.</p>
+<p>Errors, exceptions, timeouts, retries, and partial completion are representations of different failure situations.</p>
+<p>For every important operation, ask:</p>
+<p>What can fail?</p>
+<p>What state may already have changed?</p>
+<p>What does the caller learn?</p>
+<p>Can it retry safely?</p>
+<p>Who cleans up?</p>
+<p>Robust software is not code that never fails.</p>
+<p>It is software whose failure paths are designed.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

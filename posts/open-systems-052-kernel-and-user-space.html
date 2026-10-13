@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Kernel and user space separate privileged resource control from ordinary application execution. The boundary is enforced by hardware privilege and crossed through defined mechanisms such as system calls." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Kernel and User Space — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-052-kernel-and-user-space.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Kernel and User Space" property="og:title"/><meta content="Kernel and user space separate privileged resource control from ordinary application execution. The boundary is enforced by hardware privilege and crossed through defined mechanisms such as system calls." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-052-kernel-and-user-space.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Kernel and User Space</h1><p class="lede">Kernel and user space separate privileged resource control from ordinary application execution. The boundary is enforced by hardware privilege and crossed through defined mechanisms such as system calls.</p><div class="article-meta"><span>Published 2026-10-06</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A text editor should be able to save a file.</p>
+<p>It should not be able to overwrite arbitrary kernel memory.</p>
+<p>A browser should be able to create a network socket.</p>
+<p>It should not be able to reprogram every device controller directly.</p>
+<p>This separation is the practical meaning of kernel space and user space.</p>
+<h2>The CPU supports privilege</h2>
+<p>Modern processor architectures provide execution modes with different authority.</p>
+<p>The kernel runs with privilege needed to manage memory mappings, devices, interrupts, and protection.</p>
+<p>Ordinary applications run with less privilege.</p>
+<p>The exact architecture-specific modes differ.</p>
+<p>The principle is stable:</p>
+<pre><code>privileged execution
+       |
+  protected boundary
+       |
+unprivileged execution
+</code></pre>pre
+<p>Hardware helps enforce the boundary.</p>
+<p>Software policy uses it.</p>
+<h2>User space is where ordinary applications live</h2>
+<p>Your shell, browser, editor, database, Python interpreter, and many system services are user-space processes.</p>
+<p>They have virtual address spaces and kernel-managed identities.</p>
+<p>They cannot simply execute every privileged instruction successfully.</p>
+<p>They request services through operating-system interfaces.</p>
+<p>This limits blast radius.</p>
+<p>A bug in a normal process should not automatically become arbitrary kernel execution.</p>
+<p>Isolation is not perfect, but the boundary is foundational.</p>
+<h2>The kernel owns protected global state</h2>
+<p>The kernel tracks things such as:</p>
+<ul>
+<li>processes and threads;</li>
+<li>page tables;</li>
+<li>open file state;</li>
+<li>network stacks;</li>
+<li>routing tables;</li>
+<li>device drivers;</li>
+<li>credentials;</li>
+<li>timers;</li>
+<li>scheduler state.</li>
+</ul>
+<p>Many applications depend on these shared resources.</p>
+<p>If each application modified them directly, coordination and security would collapse.</p>
+<p>Central privileged mediation gives the system one place to enforce invariants.</p>
+<h2>System calls cross the boundary</h2>
+<p>A process wants to read a file.</p>
+<p>It calls a library function.</p>
+<p>Eventually a system-call mechanism transfers control into the kernel.</p>
+<p>The kernel validates the file descriptor and destination buffer, performs or initiates the operation, then returns.</p>
+<p>Conceptually:</p>
+<pre><code>user program
+   ↓
+syscall entry
+   ↓
+kernel
+   ↓
+filesystem/driver/etc.
+   ↓
+kernel result
+   ↓
+user program
+</code></pre>pre
+<p>This transition is controlled.</p>
+<p>The process does not simply call an arbitrary kernel function pointer.</p>
+<h2>Exceptions also enter the kernel</h2>
+<p>Suppose user code accesses an unmapped virtual address.</p>
+<p>The CPU detects a page fault.</p>
+<p>Control transfers to the kernel's exception handling path.</p>
+<p>The kernel decides whether the fault is:</p>
+<ul>
+<li>recoverable demand paging;</li>
+<li>copy-on-write;</li>
+<li>invalid access;</li>
+<li>protection violation.</li>
+</ul>
+<p>The application did not request a syscall.</p>
+<p>Hardware forced a privileged transition because execution encountered a condition requiring OS handling.</p>
+<h2>Interrupts can arrive from outside the current program</h2>
+<p>A network card receives data.</p>
+<p>A timer fires.</p>
+<p>A storage controller completes a request.</p>
+<p>Hardware can notify the processor through interrupts.</p>
+<p>The kernel handles the event and may wake user-space work later.</p>
+<p>This shows why application execution is not isolated in time.</p>
+<p>The machine is handling many asynchronous events around it.</p>
+<h2>Context switching changes address spaces and state</h2>
+<p>The scheduler stops thread A.</p>
+<p>Thread B runs.</p>
+<p>The processor must use B's relevant execution and memory context.</p>
+<p>Later A resumes.</p>
+<p>Protection ensures B does not simply inherit A's private memory mappings.</p>
+<p>The kernel coordinates the switch.</p>
+<p>Again, process isolation is implemented, not magical.</p>
+<h2>Kernel bugs are unusually dangerous</h2>
+<p>A user-space process crash often kills one process.</p>
+<p>A kernel crash can affect the whole machine.</p>
+<p>A driver running in kernel context may have broad privileges.</p>
+<p>This is why kernel code, drivers, privilege boundaries, and syscall attack surfaces receive intense security scrutiny.</p>
+<p>Some systems move more components into user space specifically to reduce privileged code.</p>
+<p>Architecture determines blast radius.</p>
+<h2>Containers do not create a second kernel</h2>
+<p>On ordinary Linux containers, processes are isolated using kernel features such as namespaces and cgroups while sharing the host Linux kernel.</p>
+<p>That is different from a virtual machine running its own guest kernel.</p>
+<p>This distinction matters for security, observability, and compatibility.</p>
+<p>A container image may look like a tiny Linux filesystem.</p>
+<p>It is not necessarily a tiny virtual machine.</p>
+<h2>Exercise: classify operations</h2>
+<p>For each operation, ask whether ordinary user code can do it directly or must involve the kernel:</p>
+<ul>
+<li>add two integers;</li>
+<li>read a normal file;</li>
+<li>allocate heap memory from an existing user-space allocator pool;</li>
+<li>create a TCP socket;</li>
+<li>program a physical network interface register;</li>
+<li>change another process's page table.</li>
+</ul>
+<p>Some operations happen entirely in user space until more resources are needed.</p>
+<p>Others require kernel mediation.</p>
+<p>The boundary becomes visible.</p>
+<h2>The lesson to carry forward</h2>
+<p>Kernel and user space separate authority.</p>
+<p>User programs run with constrained privilege.</p>
+<p>The kernel manages global resources and protection.</p>
+<p>System calls, exceptions, and interrupts cross into privileged execution under defined rules.</p>
+<p>This boundary is one of the reasons many independent programs can share one computer without treating every process as fully trusted.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

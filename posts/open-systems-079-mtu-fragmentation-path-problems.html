@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Every link has a maximum packet size it can carry. Path MTU is the smallest limit along the route; when endpoints ignore it, small packets can work while larger transfers stall." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>MTU, Fragmentation, and Path Problems — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-079-mtu-fragmentation-path-problems.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="MTU, Fragmentation, and Path Problems" property="og:title"/><meta content="Every link has a maximum packet size it can carry. Path MTU is the smallest limit along the route; when endpoints ignore it, small packets can work while larger transfers stall." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-079-mtu-fragmentation-path-problems.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>MTU, Fragmentation, and Path Problems</h1><p class="lede">Every link has a maximum packet size it can carry. Path MTU is the smallest limit along the route; when endpoints ignore it, small packets can work while larger transfers stall.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Ping works.</p>
+<p>TCP handshake works.</p>
+<p>Small response works.</p>
+<p>A larger transfer stalls.</p>
+<p>One possible explanation is a path-MTU problem.</p>
+<p>MTU means Maximum Transmission Unit: the largest packet a link can carry at the relevant network layer without requiring additional fragmentation or link-specific handling.</p>
+<p>The end-to-end path is constrained by the smallest relevant link MTU.</p>
+<h2>One path, several limits</h2>
+<p>Imagine:</p>
+<pre><code>link A: 1500
+tunnel: effective 1400
+link B: 1500
+</code></pre>pre
+<p>The path cannot safely carry a 1500-byte inner packet through the 1400-byte tunnel without adaptation.</p>
+<p>The limiting value is not bandwidth.</p>
+<p>It is packet size.</p>
+<h2>IPv4 fragmentation</h2>
+<p>Classic IPv4 permits fragmentation in the network when a router encounters a smaller outgoing MTU unless the packet is marked not to fragment.</p>
+<p>Fragments are reassembled at the destination.</p>
+<p>Fragmentation creates overhead and makes packet loss more costly because losing one fragment can invalidate the whole reassembled packet.</p>
+<p>Modern stacks prefer avoiding unnecessary fragmentation when possible.</p>
+<h2>IPv6 changes the rule</h2>
+<p>IPv6 routers do not fragment packets in transit.</p>
+<p>RFC 8200 defines a minimum IPv6 link MTU of 1280 octets and expects endpoints to adapt packet sizes, including through Path MTU Discovery where implemented.</p>
+<p>If a router cannot forward an oversized IPv6 packet, ICMPv6 Packet Too Big feedback is part of the mechanism used to inform the sender.</p>
+<p>Blocking all ICMPv6 can therefore break valid network behaviour.</p>
+<h2>TCP MSS is related but different</h2>
+<p>TCP Maximum Segment Size describes how much TCP payload an endpoint can receive in one segment.</p>
+<p>MTU applies at the IP/link boundary.</p>
+<p>MSS applies to TCP payload sizing.</p>
+<p>Headers consume part of the packet budget.</p>
+<p>Tunnels consume more.</p>
+<p>A rough IPv4/TCP example with no options:</p>
+<pre><code>MTU 1500
+minus IP header 20
+minus TCP header 20
+gives MSS 1460
+</code></pre>pre
+<p>Real headers, options, and tunnels can change this.</p>
+<h2>Why small probes can mislead</h2>
+<p>Suppose the path allows 1300-byte packets.</p>
+<p>A small ICMP echo succeeds.</p>
+<p>The TCP handshake uses small packets and succeeds.</p>
+<p>Then the application sends a larger segment.</p>
+<p>If needed MTU feedback is lost or filtered, the large packet may repeatedly fail.</p>
+<p>RFC 8201 discusses this class of failure in the context of Path MTU Discovery.</p>
+<p>The key symptom is selective failure by packet size.</p>
+<p>It is a hypothesis, not a diagnosis by itself.</p>
+<h2>Tunnels consume packet budget</h2>
+<p>VPNs and overlays add encapsulation.</p>
+<p>Examples include WireGuard, IPsec, GRE, VXLAN, and other tunnels.</p>
+<p>Every outer header reduces space available to the inner packet when the physical link MTU stays fixed.</p>
+<p>Nested encapsulation can compound the reduction.</p>
+<p>Virtual networking still sits on physical packet-size constraints.</p>
+<h2>Path MTU can change</h2>
+<p>Routing is dynamic.</p>
+<p>A new path may include a smaller link.</p>
+<p>A mobile device may move between networks.</p>
+<p>A tunnel may appear or disappear.</p>
+<p>Cached path information therefore has a lifetime.</p>
+<p>Transport implementations must be able to adapt.</p>
+<h2>Exercise: reason about one tunnel</h2>
+<p>Outer-link MTU:</p>
+<pre><code>1500 bytes
+</code></pre>pre
+<p>Tunnel overhead:</p>
+<pre><code>60 bytes
+</code></pre>pre
+<p>Approximate maximum inner packet:</p>
+<pre><code>1440 bytes
+</code></pre>pre
+<p>If inner IPv4 plus TCP headers consume 40 bytes:</p>
+<pre><code>approximate TCP payload = 1400 bytes
+</code></pre>pre
+<p>This is a constructed arithmetic example, not a configuration recommendation.</p>
+<p>The purpose is to show that encapsulation uses space.</p>
+<h2>The lesson to carry forward</h2>
+<p>Packet size is part of network compatibility.</p>
+<p>Path MTU is constrained by the smallest usable link along the route.</p>
+<p>When tunnel overhead or ICMP feedback is mishandled, connectivity can fail selectively.</p>
+<p>Do not test a path only with tiny packets.</p>
+<p>Sometimes size is the variable.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

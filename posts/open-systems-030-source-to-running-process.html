@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A complete path connects source code, compilation or interpretation, object files, linking, executable formats, loading, virtual memory, processes, runtimes, system calls, and CPU instructions." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>From Source File to Running Process — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-030-source-to-running-process.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="From Source File to Running Process" property="og:title"/><meta content="A complete path connects source code, compilation or interpretation, object files, linking, executable formats, loading, virtual memory, processes, runtimes, system calls, and CPU instructions." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-030-source-to-running-process.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>From Source File to Running Process</h1><p class="lede">A complete path connects source code, compilation or interpretation, object files, linking, executable formats, loading, virtual memory, processes, runtimes, system calls, and CPU instructions.</p><div class="article-meta"><span>Published 2026-10-06</span><span>14 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Module 3 began with a claim:</p>
+<p>The CPU does not execute your source file.</p>
+<p>Now rebuild the complete path.</p>
+<p>We will use a small compiled C program because its stages are easy to expose. Then we will compare a Python program to show which layers change and which remain.</p>
+<h2>Stage 1: source</h2>
+<p>Write:</p>
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(void) {
+    printf("hello\n");
+    return 0;
+}
+</code></pre>pre
+<p>This is C source.</p>
+<p>It has language semantics.</p>
+<p>It is not yet the final executable representation the CPU will run.</p>
+<h2>Stage 2: preprocessing</h2>
+<p>The C preprocessor handles directives such as includes and macros.</p>
+<p>GCC can stop after preprocessing with its documented -E option.</p>
+<p>Conceptually:</p>
+<pre><code>main.c
+  -&gt; preprocessor
+  -&gt; expanded source
+</code></pre>pre
+<p>The included header does not literally paste a complete libc implementation into your program.</p>
+<p>Headers generally provide declarations and definitions needed at compile time.</p>
+<p>Library implementation arrives through other build/link/runtime mechanisms.</p>
+<h2>Stage 3: compilation</h2>
+<p>The compiler parses the program, checks rules, builds internal representations, performs transformations, and emits target-specific output.</p>
+<p>GCC can emit assembly text.</p>
+<p>Now you can see instructions and labels for a target architecture.</p>
+<p>But symbolic references and final addresses may still be unresolved.</p>
+<h2>Stage 4: assembly</h2>
+<p>The assembler converts assembly into a relocatable object file.</p>
+<p>Now we have binary machine code fragments plus metadata.</p>
+<p>The object file can define symbols and reference symbols supplied elsewhere.</p>
+<p>ELF is a common object format on Linux systems.</p>
+<p>The program is closer to execution but still not necessarily complete.</p>
+<h2>Stage 5: linking</h2>
+<p>The linker combines object files and libraries.</p>
+<p>It resolves symbols, performs relocation, and produces an executable or shared object.</p>
+<p>If printf cannot be resolved according to the link configuration, the build can fail here.</p>
+<p>A linker error therefore tells you something precise:</p>
+<p>source translation progressed farther than parsing, but binary pieces could not be connected as required.</p>
+<h2>Stage 6: persistent executable</h2>
+<p>Now an executable file exists on storage.</p>
+<p>It contains machine code and metadata used for loading.</p>
+<p>Nothing is executing yet.</p>
+<p>This is still a program artifact, not a process.</p>
+<h2>Stage 7: process launch</h2>
+<p>A shell or launcher requests execution.</p>
+<p>On Unix-like systems, process creation and program replacement may involve operations conceptually represented by fork/exec patterns, although exact launch paths vary.</p>
+<p>The kernel validates permissions and prepares a process execution context.</p>
+<h2>Stage 8: memory mapping and loading</h2>
+<p>Executable segments are mapped into the process virtual address space.</p>
+<p>The dynamic loader may map shared libraries and resolve dynamic dependencies.</p>
+<p>Stack and other runtime memory are prepared.</p>
+<p>Arguments and environment are made available.</p>
+<p>Control eventually reaches program startup code and then main.</p>
+<p>The ELF specification explicitly includes program-loading and dynamic-linking information for this purpose.</p>
+<h2>Stage 9: runtime and libraries execute</h2>
+<p>printf is not a CPU instruction.</p>
+<p>The C library implements formatted output logic.</p>
+<p>That implementation may buffer data and eventually invoke operating-system services.</p>
+<p>The program may call write through a library wrapper.</p>
+<p>A system call crosses into the kernel.</p>
+<p>The kernel ultimately sends bytes toward the terminal or output stream.</p>
+<h2>Stage 10: CPU instructions keep executing underneath</h2>
+<p>Throughout startup, dynamic linking, libc, your main function, and kernel transitions, processor instructions are executing.</p>
+<p>The source-level call:</p>
+<pre><code>printf("hello\n")
+</code></pre>pre
+<p>corresponds to a large path of native instructions across several components.</p>
+<p>The CPU never needed to understand the word printf.</p>
+<p>Software layers did.</p>
+<h2>Now compare Python</h2>
+<p>Write:</p>
+<pre><code>print("hello")
+</code></pre>pre
+<p>The outer operating-system path is familiar:</p>
+<pre><code>executable Python interpreter
+  -&gt; process
+  -&gt; virtual memory
+  -&gt; libraries
+  -&gt; syscalls
+  -&gt; CPU instructions
+</code></pre>pre
+<p>Inside the interpreter process another layer appears:</p>
+<pre><code>Python source
+  -&gt; compiled code object / bytecode
+  -&gt; Python interpreter execution
+  -&gt; runtime operation
+  -&gt; output library
+  -&gt; OS
+</code></pre>pre
+<p>CPython's dis documentation lets you inspect the bytecode representation while warning that it is implementation-specific.</p>
+<p>Different language path.</p>
+<p>Same operating-system and hardware foundations.</p>
+<h2>Every arrow creates a diagnostic boundary</h2>
+<p>Suppose the program fails.</p>
+<p>Syntax error?</p>
+<p>Compiler stage.</p>
+<p>Undefined reference?</p>
+<p>Link stage.</p>
+<p>Permission denied launching?</p>
+<p>Execution boundary.</p>
+<p>Missing shared library?</p>
+<p>Loader/dynamic-link stage.</p>
+<p>Segmentation fault?</p>
+<p>Runtime memory-access failure.</p>
+<p>Write returns broken pipe?</p>
+<p>I/O path.</p>
+<p>The phrase "program doesn't work" hides all these categories.</p>
+<p>Systems knowledge makes failure narrower.</p>
+<h2>Exercise: draw both paths</h2>
+<p>Draw two vertical diagrams.</p>
+<p>C:</p>
+<pre><code>source
+preprocess
+compile
+assemble
+link
+executable
+loader
+process
+syscalls
+CPU
+</code></pre>pre
+<p>Python:</p>
+<pre><code>source
+Python runtime
+bytecode/interpreter
+process
+syscalls
+CPU
+</code></pre>pre
+<p>Now add:</p>
+<pre><code>libraries
+virtual memory
+files
+terminal
+</code></pre>pre
+<p>You will see that language choice changes important upper layers but does not replace the operating system or hardware beneath.</p>
+<h2>The lesson to carry forward</h2>
+<p>A running program is the result of a chain.</p>
+<p>Source code becomes or feeds executable representations.</p>
+<p>Object files and linkers assemble binary artifacts.</p>
+<p>The operating system creates a process and address space.</p>
+<p>Runtimes and libraries initialize.</p>
+<p>System calls request kernel services.</p>
+<p>Processor instructions execute underneath everything.</p>
+<p>This is why syntax alone is not programming education.</p>
+<p>The syntax sits on top of a machine.</p>
+<p>Module 4 now uses this system context to introduce programming concepts from the problems that create them.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

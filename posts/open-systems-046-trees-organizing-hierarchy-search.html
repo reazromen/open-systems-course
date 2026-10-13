@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Trees model parent-child structure and can support efficient ordered search when their shape is controlled. Filesystems, indexes, parsers, and routing structures all exploit tree-like organization." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Trees: Organizing Hierarchies and Search — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-046-trees-organizing-hierarchy-search.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Trees: Organizing Hierarchies and Search" property="og:title"/><meta content="Trees model parent-child structure and can support efficient ordered search when their shape is controlled. Filesystems, indexes, parsers, and routing structures all exploit tree-like organization." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-046-trees-organizing-hierarchy-search.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Trees: Organizing Hierarchies and Search</h1><p class="lede">Trees model parent-child structure and can support efficient ordered search when their shape is controlled. Filesystems, indexes, parsers, and routing structures all exploit tree-like organization.</p><div class="article-meta"><span>Published 2026-10-06</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Some data is not naturally flat.</p>
+<p>A filesystem has directories inside directories.</p>
+<p>An organization has teams inside divisions.</p>
+<p>A parser has expressions containing subexpressions.</p>
+<p>A database index needs ordered branching.</p>
+<p>These relationships create trees.</p>
+<h2>A tree starts with nodes and edges</h2>
+<p>A rooted tree has a root.</p>
+<p>Nodes can have children.</p>
+<p>Every non-root node has one parent in the basic model.</p>
+<p>Example:</p>
+<pre><code>root
+├── A
+│   ├── C
+│   └── D
+└── B
+</code></pre>pre
+<p>The path from root to D is:</p>
+<pre><code>root -&gt; A -&gt; D
+</code></pre>pre
+<p>That structural language is more important than one implementation.</p>
+<h2>Binary search trees add an ordering invariant</h2>
+<p>A binary search tree can enforce:</p>
+<pre><code>left subtree &lt; node &lt; right subtree
+</code></pre>pre
+<p>for keys under a chosen ordering rule.</p>
+<p>Lookup compares the desired key and chooses one branch.</p>
+<p>If the tree remains balanced, each decision can discard a large fraction of possibilities.</p>
+<p>That can give logarithmic-height search.</p>
+<p>But the word balanced matters.</p>
+<h2>A bad tree becomes a list</h2>
+<p>Insert already sorted keys into a naive binary search tree:</p>
+<pre><code>1
+       2
+           3
+               4
+</code></pre>pre
+<p>The tree has degenerated.</p>
+<p>Search becomes linear.</p>
+<p>Balanced-tree designs such as AVL or red-black trees maintain shape constraints to keep height controlled.</p>
+<p>MIT's algorithms courses treat balanced binary search trees as a distinct topic for exactly this reason.</p>
+<p>The data structure's invariant creates its performance guarantee.</p>
+<h2>Trees support ordered operations</h2>
+<p>Hash tables are excellent for direct key lookup.</p>
+<p>Trees can also support:</p>
+<ul>
+<li>sorted traversal;</li>
+<li>minimum/maximum;</li>
+<li>predecessor/successor;</li>
+<li>range queries.</li>
+</ul>
+<p>If you need all keys between 100 and 200, ordering matters.</p>
+<p>This is why databases often use B-tree-family indexes rather than simple hash tables for general ordered indexing.</p>
+<p>Different query patterns choose different structures.</p>
+<h2>High branching factor fits storage systems</h2>
+<p>Binary trees have at most two children per node.</p>
+<p>Storage indexes often use much larger branching factors.</p>
+<p>Why?</p>
+<p>A disk or SSD access can fetch a block containing many keys and child pointers.</p>
+<p>A B-tree-like structure can reduce the number of storage accesses needed to reach a record.</p>
+<p>Hardware characteristics shape data structures.</p>
+<p>The same abstract search problem receives a storage-aware implementation.</p>
+<h2>Syntax trees represent programs</h2>
+<p>Consider:</p>
+<pre><code>a + b * c
+</code></pre>pre
+<p>A parser can represent structure as:</p>
+<pre><code>    +
+   /       a   *
+     /         b   c
+</code></pre>pre
+<p>Multiplication is nested beneath addition according to precedence.</p>
+<p>This tree gives compilers a structural representation of source meaning.</p>
+<p>Trees are therefore not only containers for user data.</p>
+<p>They are internal representations of programs.</p>
+<h2>Filesystems are tree-like but not always pure trees</h2>
+<p>Directory paths look hierarchical:</p>
+<pre><code>/home/user/project/file
+</code></pre>pre
+<p>But hard links, mount points, symbolic links, and special filesystem features complicate the pure-tree model.</p>
+<p>This is a useful warning.</p>
+<p>A tree can be a helpful abstraction even when the real system contains graph-like relationships.</p>
+<p>Know where the model stops being exact.</p>
+<h2>Exercise: choose hash or tree</h2>
+<p>Requirement A:</p>
+<p>Given user ID, retrieve exact user.</p>
+<p>Hash table is a strong candidate.</p>
+<p>Requirement B:</p>
+<p>Return all timestamps between 10:00 and 10:05 in sorted order.</p>
+<p>Ordered tree/index is a strong candidate.</p>
+<p>Requirement C:</p>
+<p>Represent a nested JSON document.</p>
+<p>Tree-like representation is natural.</p>
+<p>The structure follows the operations and relationships.</p>
+<h2>The lesson to carry forward</h2>
+<p>Trees organize hierarchical and ordered relationships.</p>
+<p>Their usefulness depends on invariants such as ordering and balance.</p>
+<p>A shape that looks like a tree is not enough to guarantee good search.</p>
+<p>When choosing a tree, ask:</p>
+<p>What ordering or hierarchy must it preserve?</p>
+<p>What operations must be efficient?</p>
+<p>What keeps the shape healthy?</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

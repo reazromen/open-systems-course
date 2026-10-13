@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="IP identifies network endpoints; transport ports distinguish applications; sockets are operating-system objects representing communication endpoints and their state." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Ports and Sockets — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-078-ports-and-sockets.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Ports and Sockets" property="og:title"/><meta content="IP identifies network endpoints; transport ports distinguish applications; sockets are operating-system objects representing communication endpoints and their state." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-078-ports-and-sockets.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Ports and Sockets</h1><p class="lede">IP identifies network endpoints; transport ports distinguish applications; sockets are operating-system objects representing communication endpoints and their state.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Your server has one IP address:</p>
+<pre><code>203.0.113.10
+</code></pre>pre
+<p>It runs:</p>
+<ul>
+<li>SSH;</li>
+<li>web;</li>
+<li>database;</li>
+<li>voice service.</li>
+</ul>
+<p>How does incoming traffic reach the right application?</p>
+<p>Transport ports provide part of the answer.</p>
+<p>Sockets are the operating-system abstraction applications use to participate.</p>
+<h2>Port is not a physical connector</h2>
+<p>TCP port 443 is a number in a transport header.</p>
+<p>It is not a hardware slot.</p>
+<p>A listening server binds a socket to an address/port combination according to operating-system rules.</p>
+<p>Incoming traffic matching that endpoint can be delivered to the application.</p>
+<h2>The same port can exist on different IPs</h2>
+<p>Server:</p>
+<pre><code>127.0.0.1:8080
+</code></pre>pre
+<p>is different from:</p>
+<pre><code>192.168.1.10:8080
+</code></pre>pre
+<p>A service bound only to loopback is not reachable from another machine even though it "uses port 8080."</p>
+<p>This explains many deployment problems.</p>
+<p>Always inspect:</p>
+<pre><code>address + port + protocol
+</code></pre>pre
+<p>not just port number.</p>
+<h2>TCP connections use endpoint tuples</h2>
+<p>A TCP flow is identified by endpoint information including:</p>
+<pre><code>source IP
+source port
+destination IP
+destination port
+</code></pre>pre
+<p>plus protocol context.</p>
+<p>A web server can therefore serve thousands of clients all connecting to destination port 443 because each connection has a distinct remote endpoint tuple.</p>
+<p>"One port means one connection" is wrong.</p>
+<h2>Client ports are usually ephemeral</h2>
+<p>A browser connecting to remote 443 usually receives a temporary local source port from the OS.</p>
+<p>Example:</p>
+<pre><code>192.168.1.20:53122
+    -&gt;
+93.184.216.34:443
+</code></pre>pre
+<p>Another connection can use 53123.</p>
+<p>The destination service port is stable.</p>
+<p>Client source ports help distinguish concurrent flows.</p>
+<h2>A socket is an OS object</h2>
+<p>The application calls socket-related APIs.</p>
+<p>The kernel creates communication state.</p>
+<p>For TCP server:</p>
+<pre><code>socket
+bind
+listen
+accept
+</code></pre>pre
+<p>accept returns a new connected socket while the listening socket remains available for new connections.</p>
+<p>This is why a server can have one listening endpoint and many active connections.</p>
+<h2>UDP sockets have different state</h2>
+<p>UDP does not require a TCP handshake.</p>
+<p>An application can bind a UDP socket and send/receive datagrams.</p>
+<p>Some UDP sockets can be "connected" at the API level to fix a default peer and filter traffic, but that does not create a TCP-style reliable connection.</p>
+<p>The word connected depends on the layer.</p>
+<h2>Ports can conflict</h2>
+<p>Two ordinary processes try to bind the same local address and port under incompatible socket options.</p>
+<p>One usually fails with address-in-use.</p>
+<p>This is an ownership conflict over a transport endpoint.</p>
+<p>Running process A does not prove process A owns the expected socket.</p>
+<p>Use:</p>
+<pre><code>ss -ltnp
+ss -lunp
+</code></pre>pre
+<p>to inspect listeners where permissions permit.</p>
+<h2>Firewalls operate around sockets, not inside them</h2>
+<p>A service can be listening.</p>
+<p>Firewall blocks inbound traffic.</p>
+<p>Local curl works.</p>
+<p>Remote connection fails.</p>
+<p>The socket state is healthy.</p>
+<p>The path to it is not.</p>
+<p>This is why local and remote tests belong at different layers.</p>
+<h2>Exercise: bind addresses matter</h2>
+<p>Run a local test server bound to:</p>
+<pre><code>127.0.0.1
+</code></pre>pre
+<p>Inspect with ss.</p>
+<p>Then bind to an interface address or all interfaces in a safe environment.</p>
+<p>Compare.</p>
+<p>You will see that a port number without bind address is incomplete information.</p>
+<h2>The lesson to carry forward</h2>
+<p>Ports distinguish transport endpoints.</p>
+<p>Sockets are the operating-system communication objects applications use.</p>
+<p>For troubleshooting, always identify:</p>
+<ul>
+<li>protocol;</li>
+<li>local address;</li>
+<li>local port;</li>
+<li>remote address;</li>
+<li>remote port;</li>
+<li>socket state.</li>
+</ul>
+<p>"Port 443 is open" is shorthand, not a full network model.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

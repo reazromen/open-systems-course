@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Consistency is not one Boolean property. Linearizability, serializability, causal ordering, read-your-writes, monotonic reads, and eventual consistency describe different guarantees about distributed state." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Consistency Models: What Reads Are Allowed to See — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-143-consistency-models-what-reads-are-allowed-to-see.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Consistency Models: What Reads Are Allowed to See" property="og:title"/><meta content="Consistency is not one Boolean property. Linearizability, serializability, causal ordering, read-your-writes, monotonic reads, and eventual consistency describe different guarantees about distributed state." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-143-consistency-models-what-reads-are-allowed-to-see.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Consistency Models: What Reads Are Allowed to See</h1><p class="lede">Consistency is not one Boolean property. Linearizability, serializability, causal ordering, read-your-writes, monotonic reads, and eventual consistency describe different guarantees about distributed state.</p><div class="article-meta"><span>Published 2026-10-07</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Engineers often ask:</p>
+<p>is this database consistent?</p>
+<p>That question is too broad.</p>
+<p>Consistency is a family of observable guarantees.</p>
+<h2>Linearizability gives a single real-time order</h2>
+<p>A linearizable register behaves as though each operation took effect at one instant between invocation and response.</p>
+<p>If write X completes before read Y begins, Y must observe X or something newer.</p>
+<p>This is a strong and intuitive model for locks, configuration, and coordination.</p>
+<p>It can require communication with an authoritative quorum and therefore cost latency or availability during partitions.</p>
+<h2>Serializability is about transactions</h2>
+<p>Serializability says concurrent transactions behave like some serial execution.</p>
+<p>It does not necessarily respect real-time order between separate transactions.</p>
+<p>Strict serializability combines serial transaction behavior with a real-time constraint and is stronger.</p>
+<p>Do not use linearizable and serializable as synonyms.</p>
+<h2>Read-your-writes is a session guarantee</h2>
+<p>After a user changes a profile name, they usually expect to see the new name immediately.</p>
+<p>A system with asynchronous replicas can violate this if the next read goes to a lagging replica.</p>
+<p>Read-your-writes can be achieved without making every global read linearizable.</p>
+<p>Session-level guarantees are often enough for product behavior.</p>
+<h2>Monotonic reads prevent going backward</h2>
+<p>Suppose a client observes version 12.</p>
+<p>A later read should not return version 10.</p>
+<p>Routing the client between replicas at different lag levels can violate monotonic reads.</p>
+<p>Sticky sessions, version tracking, or replica selection can preserve monotonicity.</p>
+<h2>Causal consistency preserves cause before effect</h2>
+<p>If message B was written because process observed message A, causal consistency ensures observers do not see B while missing A.</p>
+<p>Causality is weaker than a single total global order and can therefore scale differently.</p>
+<p>It fits collaboration and social-style workloads better than some financial invariants.</p>
+<h2>Eventual consistency promises convergence, not timing</h2>
+<p>If writes stop and communication continues, replicas eventually converge under the system's conflict rules.</p>
+<p>“Eventually” does not say whether convergence takes 10 ms or 10 hours.</p>
+<p>Operationally, you still need lag metrics and user-facing expectations.</p>
+<p>Eventual consistency is not “anything goes.”</p>
+<p>It is a specific convergence claim under assumptions.</p>
+<h2>Stronger consistency can reduce availability</h2>
+<p>During a network partition, a system that requires a quorum may reject operations rather than risk conflicting state.</p>
+<p>A system that accepts writes on both sides remains available but needs reconciliation.</p>
+<p>This trade-off is related to the CAP theorem, but real systems involve latency, partial quorums, dynamic membership, and many guarantees beyond the three-letter summary.</p>
+<p>Use CAP as a boundary result, not a complete architecture method.</p>
+<h2>The domain chooses the guarantee</h2>
+<p>Examples:</p>
+<p>feature flag controlling a safety interlock may need strong ordering;
+social feed view can tolerate brief staleness;
+shopping cart can merge additions;
+financial ledger should preserve stronger invariants;
+IoT telemetry can be eventually ingested while command authorization remains strongly controlled.</p>
+<p>One application can contain several consistency models.</p>
+<h2>Practical exercise</h2>
+<p>For one system, list five pieces of state.</p>
+<p>For each, write the weakest guarantee users can safely tolerate.</p>
+<p>Then describe the visible anomaly if the guarantee is weaker.</p>
+<p>If you cannot name the anomaly, the consistency requirement is not yet concrete.</p>
+<h2>The lesson to carry forward</h2>
+<p>Consistency models describe what histories clients are allowed to observe.</p>
+<p>The next lesson examines one way systems agree on shared order and leadership: consensus.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

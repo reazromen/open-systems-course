@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="One embedded event can cross voltage thresholds, GPIO or ADC hardware, interrupts, DMA, RTOS queues, application state, timers, PWM, and a power driver before the physical world changes again." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Follow One Sensor-to-Output Path — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-120-follow-one-sensor-to-output-path.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Follow One Sensor-to-Output Path" property="og:title"/><meta content="One embedded event can cross voltage thresholds, GPIO or ADC hardware, interrupts, DMA, RTOS queues, application state, timers, PWM, and a power driver before the physical world changes again." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-120-follow-one-sensor-to-output-path.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Follow One Sensor-to-Output Path</h1><p class="lede">One embedded event can cross voltage thresholds, GPIO or ADC hardware, interrupts, DMA, RTOS queues, application state, timers, PWM, and a power driver before the physical world changes again.</p><div class="article-meta"><span>Published 2026-10-07</span><span>15 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>We have studied the pieces separately.</p>
+<p>Now follow one physical event through an embedded system.</p>
+<p>Constructed example: a temperature sensor reports that a device is too hot, and firmware increases fan speed using PWM.</p>
+<p>No real product is being described.</p>
+<h2>1. The physical world changes first</h2>
+<p>The temperature rises.</p>
+<p>The sensor converts a physical property into an electrical or digital representation.</p>
+<p>Depending on the device, that can be:</p>
+<ul>
+<li>analog voltage;</li>
+<li>resistance converted by a measurement circuit;</li>
+<li>I2C register data;</li>
+<li>SPI frame;</li>
+<li>pulse frequency;</li>
+<li>one-bit threshold output.</li>
+</ul>
+<p>Firmware begins after physics has already shaped the signal.</p>
+<h2>2. The electrical interface must be valid</h2>
+<p>Before software reads anything, voltage levels, pull resistors, reference voltage, grounding, bus wiring, and signal integrity must be correct.</p>
+<p>A corrupted I2C waveform can produce a software timeout.</p>
+<p>An overloaded ADC input can produce a plausible but wrong number.</p>
+<p>The first debugging boundary is therefore always physical compatibility.</p>
+<h2>3. A peripheral captures the signal</h2>
+<p>Assume the sensor uses I2C.</p>
+<p>The MCU's I2C controller generates clock and address phases and receives bytes.</p>
+<p>The CPU does not need to bit-bang every edge.</p>
+<p>Hardware peripheral state machines perform the bus timing.</p>
+<p>The driver configures and supervises that hardware.</p>
+<h2>4. Interrupt or DMA reports progress</h2>
+<p>The peripheral can generate interrupts when bytes arrive, buffers complete, or errors occur.</p>
+<p>For larger transfers, DMA can move data into memory.</p>
+<p>Now the same sample exists at several possible locations over time:</p>
+<p>sensor register → bus shift register → peripheral FIFO → DMA buffer → driver buffer → application structure.</p>
+<p>When debugging stale or corrupted data, ask which copy you are looking at.</p>
+<h2>5. The ISR defers work</h2>
+<p>The interrupt handler acknowledges the peripheral event and signals a task.</p>
+<p>It does not parse configuration files, update a display, and compute control laws inside the ISR.</p>
+<p>The short ISR protects latency for other interrupts.</p>
+<p>The task does the expensive work later.</p>
+<h2>6. An RTOS task interprets the sample</h2>
+<p>The sensor task wakes and receives the new bytes.</p>
+<p>It checks transport status, validates the sensor response, converts raw units to engineering units, and timestamps the sample.</p>
+<p>That transformation creates another state boundary:</p>
+<p>raw measurement → validated application sample.</p>
+<p>If calibration constants are wrong, the bus can be perfect while the temperature value is wrong.</p>
+<h2>7. The control algorithm decides what should happen</h2>
+<p>The application compares temperature with a threshold or control curve.</p>
+<p>A robust design often adds hysteresis so the fan does not rapidly toggle around one exact threshold.</p>
+<p>For example, turn high speed on above one threshold and return to low speed only after temperature falls below a lower threshold.</p>
+<p>That is software state introduced to stabilize physical behavior.</p>
+<h2>8. A timer peripheral generates PWM</h2>
+<p>The control task updates a PWM duty setting.</p>
+<p>A hardware timer then produces the repeated waveform.</p>
+<p>The CPU does not wake for every PWM edge.</p>
+<p>Timer hardware turns one register value into deterministic timing.</p>
+<p>This is exactly why embedded peripherals exist.</p>
+<h2>9. GPIO drives a power stage, not the motor directly</h2>
+<p>The PWM pin controls a transistor, MOSFET, motor driver, or fan-control input.</p>
+<p>The GPIO provides a logic signal.</p>
+<p>The power stage supplies the actual load current.</p>
+<p>Power integrity, flyback behavior for inductive loads, grounding, and driver ratings remain outside the software abstraction.</p>
+<p>Correct duty-cycle code cannot compensate for an undersized transistor.</p>
+<h2>10. The physical system responds slowly</h2>
+<p>The fan accelerates.</p>
+<p>Airflow changes.</p>
+<p>Temperature falls later.</p>
+<p>That delay means the firmware is part of a feedback loop with physical inertia.</p>
+<p>Sampling too fast does not make the fan respond instantly.</p>
+<p>Control-system stability depends on the dynamics of the plant, sensor, actuator, and algorithm.</p>
+<h2>11. Faults need independent paths</h2>
+<p>What if the sensor disconnects?</p>
+<p>What if temperature exceeds a hard safety limit?</p>
+<p>What if the control task deadlocks?</p>
+<p>A production system may need:</p>
+<ul>
+<li>plausibility limits;</li>
+<li>sensor timeout;</li>
+<li>watchdog;</li>
+<li>fail-safe output state;</li>
+<li>independent thermal cutoff;</li>
+<li>error logging.</li>
+</ul>
+<p>Safety-critical systems require much stronger engineering than this course example. Do not rely on one software loop for hazardous protection.</p>
+<h2>12. Timing can be traced end to end</h2>
+<p>For one sample, useful timestamps are:</p>
+<ul>
+<li>sensor-ready event;</li>
+<li>peripheral completion;</li>
+<li>ISR entry;</li>
+<li>task wake;</li>
+<li>sample validation complete;</li>
+<li>control decision;</li>
+<li>PWM register update;</li>
+<li>physical output edge.</li>
+</ul>
+<p>These let you distinguish:</p>
+<p>sensor latency, bus latency, interrupt latency, scheduler latency, algorithm time, and actuator timing.</p>
+<p>One number called response time hides all of them.</p>
+<h2>13. Memory ownership is part of the path</h2>
+<p>If DMA writes into a buffer, the application must not reuse that buffer before transfer completion.</p>
+<p>If a queue passes a pointer, the producer must not free the object before the consumer finishes.</p>
+<p>If a task stack holds the only copy, returning from the function can invalidate it.</p>
+<p>Many embedded bugs are really lifetime bugs.</p>
+<h2>14. Reset must leave hardware safe</h2>
+<p>Suppose the MCU resets while the fan PWM was high.</p>
+<p>What happens to the output pin during reset and boot?</p>
+<p>Pins can enter input or default states before firmware reconfigures them.</p>
+<p>The hardware design should choose pull resistors and driver behavior so reset transitions are safe.</p>
+<p>Boot behavior is part of the actuator contract.</p>
+<h2>Build an evidence map</h2>
+<p>For one device you own, draw:</p>
+<p>physical input → electrical interface → MCU peripheral → ISR/DMA → task → application state → output peripheral → driver → physical output.</p>
+<p>At each arrow, write what evidence is available: logic analyzer, register, driver log, queue count, timestamp, GPIO probe, or measurement.</p>
+<p>That diagram is far more useful than a generic flowchart because every arrow corresponds to a real failure boundary.</p>
+<h2>What this module added</h2>
+<p>Embedded Systems introduced:</p>
+<ul>
+<li>microcontroller architecture;</li>
+<li>GPIO and electrical logic;</li>
+<li>interrupts;</li>
+<li>clocks and timers;</li>
+<li>UART, I2C, and SPI;</li>
+<li>memory regions and DMA;</li>
+<li>bootloaders and partitions;</li>
+<li>RTOS tasks and synchronization;</li>
+<li>watchdogs and power;</li>
+<li>end-to-end sensor/actuator tracing.</li>
+</ul>
+<p>Firmware is not merely software running on a smaller computer.</p>
+<p>It is software embedded inside a timing, electrical, and physical system.</p>
+<h2>The module to carry forward</h2>
+<p>A systems engineer should now be able to ask:</p>
+<p>What physical signal exists?</p>
+<p>Which peripheral captures it?</p>
+<p>Which execution context handles the event?</p>
+<p>Who owns the buffer?</p>
+<p>What timing guarantee matters?</p>
+<p>What happens during reset?</p>
+<p>What happens during low voltage?</p>
+<p>What evidence proves each boundary?</p>
+<p>Module 13 moves outward from one embedded device into IoT and Device Communication: sensors, provisioning, Wi-Fi, MQTT, telemetry, command state, OTA, fleet management, and one complete device-to-cloud-to-device path.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

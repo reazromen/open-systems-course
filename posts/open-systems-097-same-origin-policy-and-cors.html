@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Browsers isolate origins so one site cannot freely read another site's data. CORS is a controlled browser permission mechanism for cross-origin HTTP access, not an authentication system or network firewall." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Same-Origin Policy and CORS — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-097-same-origin-policy-and-cors.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Same-Origin Policy and CORS" property="og:title"/><meta content="Browsers isolate origins so one site cannot freely read another site's data. CORS is a controlled browser permission mechanism for cross-origin HTTP access, not an authentication system or network firewall." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-097-same-origin-policy-and-cors.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Same-Origin Policy and CORS</h1><p class="lede">Browsers isolate origins so one site cannot freely read another site's data. CORS is a controlled browser permission mechanism for cross-origin HTTP access, not an authentication system or network firewall.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A browser can reach many servers.</p>
+<p>That does not mean JavaScript from one site should be allowed to read data from all of them.</p>
+<p>If arbitrary code loaded from one page could freely read your bank, webmail, router UI, and internal dashboards, the browser would turn every visited site into a universal credentialed HTTP client.</p>
+<p>The web platform therefore has a security boundary based heavily on <strong>origin</strong>.</p>
+<h2>An origin is more specific than a domain name</h2>
+<p>At a practical level, an origin is determined by the tuple:</p>
+<pre><code class="language-text">scheme + host + port
+</code></pre>pre
+<p>For example:</p>
+<pre><code class="language-text">https://example.com
+https://api.example.com
+http://example.com
+https://example.com:8443
+</code></pre>pre
+<p>are not all the same origin.</p>
+<p>RFC 6454 defines the web-origin concept, and the HTML and Fetch standards define the current browser behavior around origins and fetching.</p>
+<p>This matters because two services owned by the same organization can still be cross-origin to the browser.</p>
+<p>Administrative ownership and browser origin are different concepts.</p>
+<h2>Same-origin policy limits script access</h2>
+<p>The same-origin policy is not one single rule implemented in one place.</p>
+<p>It is a broad browser security principle used across APIs and resources.</p>
+<p>A useful mental model is:</p>
+<pre><code class="language-text">document from origin A
+        ↓
+script execution
+        ↓
+browser asks:
+"may this context read or manipulate data from origin B?"
+</code></pre>pre
+<p>Many cross-origin operations are restricted.</p>
+<p>Some cross-origin actions are still allowed. For example, pages have long been able to embed images, navigate to other sites, and submit certain forms.</p>
+<p>The important distinction is often not "can a request be sent?" but:</p>
+<p><strong>can script read the response or access the other origin's protected state?</strong></p>
+<h2>CORS relaxes one browser boundary</h2>
+<p>Cross-Origin Resource Sharing, or CORS, is integrated into the Fetch standard.</p>
+<p>A server can return response fields that tell a browser which origins are permitted to access a response through CORS-enabled fetch APIs.</p>
+<p>A simple conceptual response might include:</p>
+<pre><code class="language-http">Access-Control-Allow-Origin: https://app.example
+</code></pre>pre
+<p>That tells a conforming browser that the specified origin is allowed to access the response under the applicable CORS rules.</p>
+<p>CORS does not create network reachability.</p>
+<p>CORS does not authenticate the user.</p>
+<p>CORS does not authorize a business operation by itself.</p>
+<p>CORS is browser-enforced cross-origin sharing policy.</p>
+<h2>A CORS error can happen after the server responded</h2>
+<p>This is one of the most confusing parts of browser debugging.</p>
+<p>A browser script can issue a cross-origin request.</p>
+<p>The server can receive it.</p>
+<p>The server can process it.</p>
+<p>The server can even return HTTP 200.</p>
+<p>Then the browser can block script access to the response because the CORS policy does not permit it.</p>
+<p>From the server:</p>
+<pre><code class="language-text">request received
+response sent
+</code></pre>pre
+<p>From JavaScript:</p>
+<pre><code class="language-text">fetch failed due to browser policy
+</code></pre>pre
+<p>Both observations can be true.</p>
+<p>This is why "CORS error" does not automatically mean the API never saw the request.</p>
+<h2>Some requests trigger a preflight</h2>
+<p>For certain cross-origin requests, the browser first sends a CORS preflight request, normally using the OPTIONS method.</p>
+<p>The browser is asking whether the intended cross-origin request is permitted.</p>
+<p>Conceptually:</p>
+<pre><code class="language-text">browser
+   ↓
+OPTIONS preflight
+   ↓
+server CORS policy response
+   ↓
+browser decision
+   ↓
+actual request, if permitted
+</code></pre>pre
+<p>The Fetch standard defines which requests are CORS-safelisted and when preflight is required.</p>
+<p>Do not memorize a tiny list without understanding the reason.</p>
+<p>A preflight exists because some cross-origin requests can carry methods or fields that web pages historically could not send through simpler mechanisms.</p>
+<p>The browser asks permission before sending the actual operation.</p>
+<h2>Preflight success and request authorization are separate</h2>
+<p>Suppose a server responds to preflight with permission for:</p>
+<pre><code class="language-text">origin: https://app.example
+method: PUT
+field: Authorization
+</code></pre>pre
+<p>That does not mean every PUT request is authorized.</p>
+<p>The actual request still needs normal authentication, authorization, validation, and application policy.</p>
+<p>Think of the layers:</p>
+<pre><code class="language-text">CORS:
+may this browser origin make/read this cross-origin request?
+
+authentication:
+who is the caller?
+
+authorization:
+may that identity perform this operation?
+
+application validation:
+is the requested state transition valid?
+</code></pre>pre
+<p>Combining these into one "security check" makes systems harder to reason about.</p>
+<h2>Credentials make policy stricter</h2>
+<p>Cross-origin requests can interact with cookies and other credentials.</p>
+<p>When credentials are involved, CORS rules require more explicit handling. A wildcard origin is not a substitute for deliberate credentialed access policy.</p>
+<p>This matters because a server that reflects arbitrary origins while permitting credentials can undermine the browser boundary it was supposed to control.</p>
+<p>The origin allowlist should come from actual application architecture.</p>
+<p>Do not generate it from untrusted request data without policy.</p>
+<h2>CORS does not protect server-to-server APIs</h2>
+<p>A command-line client, backend service, or custom program is not required to enforce browser CORS policy.</p>
+<p>That means this request can succeed from a server-side HTTP client even when browser JavaScript is blocked.</p>
+<p>Therefore:</p>
+<pre><code class="language-text">"CORS blocks unauthorized API access"
+</code></pre>pre
+<p>is false as a security model.</p>
+<p>The API must still authenticate and authorize requests independently.</p>
+<p>CORS protects a browser interaction boundary.</p>
+<p>It is not a replacement for server security.</p>
+<h2>Same-site and same-origin are not the same concept</h2>
+<p>Cookie policy introduces another term: <strong>site</strong>.</p>
+<p>SameSite cookie behavior uses a site concept that is not identical to same-origin.</p>
+<p>Two URLs can be cross-origin while still belonging to the same site under browser cookie rules.</p>
+<p>This distinction becomes important in authentication and CSRF design.</p>
+<p>Do not use "same-site" and "same-origin" interchangeably.</p>
+<p>They solve related but different web-security problems.</p>
+<h2>Inspect a CORS exchange</h2>
+<p>Use a test API you control.</p>
+<p>Serve a page from one local origin, for example one port, and an API from another port.</p>
+<p>Even on the same hostname, different ports create different origins.</p>
+<p>In the browser network panel, trigger a cross-origin request.</p>
+<p>Observe:</p>
+<ul>
+<li>Origin request field;</li>
+<li>OPTIONS request if a preflight occurs;</li>
+<li>Access-Control-Allow-Origin response field;</li>
+<li>Access-Control-Allow-Methods when relevant;</li>
+<li>Access-Control-Allow-Headers when relevant;</li>
+<li>actual request;</li>
+<li>browser console result.</li>
+</ul>
+<p>Then deliberately remove the CORS response fields while leaving the API functional.</p>
+<p>You can observe:</p>
+<pre><code class="language-text">server works
+browser policy rejects cross-origin access
+</code></pre>pre
+<p>That is the boundary made visible.</p>
+<h2>Build a failure ladder</h2>
+<p>For a browser cross-origin failure:</p>
+<pre><code class="language-text">Did DNS/network/TLS reach the API?
+        ↓
+Did the browser send a preflight?
+        ↓
+Did the server answer the preflight?
+        ↓
+Did the CORS response permit the requesting origin?
+        ↓
+Did it permit the method and request fields?
+        ↓
+Did the browser send the actual request?
+        ↓
+Did authentication succeed?
+        ↓
+Did authorization succeed?
+        ↓
+Did application processing succeed?
+        ↓
+Did the browser expose the response to script?
+</code></pre>pre
+<p>This prevents a 401 authentication error from being misdiagnosed as CORS, or a CORS rejection from being treated as network failure.</p>
+<h2>The lesson to carry forward</h2>
+<p>The browser is an active security participant.</p>
+<p>Same-origin policy creates isolation between web origins.</p>
+<p>CORS provides controlled exceptions for HTTP access across those origins.</p>
+<p>Neither one replaces server-side authentication or authorization.</p>
+<p>The next lesson moves into the API contract itself: resources, validation, error formats, compatibility, and versioning.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

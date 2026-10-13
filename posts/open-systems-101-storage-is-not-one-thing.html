@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="RAM, files, databases, caches, object stores, and logs all hold state, but they make different promises about lifetime, structure, durability, and concurrency." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Storage Is Not One Thing — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-101-storage-is-not-one-thing.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Storage Is Not One Thing" property="og:title"/><meta content="RAM, files, databases, caches, object stores, and logs all hold state, but they make different promises about lifetime, structure, durability, and concurrency." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-101-storage-is-not-one-thing.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Storage Is Not One Thing</h1><p class="lede">RAM, files, databases, caches, object stores, and logs all hold state, but they make different promises about lifetime, structure, durability, and concurrency.</p><div class="article-meta"><span>Published 2026-10-07</span><span>10 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>When people say the data is stored, the sentence is incomplete. Stored where, for how long, in what structure, and under what failure model?</p>
+<p>A register, RAM page, filesystem block, database row, cache entry, queue message, and object in object storage can all hold data. They are not interchangeable.</p>
+<p>The first lesson of Data Systems is simple: <strong>storage is a set of contracts about state</strong>.</p>
+<h2>State has a lifetime</h2>
+<p>A useful mental model is: CPU registers → process memory → kernel page cache → filesystem → database → replica or backup.</p>
+<p>This is not a ranking. Each layer exists for a different reason. A value in process memory may disappear when the process exits. Dirty filesystem data may still be buffered. A database may acknowledge a transaction only after satisfying its durability policy. A backup may preserve an older state after the primary is corrupted.</p>
+<p>So the word written should always be followed by a question: written to which layer?</p>
+<h2>Volatile and durable are different promises</h2>
+<p>Volatile state depends on continued process or power lifetime. Durable state is intended to survive the failures named by the storage contract.</p>
+<p>POSIX separates write operations from synchronization operations such as fsync(). That distinction matters: the application supplying bytes to the operating system is not the same claim as the bytes being durably persisted on stable storage.</p>
+<p>The actual guarantee also depends on filesystem behavior, device caches, controller behavior, mount configuration, and hardware.</p>
+<h2>Structure changes what questions are cheap</h2>
+<p>A flat file can store millions of records. That does not mean it can efficiently answer queries such as: find every active customer in one district, ordered by last payment, whose subscription has not expired.</p>
+<p>A database adds structure such as schemas, keys, indexes, transactions, constraints, query planning, and concurrency control. Those features cost CPU, memory, I/O, disk space, and operational complexity. The benefit is a stronger data contract.</p>
+<p>Storage design therefore starts from the workload: what do we write, how often, how do we read it, what must be atomic, how stale may reads be, how much data can we lose, and how quickly must we recover?</p>
+<h2>Filesystems store named byte streams</h2>
+<p>A filesystem provides directories, filenames, permissions, timestamps, allocation metadata, and file descriptors. Applications build their own formats inside those files.</p>
+<p>A SQLite database, PostgreSQL data directory, Git repository, JPEG image, and log file can all ultimately live on a filesystem. The filesystem knows bytes and metadata; it does not know that a particular byte range means customer email unless the application above it defines that meaning.</p>
+<h2>Databases add data semantics</h2>
+<p>A database management system can add structured records, schemas, indexes, transaction boundaries, concurrency control, query languages, recovery, and replication.</p>
+<p>For example, the database can enforce that a customer identifier is unique, an order references an existing customer, and a required field is not null. A plain file can encode the same information, but the filesystem will not enforce those relationships for you.</p>
+<h2>Caches and queues are storage too</h2>
+<p>A cache stores copies or derived results because the authoritative source is slower or more expensive. Its central question is what happens when the cached copy disagrees with the source of truth.</p>
+<p>A queue stores pending work or events over time. Its central questions include delivery count, acknowledgement, ordering, retention, and failure recovery.</p>
+<p>Both are storage systems because both preserve state under a defined contract.</p>
+<h2>Replication is not backup</h2>
+<p>Suppose a database has three replicas. If an operator accidentally deletes a table and replication works perfectly, all replicas can quickly contain the same mistake.</p>
+<p>Replication improves some availability properties. A backup adds a historical recovery path. A real backup policy asks what point in time can be restored, how long history is retained, whether restore has been tested, and whether the backup is independent from the primary failure domain.</p>
+<h2>Practical inspection</h2>
+<p>On a Linux machine you administer, create a small file and inspect it with ls -li, stat, and df -T. If strace is available, observe the open, write, close, and synchronization system calls made by a tiny program or shell command.</p>
+<p>The exercise is not to prove one filesystem is faster. It is to see that application writes, operating-system buffering, filesystem state, and durable persistence are separate layers.</p>
+<p>Then build a table for one real system you operate with columns such as authority, durable, shared, rebuildable, and recovery source. Every ambiguous cell is a design question worth answering.</p>
+<h2>The lesson to carry forward</h2>
+<p>Storage systems differ in lifetime, structure, durability, concurrency, access pattern, and authority. Before choosing a database or cache, name the state contract you actually need.</p>
+<p>The next lesson compares two foundational abstractions directly: filesystems and databases.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

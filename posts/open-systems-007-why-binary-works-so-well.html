@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Binary is not mystical and it is not the only possible number system. It is useful because two-state representations can be implemented, restored, combined, stored, and reasoned about reliably." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Why Binary Works So Well — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-007-why-binary-works-so-well.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Why Binary Works So Well" property="og:title"/><meta content="Binary is not mystical and it is not the only possible number system. It is useful because two-state representations can be implemented, restored, combined, stored, and reasoned about reliably." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-007-why-binary-works-so-well.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Why Binary Works So Well</h1><p class="lede">Binary is not mystical and it is not the only possible number system. It is useful because two-state representations can be implemented, restored, combined, stored, and reasoned about reliably.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Binary is often introduced as if computers chose a strange language:</p>
+<pre><code>0 1 10 11 100 101 ...
+</code></pre>pre
+<p>Then students spend time converting decimal numbers into binary and back.</p>
+<p>That arithmetic is useful, but it misses the more interesting question:</p>
+<p><strong>Why are two symbols such a good engineering choice?</strong></p>
+<p>The answer is not that nature itself is binary.</p>
+<p>The answer is that digital systems can use two well-separated regions to represent two symbols robustly, and those symbols can be combined into larger representations.</p>
+<h2>Binary is a representation system</h2>
+<p>In decimal, each position can contain one of ten digits:</p>
+<pre><code>0 through 9
+</code></pre>pre
+<p>In binary, each position can contain one of two digits:</p>
+<pre><code>0 or 1
+</code></pre>pre
+<p>The place-value rule is the same idea with a different base.</p>
+<p>Decimal:</p>
+<pre><code>347
+= 3 × 10² + 4 × 10¹ + 7 × 10⁰
+</code></pre>pre
+<p>Binary:</p>
+<pre><code>1011
+= 1 × 2³ + 0 × 2² + 1 × 2¹ + 1 × 2⁰
+= 11 decimal
+</code></pre>pre
+<p>Nothing magical happened.</p>
+<p>We changed the set of symbols and the powers used for each position.</p>
+<h2>Two states are easy to separate physically</h2>
+<p>Consider an imaginary digital receiver.</p>
+<p>Suppose voltages near 0 V represent one logical state and voltages near 3.3 V represent another.</p>
+<p>A small amount of noise may move a signal from 3.30 V to 3.22 V without changing its logical interpretation.</p>
+<p>If instead we tried to represent ten different symbols using ten narrowly spaced voltage regions over the same voltage range, the separation between neighbouring symbols would be much smaller.</p>
+<p>That does not prove that multi-level signaling is impossible. Real communication and storage technologies sometimes use multiple levels because doing so can increase information density.</p>
+<p>The point is narrower:</p>
+<p><strong>two widely separated states are comparatively easy to distinguish and restore.</strong></p>
+<p>Digital logic benefits from that robustness.</p>
+<h2>One bit is small, but combinations grow fast</h2>
+<p>One bit provides two possible patterns:</p>
+<pre><code>0
+1
+</code></pre>pre
+<p>Two bits provide four:</p>
+<pre><code>00
+01
+10
+11
+</code></pre>pre
+<p>Three bits provide eight.</p>
+<p>In general, n bits provide:</p>
+<pre><code>2^n
+</code></pre>pre
+<p>possible bit patterns.</p>
+<p>Eight bits therefore provide 256 patterns.</p>
+<p>Sixteen bits provide 65,536.</p>
+<p>Thirty-two bits provide more than four billion patterns.</p>
+<p>The power of binary does not come from one bit. It comes from composition.</p>
+<p>A long sequence of two-state symbols can represent large numbers, text, instructions, addresses, colors, samples, flags, and many other structures.</p>
+<h2>Bit patterns do not carry their interpretation with them</h2>
+<p>The eight-bit pattern:</p>
+<pre><code>01000001
+</code></pre>pre
+<p>can be interpreted as the unsigned integer 65.</p>
+<p>In ASCII it can correspond to the capital letter A.</p>
+<p>It might also be part of a machine instruction, a color component, compressed data, encrypted data, or a packet field.</p>
+<p>So binary is not meaning.</p>
+<p>Binary provides patterns.</p>
+<p>Formats, protocols, instruction sets, types, and applications give those patterns interpretation.</p>
+<p>This is the same distinction we developed in Lesson 2: representation and meaning are different layers.</p>
+<h2>Binary logic composes cleanly</h2>
+<p>Once we represent conditions as two logical states, Boolean logic gives us a compact way to express relationships.</p>
+<p>Imagine two inputs:</p>
+<pre><code>door_closed
+system_armed
+</code></pre>pre
+<p>We might want an alarm condition when the system is armed AND the door is not closed.</p>
+<p>At a logical level:</p>
+<pre><code>alarm = system_armed AND NOT door_closed
+</code></pre>pre
+<p>This can be represented with truth tables, Boolean algebra, and ultimately physical logic circuits.</p>
+<p>The same principle scales into comparison units, arithmetic units, decoders, state machines, and processor control logic.</p>
+<p>The important thing is not that every higher-level software decision literally looks like a two-input gate. It is that complex digital behaviour can be built compositionally from logical operations and stored state.</p>
+<h2>Why not decimal computers?</h2>
+<p>Machines using decimal or other number representations have existed, and modern hardware can encode more than one bit per physical element in some contexts.</p>
+<p>So "computers must be binary" is historically and technically too strong.</p>
+<p>Binary became dominant because it fits extremely well with electronic switching, logic design, storage, error margins, and mathematical reasoning.</p>
+<p>Engineering choices are rarely metaphysical necessities.</p>
+<p>They are trade-offs.</p>
+<p>A useful teaching rule is:</p>
+<blockquote>
+<p>Do not ask only whether another design is possible. Ask what becomes easier or harder.</p>
+</blockquote>
+<p>With binary, circuit thresholds can be separated widely. Logic operations are simple to formalize. Error detection and storage structures compose naturally. Hardware design techniques became extremely mature around these assumptions.</p>
+<h2>Numbers require interpretation rules</h2>
+<p>Suppose we have four bits:</p>
+<pre><code>1111
+</code></pre>pre
+<p>As an unsigned integer, that is 15.</p>
+<p>But a signed representation may interpret the same pattern differently.</p>
+<p>A floating-point format uses bits to represent sign, exponent, and significand according to its specification.</p>
+<p>A fixed-point representation may treat some positions as fractional.</p>
+<p>This leads to an important systems lesson:</p>
+<p><strong>the bit width and encoding are part of the contract.</strong></p>
+<p>Sending "a number" across a protocol is not enough.</p>
+<p>You may need to specify:</p>
+<ul>
+<li>width;</li>
+<li>signedness;</li>
+<li>byte order;</li>
+<li>integer or floating-point format;</li>
+<li>scale;</li>
+<li>unit.</li>
+</ul>
+<p>Many real bugs occur because two components agree on the bytes but disagree on how to interpret them.</p>
+<h2>Binary arithmetic eventually becomes hardware operations</h2>
+<p>At the software level:</p>
+<pre><code>x = 5 + 7
+</code></pre>pre
+<p>looks like arithmetic.</p>
+<p>At a lower layer, an instruction tells a processor to perform an operation on encoded values.</p>
+<p>At a lower layer again, combinational and sequential logic implement the processor datapath and control.</p>
+<p>We do not need to open all those layers every time we add two numbers.</p>
+<p>That is abstraction doing useful work.</p>
+<p>But understanding that the layers exist prevents a common misconception: software arithmetic is not performed by symbols floating in an abstract universe. It is eventually realized through physical computation.</p>
+<h2>Error detection also benefits from discrete symbols</h2>
+<p>Suppose a stored or transmitted bit is intended to be 1.</p>
+<p>Noise alters the physical signal slightly.</p>
+<p>If the receiving system can still classify it within the valid HIGH range, the logical symbol is restored.</p>
+<p>This regeneration is one of the major strengths of digital systems.</p>
+<p>For larger data, systems can add redundancy such as parity bits, checksums, error-detecting codes, or error-correcting codes.</p>
+<p>Those mechanisms do not make errors impossible.</p>
+<p>They make some classes of errors detectable or correctable under stated assumptions.</p>
+<p>Later, when we study networks and storage, we will see this same pattern repeatedly: represent, transmit, validate, recover.</p>
+<h2>Exercise: count without decimal</h2>
+<p>Start with three bits.</p>
+<p>List all eight patterns:</p>
+<pre><code>000
+001
+010
+011
+100
+101
+110
+111
+</code></pre>pre
+<p>Now assign a different interpretation.</p>
+<p>Instead of numbers, imagine three switches:</p>
+<pre><code>light
+fan
+heater
+</code></pre>pre
+<p>Each bit represents on or off.</p>
+<p>The pattern:</p>
+<pre><code>101
+</code></pre>pre
+<p>could mean:</p>
+<pre><code>light on
+fan off
+heater on
+</code></pre>pre
+<p>Same bits.</p>
+<p>Different interpretation.</p>
+<p>Now you can see why bit fields appear in hardware registers and protocols: a group of binary positions can compactly represent several independent conditions.</p>
+<h2>The lesson to carry forward</h2>
+<p>Binary works well because two-state representations can be implemented with useful tolerance, combined mathematically, stored, copied, regenerated, and composed into much larger structures.</p>
+<p>But binary does not explain everything about computers.</p>
+<p>Bits need encodings.</p>
+<p>Encodings need context.</p>
+<p>Logical states need physical implementation.</p>
+<p>Software needs layers of abstraction above all of this.</p>
+<p>The correct mental model is not "a computer is zeros and ones."</p>
+<p>It is:</p>
+<blockquote>
+<p>a computer uses physical systems to represent and transform information, and binary is an extraordinarily useful abstraction for building reliable digital machinery.</p>
+</blockquote>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

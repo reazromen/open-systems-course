@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Stack, heap, and static storage describe different lifetime and allocation patterns inside a process address space. They are software conventions built on virtual memory, not separate physical RAM chips." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Stack, Heap, and Static Data — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-028-stack-heap-static-data.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Stack, Heap, and Static Data" property="og:title"/><meta content="Stack, heap, and static storage describe different lifetime and allocation patterns inside a process address space. They are software conventions built on virtual memory, not separate physical RAM chips." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-028-stack-heap-static-data.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Stack, Heap, and Static Data</h1><p class="lede">Stack, heap, and static storage describe different lifetime and allocation patterns inside a process address space. They are software conventions built on virtual memory, not separate physical RAM chips.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Beginners are sometimes shown a memory diagram:</p>
+<pre><code>code
+static data
+heap
+...
+stack
+</code></pre>pre
+<p>Then the diagram becomes mythology.</p>
+<p>They imagine the computer contains one physical "stack area" and one physical "heap area."</p>
+<p>That is not the right model.</p>
+<p>Stack, heap, and static data are process-level organization and allocation concepts built inside a virtual address space.</p>
+<h2>Static storage exists for long-lived program state</h2>
+<p>Compiled programs often contain data with static storage duration:</p>
+<ul>
+<li>global variables;</li>
+<li>static variables;</li>
+<li>constants;</li>
+<li>initialization data.</li>
+</ul>
+<p>Some values are initialized from the executable.</p>
+<p>Others begin zeroed.</p>
+<p>Exact section names and layout depend on object format, linker, compiler, and platform.</p>
+<p>The important property is lifetime.</p>
+<p>This state exists for the lifetime of the process or relevant program image, rather than being created for one function call.</p>
+<h2>The stack follows nested execution</h2>
+<p>A thread typically has a stack used for call frames and automatic state.</p>
+<p>A function call may require storage for:</p>
+<ul>
+<li>return information;</li>
+<li>saved registers;</li>
+<li>local variables;</li>
+<li>arguments that do not remain in registers.</li>
+</ul>
+<p>Calling another function adds another frame.</p>
+<p>Returning removes it.</p>
+<p>This creates last-in, first-out behaviour.</p>
+<p>The stack's structure matches nested function calls naturally.</p>
+<h2>Stack memory is not always where every local variable lives</h2>
+<p>An optimizing compiler can keep a local value entirely in a register.</p>
+<p>It can eliminate the variable.</p>
+<p>It can reorder storage.</p>
+<p>Debug builds and optimized builds can differ.</p>
+<p>So the source concept:</p>
+<pre><code>local variable
+</code></pre>pre
+<p>does not guarantee one stable stack slot.</p>
+<p>The language's semantics matter more than a simplistic physical diagram.</p>
+<h2>The heap supports dynamic lifetime</h2>
+<p>Suppose you need an object whose size or lifetime is not tied to one function call.</p>
+<p>Dynamic allocation obtains memory from a heap allocator or runtime-managed heap.</p>
+<p>In C:</p>
+<pre><code>malloc
+</code></pre>pre
+<p>requests dynamic storage from the allocator.</p>
+<p>In managed languages, object allocation may occur on a garbage-collected heap.</p>
+<p>The application does not usually ask the kernel for one page on every tiny allocation.</p>
+<p>User-space allocators obtain larger regions and manage them efficiently.</p>
+<p>This creates another abstraction layer:</p>
+<pre><code>application object
+  -&gt; allocator
+  -&gt; virtual-memory regions
+  -&gt; physical memory as needed
+</code></pre>pre
+<h2>Allocation and lifetime are different problems</h2>
+<p>Creating memory is easy.</p>
+<p>Knowing when it can be reused is harder.</p>
+<p>C gives programmers explicit mechanisms such as free.</p>
+<p>Failure to release unreachable allocations creates memory leaks.</p>
+<p>Releasing too early creates use-after-free bugs.</p>
+<p>Managed runtimes use garbage collection to find or infer unreachable objects and reclaim them automatically.</p>
+<p>That reduces some classes of manual memory error but introduces runtime work and its own performance behaviour.</p>
+<p>No model removes the need to understand lifetime.</p>
+<h2>The stack can overflow</h2>
+<p>A thread stack is finite.</p>
+<p>Deep or unbounded recursion can exhaust it.</p>
+<p>Large local allocations can also contribute.</p>
+<p>A stack overflow is not the same as "the computer ran out of RAM."</p>
+<p>The process hit a limit associated with one execution structure.</p>
+<p>Again, broad resource labels hide the actual boundary.</p>
+<h2>Heap fragmentation can matter</h2>
+<p>A program repeatedly allocates and frees blocks of different sizes.</p>
+<p>Free memory may become divided into regions.</p>
+<p>Allocators use strategies to manage fragmentation, reuse, concurrency, and metadata overhead.</p>
+<p>A process can therefore experience allocation difficulties or poor locality even when a naive sum of free bytes looks sufficient.</p>
+<p>This is allocator behaviour, not just raw RAM capacity.</p>
+<h2>Threads make the diagram richer</h2>
+<p>Each thread usually has its own stack.</p>
+<p>Threads in the process share the heap and global address space.</p>
+<p>So:</p>
+<pre><code>process
+  ├── static/global state
+  ├── heap
+  ├── thread A stack
+  ├── thread B stack
+  └── mapped libraries/files
+</code></pre>pre
+<p>This is a more useful model than one stack per process.</p>
+<p>POSIX thread documentation explicitly notes shared global memory and separate stacks.</p>
+<h2>Security bugs often cross these boundaries</h2>
+<p>Buffer overflows can corrupt adjacent state.</p>
+<p>Use-after-free bugs involve heap object lifetime.</p>
+<p>Stack corruption can affect control data.</p>
+<p>Memory-safety vulnerabilities are partly failures to maintain valid relationships between addresses, object bounds, and lifetimes.</p>
+<p>Higher-level languages can enforce more of those rules automatically.</p>
+<p>Low-level languages expose more control and more responsibility.</p>
+<h2>Exercise: classify lifetimes</h2>
+<p>Take:</p>
+<pre><code>global configuration
+function counter
+dynamically created user object
+per-thread temporary buffer
+</code></pre>pre
+<p>Ask:</p>
+<p>How long should each live?</p>
+<p>Who owns it?</p>
+<p>Who releases it?</p>
+<p>Can multiple threads access it?</p>
+<p>The correct storage strategy follows from lifetime and sharing requirements.</p>
+<p>Do not start with "stack or heap?"</p>
+<p>Start with:</p>
+<p><strong>What lifetime and ownership does the data need?</strong></p>
+<h2>The lesson to carry forward</h2>
+<p>Stack, heap, and static data are not mysterious memory species.</p>
+<p>They are organization patterns inside a process's virtual address space.</p>
+<p>The stack naturally supports nested execution.</p>
+<p>Static storage supports process-lifetime state.</p>
+<p>The heap supports dynamic allocation with flexible lifetime.</p>
+<p>The physical memory underneath may move, page, cache, or even temporarily live outside RAM.</p>
+<p>Abstraction separates program lifetime rules from physical placement.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

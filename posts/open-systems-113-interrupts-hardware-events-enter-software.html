@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Interrupts let hardware request CPU attention asynchronously. They reduce polling but introduce latency, priority, shared-state, and execution-context constraints." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Interrupts: When Hardware Events Enter Software — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-113-interrupts-hardware-events-enter-software.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Interrupts: When Hardware Events Enter Software" property="og:title"/><meta content="Interrupts let hardware request CPU attention asynchronously. They reduce polling but introduce latency, priority, shared-state, and execution-context constraints." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-113-interrupts-hardware-events-enter-software.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Interrupts: When Hardware Events Enter Software</h1><p class="lede">Interrupts let hardware request CPU attention asynchronously. They reduce polling but introduce latency, priority, shared-state, and execution-context constraints.</p><div class="article-meta"><span>Published 2026-10-07</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A processor can poll a GPIO forever asking whether anything changed.</p>
+<p>That works.</p>
+<p>It also wastes time and can miss timing requirements when many things need attention.</p>
+<p>Interrupts invert the relationship: hardware raises an event and the processor temporarily changes control flow to handle it.</p>
+<h2>An interrupt is asynchronous to normal code</h2>
+<p>Main code can be executing one instruction stream when a timer, GPIO edge, UART, DMA engine, or other peripheral signals an interrupt.</p>
+<p>The processor saves enough context, transfers control to an interrupt handler, and later resumes interrupted execution.</p>
+<p>That creates two execution contexts touching shared state.</p>
+<p>Concurrency begins even on a single-core MCU.</p>
+<h2>ISR means interrupt service routine</h2>
+<p>An ISR should usually do the smallest time-critical work necessary.</p>
+<p>Common responsibilities are acknowledging or clearing the interrupt source, capturing essential state, placing data into a queue or buffer, and waking deferred work.</p>
+<p>Heavy parsing, logging, dynamic allocation, blocking I/O, and long computations are often poor ISR choices.</p>
+<p>Why? Because while a long ISR runs, lower-priority work and interrupts may be delayed.</p>
+<h2>Latency is different from execution time</h2>
+<p>Interrupt latency is the time from the hardware event to the ISR beginning useful handling.</p>
+<p>ISR execution time is how long the handler occupies its execution context.</p>
+<p>Both matter.</p>
+<p>Latency can be affected by disabled interrupts, higher-priority handlers, critical sections, cache effects, and architecture-specific entry overhead.</p>
+<p>Real-time debugging must measure the path, not assume the interrupt is immediate.</p>
+<h2>Priority is a scheduling policy</h2>
+<p>Many MCUs support interrupt priorities.</p>
+<p>A higher-priority interrupt can preempt a lower-priority one according to architecture and configuration.</p>
+<p>That lets critical timing events win CPU time.</p>
+<p>It can also create starvation or hard-to-debug nested execution when priorities are chosen badly.</p>
+<p>Priority should express timing requirement, not emotional importance.</p>
+<h2>Shared variables need synchronization semantics</h2>
+<p>Suppose an ISR increments a counter while a task reads and resets it.</p>
+<p>Both contexts access the same state.</p>
+<p>Marking a variable volatile can tell the compiler that the value may change unexpectedly, but volatile is not a complete synchronization primitive.</p>
+<p>It does not make compound updates atomic and does not automatically provide ordering between cores or execution contexts.</p>
+<p>Use the synchronization primitives appropriate to the architecture and RTOS: atomic operations, critical sections, interrupt-safe queues, or locks designed for ISR use.</p>
+<h2>Interrupt flags must be handled correctly</h2>
+<p>Many peripherals latch a status bit when an event occurs.</p>
+<p>The ISR must identify the source and clear or acknowledge it according to the peripheral rules.</p>
+<p>If the flag is never cleared, the handler can immediately fire again.</p>
+<p>If it is cleared too early or incorrectly, events can be lost.</p>
+<p>Peripheral reference manuals matter because acknowledgement semantics differ.</p>
+<h2>Edge and level triggering behave differently</h2>
+<p>An edge-triggered interrupt reacts to a transition.</p>
+<p>A level-triggered interrupt remains asserted while a condition remains true.</p>
+<p>With level-triggering, returning from the ISR without removing the cause can immediately retrigger it.</p>
+<p>With edge-triggering, events that occur while handling or masking may need explicit status capture to avoid loss.</p>
+<p>Choose and debug according to the source's real behavior.</p>
+<h2>Deferred work is a powerful pattern</h2>
+<p>A clean architecture is:</p>
+<p>hardware event → short ISR → queue/notification → task handles expensive work.</p>
+<p>The ISR preserves timing. The task runs in a normal scheduler context where blocking operations and richer APIs are safer.</p>
+<p>FreeRTOS provides ISR-safe variants of queue and notification APIs for this pattern.</p>
+<h2>Practical experiment</h2>
+<p>Configure a GPIO interrupt on a development board and increment a counter in the ISR.</p>
+<p>Then signal a task to print the counter rather than printing from inside the ISR.</p>
+<p>Toggle the input slowly and then more rapidly from a safe signal source.</p>
+<p>Observe whether events are lost, coalesced, or delayed. If you have a logic analyzer, toggle a second diagnostic pin at ISR entry and exit to measure real latency and execution time.</p>
+<h2>The lesson to carry forward</h2>
+<p>Interrupts let hardware enter software asynchronously.</p>
+<p>They improve responsiveness but create concurrency, priority, and timing constraints.</p>
+<p>The next lesson introduces the hardware that often generates those interrupts: clocks, counters, timers, capture/compare, and PWM.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

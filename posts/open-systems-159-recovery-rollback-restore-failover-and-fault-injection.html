@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Recovery is a feature that must be designed and exercised. Rollback, restore, failover, graceful degradation, and controlled fault injection turn theoretical resilience into measured capability." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Recovery: Rollback, Restore, Failover, and Fault Injection — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-159-recovery-rollback-restore-failover-and-fault-injection.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Recovery: Rollback, Restore, Failover, and Fault Injection" property="og:title"/><meta content="Recovery is a feature that must be designed and exercised. Rollback, restore, failover, graceful degradation, and controlled fault injection turn theoretical resilience into measured capability." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-159-recovery-rollback-restore-failover-and-fault-injection.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Recovery: Rollback, Restore, Failover, and Fault Injection</h1><p class="lede">Recovery is a feature that must be designed and exercised. Rollback, restore, failover, graceful degradation, and controlled fault injection turn theoretical resilience into measured capability.</p><div class="article-meta"><span>Published 2026-10-07</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A backup is not a recovery.</p>
+<p>A rollback script is not a rollback until it has been used successfully.</p>
+<p>A replica is not failover until promotion and traffic movement are tested.</p>
+<p>Resilience exists only when recovery paths work.</p>
+<h2>Rollback reverses code or configuration</h2>
+<p>A deployment rollback returns to a known previous artifact or configuration.</p>
+<p>It is easiest when:</p>
+<p>artifacts are immutable;
+old versions remain available;
+database/schema changes are backward compatible;
+feature flags isolate new behavior.</p>
+<p>If a new version performed irreversible data migration, binary rollback may not restore service.</p>
+<p>Deployment and schema strategy must align.</p>
+<h2>Restore reconstructs state</h2>
+<p>Backup restore answers:</p>
+<p>can we recreate usable data after loss or corruption?</p>
+<p>Test restore into an isolated environment.</p>
+<p>Verify:</p>
+<p>schema;
+row counts;
+application queries;
+permissions;
+encryption keys;
+object-store references;
+point-in-time target.</p>
+<p>A backup file existing in storage is not enough.</p>
+<h2>Failover changes authority</h2>
+<p>Failover promotes or redirects to a redundant component.</p>
+<p>Examples:</p>
+<p>database replica promotion;
+secondary region;
+alternate SIP trunk;
+secondary DNS provider;
+backup broker.</p>
+<p>Failover needs fencing so the old authority cannot return and create split brain.</p>
+<p>It also needs client reconnection behavior.</p>
+<h2>Graceful degradation preserves core function</h2>
+<p>If recommendation service fails, checkout may still work.</p>
+<p>If cloud is unavailable, an IoT controller may continue local control.</p>
+<p>If media recording fails, policy may allow call completion or may require call rejection depending on compliance.</p>
+<p>Define which dependencies are hard and which are optional.</p>
+<p>Degradation should be intentional.</p>
+<h2>Feature flags can be recovery controls</h2>
+<p>A feature flag can disable a failing code path without full rollback.</p>
+<p>That makes flags part of the control plane.</p>
+<p>They need:</p>
+<p>authorization;
+audit;
+safe defaults;
+dependency awareness;
+cleanup after use.</p>
+<p>A forgotten emergency flag can become permanent hidden architecture.</p>
+<h2>Fault injection validates assumptions</h2>
+<p>Controlled experiments can stop a dependency, add latency, kill a process, or simulate packet loss in a test/staging environment.</p>
+<p>The goal is not chaos for entertainment.</p>
+<p>It is to test a hypothesis:</p>
+<p>if Redis is unavailable, requests should fall back to database within 200 ms;
+if one replica dies, writes should continue;
+if MQTT is unreachable, device should buffer locally.</p>
+<p>The expected outcome must be written before the fault.</p>
+<h2>Game days test humans too</h2>
+<p>A recovery drill reveals:</p>
+<p>missing permissions;
+stale runbooks;
+unknown owners;
+DNS TTL surprises;
+expired credentials;
+backup restore time;
+monitoring gaps.</p>
+<p>Those are system properties even though they involve people.</p>
+<h2>Practical exercise</h2>
+<p>Choose one service.</p>
+<p>Define three recovery paths:</p>
+<p>bad deployment;
+database corruption;
+dependency outage.</p>
+<p>For each, document:</p>
+<p>trigger;
+decision owner;
+commands/actions;
+expected duration;
+validation;
+abort condition.</p>
+<p>Then rehearse one path in a safe environment.</p>
+<p>Measure actual recovery time.</p>
+<h2>The lesson to carry forward</h2>
+<p>Recovery is an engineered path, not a hopeful plan.</p>
+<p>The final lesson of this module combines all evidence types to diagnose one multi-layer failure.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

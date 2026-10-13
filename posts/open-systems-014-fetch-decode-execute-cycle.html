@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Fetch–decode–execute is a teaching model for how stored instructions become state changes. Modern CPUs overlap and reorder work internally, but the architectural effects still have to match the program." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>The Fetch–Decode–Execute Cycle — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-014-fetch-decode-execute-cycle.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="The Fetch–Decode–Execute Cycle" property="og:title"/><meta content="Fetch–decode–execute is a teaching model for how stored instructions become state changes. Modern CPUs overlap and reorder work internally, but the architectural effects still have to match the program." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-014-fetch-decode-execute-cycle.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>The Fetch–Decode–Execute Cycle</h1><p class="lede">Fetch–decode–execute is a teaching model for how stored instructions become state changes. Modern CPUs overlap and reorder work internally, but the architectural effects still have to match the program.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A processor is programmable because instructions live in a representation the machine can fetch and interpret.</p>
+<p>The simplest useful execution story is:</p>
+<pre><code>fetch
+decode
+execute
+</code></pre>pre
+<p>This model is not a literal timing diagram for every modern CPU.</p>
+<p>It is a conceptual skeleton.</p>
+<p>Understanding the skeleton first makes later performance machinery less mysterious.</p>
+<h2>Fetch: find the next instruction</h2>
+<p>The processor needs an address for the next instruction.</p>
+<p>A program counter or instruction pointer supplies that architectural location.</p>
+<p>The processor fetches the instruction bytes from the memory hierarchy.</p>
+<p>"From memory" is deliberately vague.</p>
+<p>The bytes may already be in an instruction cache. If not, lower cache levels or main memory may become involved.</p>
+<p>The architecture describes what instruction logically comes next.</p>
+<p>The microarchitecture tries to obtain it efficiently.</p>
+<h2>Decode: determine what the bits mean</h2>
+<p>The fetched bits need interpretation according to the ISA.</p>
+<p>The decoder determines things such as:</p>
+<ul>
+<li>which operation;</li>
+<li>which registers;</li>
+<li>whether an immediate constant is present;</li>
+<li>how operands are addressed;</li>
+<li>which execution resources are needed.</li>
+</ul>
+<p>In a simple teaching processor, decoding can look like a direct mapping from instruction fields to control signals.</p>
+<p>In high-performance processors, decoding may produce internal operations that are scheduled through a much more complex pipeline.</p>
+<p>The visible architectural instruction and the internal work are not always one-to-one.</p>
+<h2>Execute: perform the operation</h2>
+<p>Execution may involve:</p>
+<ul>
+<li>arithmetic;</li>
+<li>logical operations;</li>
+<li>address calculation;</li>
+<li>branch evaluation;</li>
+<li>memory access;</li>
+<li>vector operations.</li>
+</ul>
+<p>The result may update a register, memory, flags, or the next instruction address.</p>
+<p>At the architectural level, the important question is:</p>
+<p>What state must be different after this instruction retires successfully?</p>
+<p>That phrasing remains useful even when the processor internally overlaps many instructions.</p>
+<h2>Why modern processors do not wait politely</h2>
+<p>A naive machine could completely finish instruction 1 before beginning instruction 2.</p>
+<p>That leaves hardware idle during many phases.</p>
+<p>Pipelining overlaps work.</p>
+<p>An assembly-line analogy is imperfect but useful:</p>
+<pre><code>instruction 1: execute
+instruction 2: decode
+instruction 3: fetch
+</code></pre>pre
+<p>Different instructions occupy different stages simultaneously.</p>
+<p>This can improve throughput.</p>
+<p>But overlap introduces hazards.</p>
+<p>What if instruction 2 needs a value produced by instruction 1?</p>
+<p>What if a branch changes which instruction should have been fetched?</p>
+<p>What if an exception occurs?</p>
+<p>Processor design becomes the problem of preserving correct architectural behaviour while executing efficiently.</p>
+<h2>Branches create uncertainty</h2>
+<p>Consider:</p>
+<pre><code>if x == 0:
+    do_A()
+else:
+    do_B()
+</code></pre>pre
+<p>The processor wants to keep its pipeline busy before the branch result is fully known.</p>
+<p>Modern processors may predict which path will be taken and begin speculative work.</p>
+<p>If the prediction is right, time is saved.</p>
+<p>If it is wrong, speculative work must be discarded and the correct path restored.</p>
+<p>This is one reason branch behaviour affects performance.</p>
+<p>The program's logical result has not changed.</p>
+<p>The implementation strategy changed.</p>
+<h2>Out-of-order does not mean arbitrary</h2>
+<p>High-performance processors may execute independent operations in an order different from the original instruction sequence when dependencies allow it.</p>
+<p>That sounds dangerous.</p>
+<p>The key requirement is that the architecturally visible result obey the ISA's rules.</p>
+<p>Internally:</p>
+<pre><code>instruction 5 may execute before instruction 4
+</code></pre>pre
+<p>if instruction 5 does not depend on unresolved state from instruction 4.</p>
+<p>But the processor must handle dependencies, exceptions, and visible ordering correctly.</p>
+<p>The CPU is therefore more like a constrained scheduler than a simple one-instruction-at-a-time engine.</p>
+<h2>Retirement creates a useful boundary</h2>
+<p>Modern microarchitecture often distinguishes executing work from making results architecturally committed.</p>
+<p>A speculative operation may execute but later be discarded.</p>
+<p>A completed operation may wait before its result is considered retired in program order.</p>
+<p>This gives the processor room to optimize internally while preserving a coherent architectural state.</p>
+<p>For beginners, the exact vendor mechanisms are less important than the separation:</p>
+<pre><code>internal speculative work
+        !=
+committed architectural effect
+</code></pre>pre
+<p>This distinction appears elsewhere in systems too: prepared versus committed database transactions, queued versus delivered messages, generated versus persisted data.</p>
+<h2>Interrupts and exceptions break the ordinary stream</h2>
+<p>Execution sometimes transfers control because of events outside the expected instruction sequence.</p>
+<p>An interrupt may represent an external event.</p>
+<p>An exception may arise from current execution.</p>
+<p>The processor architecture defines how control transfers to appropriate handlers and what state is saved.</p>
+<p>This is necessary for operating systems to manage devices, memory faults, privilege boundaries, and scheduling.</p>
+<p>So even our simple cycle needs an escape hatch:</p>
+<pre><code>fetch
+decode
+execute
+   |
+   +--&gt; event or exception -&gt; handler -&gt; resume or terminate
+</code></pre>pre
+<h2>Why this model is still worth learning</h2>
+<p>If modern CPUs are so complicated, why teach fetch–decode–execute?</p>
+<p>Because it gives you the right questions.</p>
+<p>Where does the instruction come from?</p>
+<p>How is it interpreted?</p>
+<p>What state does it read?</p>
+<p>What state does it change?</p>
+<p>What chooses the next instruction?</p>
+<p>What happens on exceptional events?</p>
+<p>Those questions survive every optimization layer.</p>
+<h2>Exercise: trace five instructions</h2>
+<p>Invent:</p>
+<pre><code>1 LOAD R1, [X]
+2 LOAD R2, [Y]
+3 ADD R3, R1, R2
+4 STORE [Z], R3
+5 HALT
+</code></pre>pre
+<p>For each instruction, write:</p>
+<ul>
+<li>source operands;</li>
+<li>destination state;</li>
+<li>whether memory is accessed;</li>
+<li>next program-counter value.</li>
+</ul>
+<p>Then imagine X is not currently available in fast cache.</p>
+<p>Which logical instruction changes?</p>
+<p>None.</p>
+<p>Which performance behaviour changes?</p>
+<p>Potentially a lot.</p>
+<p>You have separated architecture from microarchitecture.</p>
+<h2>The lesson to carry forward</h2>
+<p>Fetch–decode–execute is the conceptual bridge between stored instructions and changing machine state.</p>
+<p>A modern CPU may fetch ahead, decode multiple instructions, predict branches, execute out of order, speculate, and retire results later.</p>
+<p>Those techniques make the implementation complex.</p>
+<p>The architectural obligation remains simpler:</p>
+<p>Execute the program as if the defined instruction semantics were respected.</p>
+<p>The next major question is where instructions and data wait while the CPU works.</p>
+<p>That leads directly to cache.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

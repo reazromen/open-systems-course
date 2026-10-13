@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Searching and sorting show why algorithm choice matters: the same correct result can require radically different work as data grows." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Searching and Sorting: Cost Matters — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-048-searching-sorting-cost-matters.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Searching and Sorting: Cost Matters" property="og:title"/><meta content="Searching and sorting show why algorithm choice matters: the same correct result can require radically different work as data grows." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-048-searching-sorting-cost-matters.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Searching and Sorting: Cost Matters</h1><p class="lede">Searching and sorting show why algorithm choice matters: the same correct result can require radically different work as data grows.</p><div class="article-meta"><span>Published 2026-10-06</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Find the number 73 in:</p>
+<pre><code>12 18 25 31 42 55 63 73 91
+</code></pre>pre
+<p>You can scan from the beginning.</p>
+<p>Eight comparisons.</p>
+<p>But the list is sorted.</p>
+<p>You can use that structure.</p>
+<p>Check the middle.</p>
+<p>Discard half.</p>
+<p>Repeat.</p>
+<p>That is binary search.</p>
+<p>Correctness is not the only difference between algorithms.</p>
+<p>Cost changes.</p>
+<h2>Linear search needs almost no structure</h2>
+<p>For an unsorted list:</p>
+<pre><code>for each item:
+    if item matches:
+        return
+</code></pre>pre
+<p>Worst case, inspect every element.</p>
+<p>If there are N items, work grows with N.</p>
+<p>Linear search is often perfectly fine for small inputs.</p>
+<p>Do not replace clear code with elaborate indexing when N is tiny and search is rare.</p>
+<p>Performance depends on scale.</p>
+<h2>Binary search pays for order</h2>
+<p>For sorted random-access data, binary search repeatedly halves the remaining range.</p>
+<p>After roughly log2(N) decisions, it can locate or exclude a key.</p>
+<p>For one billion elements, log2 is around 30.</p>
+<p>That is dramatically fewer comparisons than scanning a billion entries.</p>
+<p>But the data must be sorted and accessible appropriately.</p>
+<p>Maintaining order has a cost.</p>
+<p>The algorithm gains speed because another invariant already exists.</p>
+<h2>Sorting creates reusable structure</h2>
+<p>If you will search once, sorting a large unsorted set just to use binary search may be wasteful.</p>
+<p>If you will search millions of times, sorting once may pay off.</p>
+<p>This is a recurring architecture pattern:</p>
+<p>Invest cost upfront to make repeated future operations cheaper.</p>
+<p>Indexes and caches follow the same idea.</p>
+<h2>Comparison sorting has limits</h2>
+<p>General comparison-based sorting algorithms cannot beat a certain asymptotic lower bound in the comparison model.</p>
+<p>Algorithms such as merge sort, heap sort, and quicksort navigate different time, space, stability, and worst-case trade-offs.</p>
+<p>But some data permits non-comparison techniques such as counting or radix-based methods under suitable constraints.</p>
+<p>"Fastest sort" is therefore not one universal function.</p>
+<p>Input properties matter.</p>
+<h2>Stability can matter more than speed</h2>
+<p>Suppose records are first sorted by name, then stably sorted by department.</p>
+<p>A stable algorithm preserves relative order among equal department values, retaining name order within groups.</p>
+<p>If the application relies on that property, an unstable sort can be wrong even when output is numerically ordered.</p>
+<p>Algorithm semantics include more than big-O complexity.</p>
+<h2>Memory matters</h2>
+<p>Merge sort commonly uses additional storage in standard array implementations.</p>
+<p>In-place algorithms trade memory differently.</p>
+<p>External sorting handles datasets too large for RAM by organizing storage I/O.</p>
+<p>Once data exceeds memory, disk/SSD access patterns become part of the algorithm.</p>
+<p>Hardware changes practical algorithm design.</p>
+<h2>Search structures outperform repeated sorting</h2>
+<p>If data changes continuously and must support frequent lookup, maintaining:</p>
+<ul>
+<li>hash table;</li>
+<li>balanced tree;</li>
+<li>database index</li>
+</ul>
+<p>may be better than repeatedly sorting a full list.</p>
+<p>The right question is the workload across time.</p>
+<p>Not one operation in isolation.</p>
+<h2>Exercise: choose the cheaper plan</h2>
+<p>One million unsorted user IDs.</p>
+<p>Case A:</p>
+<p>Find one ID once.</p>
+<p>Linear search may be reasonable.</p>
+<p>Case B:</p>
+<p>Serve 100,000 lookups per second for months.</p>
+<p>Build and maintain an index.</p>
+<p>Case C:</p>
+<p>Need range queries in sorted order.</p>
+<p>Hash table alone is not enough.</p>
+<p>The workload determines the structure.</p>
+<h2>The lesson to carry forward</h2>
+<p>Searching and sorting teach a central algorithmic truth:</p>
+<p>Two correct programs can consume radically different resources.</p>
+<p>The best choice depends on:</p>
+<ul>
+<li>input size;</li>
+<li>existing structure;</li>
+<li>operation frequency;</li>
+<li>memory;</li>
+<li>required ordering;</li>
+<li>update pattern.</li>
+</ul>
+<p>Complexity gives us language for predicting that growth.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

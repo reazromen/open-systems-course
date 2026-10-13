@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="An SSD turns persistent bits into a managed flash-storage system with pages, erase blocks, controllers, mapping tables, error correction, and wear management." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>How an SSD Remembers Without Power — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-017-how-an-ssd-remembers-without-power.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="How an SSD Remembers Without Power" property="og:title"/><meta content="An SSD turns persistent bits into a managed flash-storage system with pages, erase blocks, controllers, mapping tables, error correction, and wear management." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-017-how-an-ssd-remembers-without-power.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>How an SSD Remembers Without Power</h1><p class="lede">An SSD turns persistent bits into a managed flash-storage system with pages, erase blocks, controllers, mapping tables, error correction, and wear management.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>RAM forgets ordinary working state when power disappears.</p>
+<p>An SSD is expected to remember.</p>
+<p>That does not mean it contains tiny permanent zeros and ones.</p>
+<p>It uses non-volatile flash-memory technology plus a controller that hides a surprising amount of complexity behind the simple abstraction of addressable storage.</p>
+<h2>Persistence is physical</h2>
+<p>Flash memory stores information using transistor structures whose electrical state can remain distinguishable without continuous system power.</p>
+<p>The exact cell technology varies.</p>
+<p>Modern NAND can store more than one bit per physical cell by distinguishing multiple charge-related states.</p>
+<p>That increases density but tightens the margins between states and increases the importance of error management.</p>
+<p>The useful beginner lesson is:</p>
+<p>Persistent digital storage is still a physical measurement problem.</p>
+<p>The controller must program states, later distinguish them, and correct for imperfections.</p>
+<h2>SSDs do not behave like giant RAM</h2>
+<p>Software often addresses storage in logical blocks.</p>
+<p>Flash hardware has different constraints.</p>
+<p>NAND flash is commonly programmed in pages but erased in larger erase blocks.</p>
+<p>You cannot simply overwrite arbitrary bytes in place the way a RAM abstraction suggests.</p>
+<p>The SSD controller therefore translates between the logical block addresses the host sees and physical flash locations.</p>
+<p>This translation is a major reason the host can use an SSD without understanding raw NAND management.</p>
+<h2>The Flash Translation Layer hides movement</h2>
+<p>Imagine the operating system writes logical block 100.</p>
+<p>The controller may place that data into one physical flash page.</p>
+<p>Later the host overwrites logical block 100.</p>
+<p>The controller may write the new version somewhere else and mark the old physical version invalid.</p>
+<p>A mapping table records where the current logical block actually lives.</p>
+<p>Over time, invalid pages accumulate.</p>
+<p>The controller performs garbage collection: valid data may be moved so whole erase blocks can be reclaimed.</p>
+<p>From outside:</p>
+<pre><code>write block 100
+</code></pre>pre
+<p>Inside:</p>
+<pre><code>choose physical location
+program page
+update mapping
+later move data
+erase larger block
+maintain metadata
+</code></pre>pre
+<p>The abstraction is doing enormous work.</p>
+<h2>Wear matters</h2>
+<p>Flash cells tolerate a finite number of program/erase cycles.</p>
+<p>If the same physical block received every frequently updated logical write, it could wear much faster than the rest of the device.</p>
+<p>Controllers therefore perform wear leveling to spread erase activity.</p>
+<p>This is another case where the logical address is not a permanent physical location.</p>
+<p>The device moves state to protect the medium.</p>
+<h2>Error correction is normal engineering</h2>
+<p>As flash density increases and cells age, raw bit errors become an expected phenomenon that the controller must manage.</p>
+<p>SSDs use error-correcting codes and other integrity mechanisms to recover data within supported error limits.</p>
+<p>That does not mean SSDs are unreliable by definition.</p>
+<p>It means the storage system is designed around imperfect physical media.</p>
+<p>This is a theme across computing:</p>
+<p>Reliable abstractions are often built on components that are individually imperfect.</p>
+<h2>What does "write completed" mean?</h2>
+<p>This question is more subtle than it looks.</p>
+<p>An application may call a write function.</p>
+<p>The operating system may cache the data.</p>
+<p>The filesystem may update metadata.</p>
+<p>A storage stack may queue commands.</p>
+<p>The SSD may acknowledge data after receiving it into internal buffers.</p>
+<p>Power-loss behaviour depends on the complete chain and the device's guarantees.</p>
+<p>This is why databases and filesystems use explicit durability mechanisms such as flushes, barriers, journals, or transaction logs according to their design.</p>
+<p>A successful application-level write is not automatically proof that every relevant bit is on stable media.</p>
+<p>We need the documented contract.</p>
+<h2>TRIM tells the SSD what no longer matters</h2>
+<p>A filesystem may delete a file, but from the block device's perspective the old blocks could still appear allocated unless the storage stack communicates that their contents no longer need preservation.</p>
+<p>Commands such as TRIM or discard allow the operating system to inform an SSD that certain logical blocks are no longer in use.</p>
+<p>This can help the controller manage free space and garbage collection more effectively.</p>
+<p>Deletion at one abstraction layer becomes information for optimization at a lower layer.</p>
+<h2>SSD speed is workload-dependent</h2>
+<p>A product box may advertise a large sequential throughput number.</p>
+<p>Your workload may be small random writes.</p>
+<p>Or database sync operations.</p>
+<p>Or mixed reads and writes.</p>
+<p>Or a nearly full drive under sustained write pressure.</p>
+<p>Latency and throughput can differ greatly.</p>
+<p>Storage performance depends on:</p>
+<ul>
+<li>access pattern;</li>
+<li>queue depth;</li>
+<li>request size;</li>
+<li>free space;</li>
+<li>controller;</li>
+<li>flash type;</li>
+<li>thermal limits;</li>
+<li>interface;</li>
+<li>durability requirements.</li>
+</ul>
+<p>One headline bandwidth number does not describe the device.</p>
+<h2>An SSD is a computer-like subsystem</h2>
+<p>A modern SSD contains:</p>
+<ul>
+<li>controller logic;</li>
+<li>firmware;</li>
+<li>memory buffers;</li>
+<li>flash channels;</li>
+<li>mapping metadata;</li>
+<li>error correction;</li>
+<li>background management.</li>
+</ul>
+<p>Thinking of it as a passive box of bits hides important failure and performance modes.</p>
+<p>Firmware bugs can matter.</p>
+<p>Power-loss behaviour can matter.</p>
+<p>Temperature can matter.</p>
+<p>Controller saturation can matter.</p>
+<p>Internal garbage collection can affect latency.</p>
+<p>The storage device is an active subsystem.</p>
+<h2>Exercise: separate the layers of save</h2>
+<p>Write a document and press Save.</p>
+<p>Draw:</p>
+<pre><code>application
+  -&gt; filesystem call
+  -&gt; OS cache
+  -&gt; filesystem
+  -&gt; block layer
+  -&gt; SSD controller
+  -&gt; flash media
+</code></pre>pre
+<p>Now mark which layers may acknowledge completion before the next layer has finished durable work.</p>
+<p>You do not need the exact answer for your device.</p>
+<p>The exercise teaches you to ask for durability semantics rather than assuming them.</p>
+<h2>The lesson to carry forward</h2>
+<p>An SSD remembers without power because non-volatile flash stores physical state and a controller builds a logical storage abstraction on top of it.</p>
+<p>Pages, erase blocks, mapping, garbage collection, wear leveling, and error correction disappear behind simple block addresses.</p>
+<p>That abstraction is excellent for ordinary software.</p>
+<p>When performance, durability, or recovery matters, open the box.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

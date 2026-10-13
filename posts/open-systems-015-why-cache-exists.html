@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Cache exists because the processor can often use data faster than main memory can provide it. Locality lets a small fast store hide much of that latency—until the workload stops cooperating." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Why Cache Exists — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-015-why-cache-exists.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Why Cache Exists" property="og:title"/><meta content="Cache exists because the processor can often use data faster than main memory can provide it. Locality lets a small fast store hide much of that latency—until the workload stops cooperating." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-015-why-cache-exists.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Why Cache Exists</h1><p class="lede">Cache exists because the processor can often use data faster than main memory can provide it. Locality lets a small fast store hide much of that latency—until the workload stops cooperating.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Imagine a chef who keeps walking to a warehouse across town for every spoonful of salt.</p>
+<p>The warehouse can store everything.</p>
+<p>It is in the wrong place for the current task.</p>
+<p>A CPU faces a related problem.</p>
+<p>Processors can perform operations extremely quickly, but large main memory cannot deliver every instruction and data item at register-like latency.</p>
+<p>Cache exists to keep likely-useful information closer.</p>
+<h2>The hierarchy is a trade-off</h2>
+<p>A rough conceptual hierarchy is:</p>
+<pre><code>registers
+   ↓
+L1 cache
+   ↓
+L2 cache
+   ↓
+last-level cache
+   ↓
+main memory
+   ↓
+persistent storage
+</code></pre>pre
+<p>Exact organizations differ by processor.</p>
+<p>The general trade-off is stable:</p>
+<p>Small storage can be made very fast and close to execution.</p>
+<p>Large storage is cheaper per bit but usually slower to access.</p>
+<p>A hierarchy tries to deliver the illusion that much of the working data is both large and fast.</p>
+<p>It works because programs often exhibit locality.</p>
+<h2>Temporal locality: used recently, used again</h2>
+<p>Suppose a loop repeatedly updates the same counter.</p>
+<p>The counter was used recently.</p>
+<p>It is likely to be used again soon.</p>
+<p>That is temporal locality.</p>
+<p>Keeping recently used data in fast cache can save repeated trips to slower memory.</p>
+<p>Many hot program structures benefit:</p>
+<ul>
+<li>loop variables;</li>
+<li>frequently called code;</li>
+<li>active object fields;</li>
+<li>stack data;</li>
+<li>hot lookup tables.</li>
+</ul>
+<p>Not every workload has strong temporal locality, but enough real workloads do that caching is extremely valuable.</p>
+<h2>Spatial locality: nearby data often matters</h2>
+<p>Suppose a program reads element 0 of an array, then 1, then 2, then 3.</p>
+<p>Fetching exactly one byte from memory each time would waste bandwidth and latency.</p>
+<p>Caches move data in blocks called cache lines.</p>
+<p>When one address is fetched, nearby bytes arrive too.</p>
+<p>If the program soon uses them, the initial memory access paid for several future hits.</p>
+<p>This is spatial locality.</p>
+<p>Sequential array processing often benefits greatly.</p>
+<p>Pointer-heavy structures scattered through memory may benefit less.</p>
+<h2>A cache hit and miss tell different stories</h2>
+<p>If requested data is already in the relevant cache level:</p>
+<pre><code>cache hit
+</code></pre>pre
+<p>The processor can obtain it from that level.</p>
+<p>If not:</p>
+<pre><code>cache miss
+</code></pre>pre
+<p>The system searches or fetches from lower levels.</p>
+<p>The miss penalty can be much larger than the hit latency.</p>
+<p>This creates an important performance pattern:</p>
+<p>A program can execute the same instructions on the same CPU and run much slower because its memory-access pattern changed.</p>
+<p>Nothing in the source code needs to say "be slow."</p>
+<p>The data layout can create the slowdown.</p>
+<h2>Cache is invisible until it is not</h2>
+<p>At the source-code level:</p>
+<pre><code>value = array[i]
+</code></pre>pre
+<p>looks the same whether the value is in L1 cache or main memory.</p>
+<p>That is abstraction.</p>
+<p>The architecture generally gives the program a memory model.</p>
+<p>The microarchitecture decides how cache is used to accelerate it.</p>
+<p>But performance counters and timing measurements can reveal the lower layer.</p>
+<p>This is a classic leaky abstraction: correctness can remain unchanged while performance exposes the hidden mechanism.</p>
+<h2>Cache coherence appears with multiple cores</h2>
+<p>Now imagine two CPU cores caching copies of the same memory location.</p>
+<p>Core A writes a new value.</p>
+<p>Core B still has an old cached copy.</p>
+<p>The system needs rules to preserve the architecture's required memory behaviour.</p>
+<p>Cache-coherence protocols coordinate cached copies so cores can maintain a usable shared-memory abstraction.</p>
+<p>The details are complex and architecture-specific.</p>
+<p>The important idea is familiar from distributed systems:</p>
+<p>Multiple copies of state create a consistency problem.</p>
+<p>A multi-core cache hierarchy is not the same as a distributed database, but the conceptual question rhymes:</p>
+<p>Who has which version, and when does another participant learn about the update?</p>
+<h2>Bigger cache is not automatically better</h2>
+<p>A larger cache may improve hit rate.</p>
+<p>But larger structures can have different latency, power, area, and design costs.</p>
+<p>Cache organization also includes choices such as:</p>
+<ul>
+<li>line size;</li>
+<li>associativity;</li>
+<li>replacement policy;</li>
+<li>private versus shared levels;</li>
+<li>write policy.</li>
+</ul>
+<p>There is no single "more cache = better" rule independent of workload and implementation.</p>
+<p>The correct question is:</p>
+<p>Does this hierarchy serve this workload efficiently?</p>
+<h2>Software can help or hurt locality</h2>
+<p>Compare two ways of visiting a large matrix.</p>
+<p>One traversal order may follow contiguous memory.</p>
+<p>Another may jump across distant locations.</p>
+<p>The mathematical work is the same.</p>
+<p>The cache behaviour may be very different.</p>
+<p>Data-oriented software design often cares about layout precisely because processors retrieve memory in blocks and exploit locality.</p>
+<p>This is one reason low-level performance work eventually crosses from algorithms into architecture.</p>
+<h2>Cache also exists outside the CPU</h2>
+<p>Once you understand the CPU cache, you will recognize the pattern everywhere.</p>
+<p>Browsers cache resources.</p>
+<p>Operating systems cache disk pages.</p>
+<p>DNS resolvers cache records.</p>
+<p>CDNs cache content.</p>
+<p>Applications cache database results.</p>
+<p>The shared idea is:</p>
+<p>Keep a copy closer to likely future use.</p>
+<p>The shared danger is:</p>
+<p>Copies become stale, consume space, and need invalidation rules.</p>
+<p>CPU caches use specialized hardware coherence mechanisms.</p>
+<p>Application caches use very different mechanisms.</p>
+<p>Do not confuse the implementations just because the pattern is similar.</p>
+<h2>Exercise: locality on paper</h2>
+<p>Write sixteen numbers in a 4×4 grid.</p>
+<p>First read:</p>
+<pre><code>row 1 left to right
+row 2 left to right
+row 3 left to right
+row 4 left to right
+</code></pre>pre
+<p>Then imagine the numbers are stored row by row.</p>
+<p>Now read by columns.</p>
+<p>Both traversals visit sixteen values.</p>
+<p>But if a cache line brings several neighbouring row elements at once, the access patterns may use fetched data differently.</p>
+<p>The exercise is not a benchmark.</p>
+<p>It builds the intuition that memory order and access order interact.</p>
+<h2>The lesson to carry forward</h2>
+<p>Cache exists because fast processors and larger memories operate at different speeds.</p>
+<p>A small fast store can hide much of the latency when programs reuse recent data or nearby data.</p>
+<p>The abstraction works spectacularly well—until misses, contention, coherence, or poor locality expose the lower layer.</p>
+<p>When a program is mysteriously slow, ask not only:</p>
+<p>How many instructions does it execute?</p>
+<p>Also ask:</p>
+<p><strong>Where is the data when those instructions need it?</strong></p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

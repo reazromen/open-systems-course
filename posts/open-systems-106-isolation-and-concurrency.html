@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="Concurrency lets many transactions make progress together, but overlapping reads and writes create anomalies. Isolation levels define which outcomes the database allows." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Isolation and Concurrency: What Can Two Transactions See? — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-106-isolation-and-concurrency.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Isolation and Concurrency: What Can Two Transactions See?" property="og:title"/><meta content="Concurrency lets many transactions make progress together, but overlapping reads and writes create anomalies. Isolation levels define which outcomes the database allows." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-106-isolation-and-concurrency.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Isolation and Concurrency: What Can Two Transactions See?</h1><p class="lede">Concurrency lets many transactions make progress together, but overlapping reads and writes create anomalies. Isolation levels define which outcomes the database allows.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A database can process many transactions at once.</p>
+<p>That concurrency is essential for throughput, but it creates a hard question: what is each transaction allowed to observe while other transactions are changing the same data?</p>
+<p>Isolation is the contract that answers that question.</p>
+<h2>Concurrency creates overlapping realities</h2>
+<p>Imagine two workers reading the same inventory row. Both see quantity 1. Both decide they can sell one item. Both attempt to update the row.</p>
+<p>If the system does not detect the conflict, two customers can buy the last unit.</p>
+<p>The problem is not that either transaction was individually invalid. The problem is that both made decisions from overlapping state.</p>
+<p>Concurrency bugs are therefore about interactions between otherwise reasonable operations.</p>
+<h2>Dirty reads expose uncommitted state</h2>
+<p>A dirty read occurs when one transaction can observe another transaction's uncommitted change.</p>
+<p>If the writer later rolls back, the reader acted on a state that never became committed truth.</p>
+<p>Many modern relational systems prevent dirty reads at their commonly used isolation levels.</p>
+<p>The important lesson is to separate tentative state from committed state.</p>
+<h2>Nonrepeatable reads change a row underneath a transaction</h2>
+<p>Suppose transaction A reads a customer's status as active.</p>
+<p>Transaction B commits an update changing the status to suspended.</p>
+<p>Transaction A reads the same row again and now sees suspended.</p>
+<p>Whether that can happen depends on the isolation level and database implementation.</p>
+<p>For some workloads, that is acceptable. For others, the transaction needs a stable view.</p>
+<h2>Phantom-style changes affect predicates</h2>
+<p>Now transaction A asks for every unpaid invoice.</p>
+<p>Transaction B inserts a new unpaid invoice and commits.</p>
+<p>If transaction A repeats the predicate and sees an additional row, the result set changed even though no previously read row was directly modified.</p>
+<p>This class of anomaly shows why isolation cannot be explained only in terms of row locks.</p>
+<p>Predicates and relationships matter.</p>
+<h2>MVCC gives readers snapshots</h2>
+<p>PostgreSQL uses multiversion concurrency control, or MVCC, to let transactions see appropriate row versions while other transactions update data.</p>
+<p>Instead of overwriting one universally visible row image immediately, the engine can maintain multiple row versions and determine visibility from transaction metadata.</p>
+<p>This reduces some reader-writer blocking.</p>
+<p>It also creates cleanup work because old versions eventually become unnecessary.</p>
+<p>MVCC is therefore both a concurrency mechanism and a storage-management concern.</p>
+<h2>Read Committed is statement-oriented in PostgreSQL</h2>
+<p>At PostgreSQL's Read Committed level, each statement sees a snapshot that includes transactions committed before that statement began, plus the transaction's own earlier changes.</p>
+<p>Two SELECT statements in the same transaction can therefore see different committed data if other transactions commit between them.</p>
+<p>This is a real contract, not a bug.</p>
+<p>If your algorithm assumes one stable snapshot for the whole transaction, you need a stronger level or explicit coordination.</p>
+<h2>Repeatable Read gives a more stable snapshot</h2>
+<p>PostgreSQL Repeatable Read uses a transaction-level snapshot and prevents several anomalies that Read Committed allows.</p>
+<p>However, concurrent transactions can still conflict and one may need to abort.</p>
+<p>Stronger isolation often means the application must be prepared to retry.</p>
+<p>That is an important systems trade-off:</p>
+<p>stronger correctness can move complexity from invisible anomalies to explicit retry handling.</p>
+<h2>Serializable aims for serializable outcomes</h2>
+<p>Serializable isolation aims to make committed concurrent transactions behave as though they executed in some serial order.</p>
+<p>PostgreSQL implements Serializable Snapshot Isolation and can abort transactions when it detects dependency patterns that could produce a non-serializable result.</p>
+<p>Serializable does not mean the database literally executes every transaction one at a time.</p>
+<p>It means the allowed committed outcomes must be equivalent to some serial execution.</p>
+<h2>Locks are another coordination mechanism</h2>
+<p>Databases also use locks.</p>
+<p>Row locks can prevent conflicting writers from changing the same row simultaneously. Table and predicate-related mechanisms can protect broader structures.</p>
+<p>Explicit locking can be necessary when application logic needs a specific coordination point.</p>
+<p>But locks create their own failure modes:</p>
+<ul>
+<li>waits;</li>
+<li>deadlocks;</li>
+<li>long-held resources;</li>
+<li>reduced concurrency.</li>
+</ul>
+<p>A lock is a correctness tool with performance consequences.</p>
+<h2>Deadlocks are cycles, not just slowness</h2>
+<p>Suppose transaction A locks row 1 then waits for row 2.</p>
+<p>Transaction B locks row 2 then waits for row 1.</p>
+<p>Neither can proceed.</p>
+<p>A database can detect the wait cycle and abort one transaction.</p>
+<p>The application then needs to handle the failure and often retry safely.</p>
+<p>Consistent lock ordering can reduce deadlock opportunities.</p>
+<h2>Optimistic concurrency uses versions instead of long locks</h2>
+<p>Another pattern is optimistic concurrency.</p>
+<p>Read a row with version 7, compute a change, then update only if the version is still 7.</p>
+<p>If another transaction changed the row first, the update affects zero rows or raises a conflict according to the design.</p>
+<p>The application then retries or tells the user the data changed.</p>
+<p>This works well when conflicts are uncommon and long locks would be expensive.</p>
+<h2>Isolation levels are not application invariants</h2>
+<p>Even Serializable isolation does not know that two reservations in different tables represent the same physical seat unless the schema and transaction logic encode that relationship.</p>
+<p>Database isolation constrains concurrent execution.</p>
+<p>The application still has to define the correct state transition.</p>
+<h2>Practical experiment</h2>
+<p>Open two database sessions against a local PostgreSQL or SQLite database.</p>
+<p>In session A begin a transaction and read a row. In session B update and commit the same row. Then read again in session A.</p>
+<p>Repeat using different isolation settings supported by your database and record what changes.</p>
+<p>Do not generalize one engine's behavior to another. Read the engine's isolation documentation and explain the observed result from that contract.</p>
+<p>Then create a deliberate lock-order inversion in a test table and observe how the database reports a deadlock or lock wait.</p>
+<h2>The lesson to carry forward</h2>
+<p>Concurrency is not free parallelism. It creates overlapping views of mutable state.</p>
+<p>Isolation levels, MVCC, locks, conflict detection, and retries determine which concurrent outcomes are allowed.</p>
+<p>The next lesson moves from authoritative data to deliberately duplicated data: caches.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>

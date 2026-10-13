@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<meta content="A production web request often crosses several processes and services before it reaches business data. Separating edge, proxy, application, cache, queue, and database roles makes failures and trust boundaries easier to locate." name="description"/>
+<meta content="Reaz Romen" name="author"/>
+<link href="../about.html" rel="author"/>
+<title>Web Server, Reverse Proxy, Application, and Backend — Reaz Romen</title>
+<link href="../static/css/site.css?v=2361ec052e9b" rel="stylesheet"/>
+<link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-099-web-server-reverse-proxy-application-backend.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="Web Server, Reverse Proxy, Application, and Backend" property="og:title"/><meta content="A production web request often crosses several processes and services before it reaches business data. Separating edge, proxy, application, cache, queue, and database roles makes failures and trust boundaries easier to locate." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-099-web-server-reverse-proxy-application-backend.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
+<body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
+<header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>Web Server, Reverse Proxy, Application, and Backend</h1><p class="lede">A production web request often crosses several processes and services before it reaches business data. Separating edge, proxy, application, cache, queue, and database roles makes failures and trust boundaries easier to locate.</p><div class="article-meta"><span>Published 2026-10-07</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A browser sends one request.</p>
+<p>The server side may contain many systems.</p>
+<p>A simplified production path can be:</p>
+<pre><code class="language-text">client
+  ↓
+edge or load balancer
+  ↓
+reverse proxy / gateway
+  ↓
+application process
+  ↓
+cache / database / queue / other service
+</code></pre>pre
+<p>Each arrow can cross a process boundary, a host boundary, a network boundary, or an administrative boundary.</p>
+<p>The most important habit is to stop calling all of it "the server."</p>
+<h2>A web server can mean several things</h2>
+<p>The phrase <strong>web server</strong> is overloaded.</p>
+<p>It can mean:</p>
+<ul>
+<li>software that accepts HTTP connections;</li>
+<li>a reverse proxy;</li>
+<li>a static-file server;</li>
+<li>an application process;</li>
+<li>a machine hosting several web-related services.</li>
+</ul>
+<p>That ambiguity causes bad incident conversations.</p>
+<p>Instead of saying:</p>
+<pre><code class="language-text">the web server is broken
+</code></pre>pre
+<p>say what is actually failing:</p>
+<pre><code class="language-text">public TLS listener
+reverse-proxy route
+application worker
+database dependency
+cache cluster
+upstream API
+</code></pre>pre
+<p>Precise component names produce smaller hypotheses.</p>
+<h2>The edge terminates the public path</h2>
+<p>A public service often has an edge component such as a CDN, load balancer, or ingress proxy.</p>
+<p>That component can:</p>
+<ul>
+<li>accept public TCP or QUIC connections;</li>
+<li>terminate TLS;</li>
+<li>enforce request limits;</li>
+<li>route by host or path;</li>
+<li>add observability metadata;</li>
+<li>cache responses;</li>
+<li>choose an upstream.</li>
+</ul>
+<p>The public DNS name may resolve to the edge, not the origin application host.</p>
+<p>That means:</p>
+<pre><code class="language-text">client reached public IP
+</code></pre>pre
+<p>proves only the client-to-edge portion of the architecture.</p>
+<p>The edge still needs a healthy path inward.</p>
+<h2>A reverse proxy creates another request boundary</h2>
+<p>RFC 9110 describes intermediaries including gateways, which are commonly called reverse proxies.</p>
+<p>A reverse proxy acts as the server toward the client and as a client toward an upstream.</p>
+<p>That creates two relationships:</p>
+<pre><code class="language-text">client → reverse proxy
+reverse proxy → upstream
+</code></pre>pre
+<p>Those relationships can use different:</p>
+<ul>
+<li>addresses;</li>
+<li>ports;</li>
+<li>protocols;</li>
+<li>TLS policies;</li>
+<li>timeouts;</li>
+<li>authentication mechanisms;</li>
+<li>connection pools.</li>
+</ul>
+<p>A successful public connection says nothing automatic about upstream health.</p>
+<h2>Routing is application architecture</h2>
+<p>A proxy can route by:</p>
+<ul>
+<li>hostname;</li>
+<li>path prefix;</li>
+<li>request method;</li>
+<li>header;</li>
+<li>deployment metadata;</li>
+<li>service-discovery result.</li>
+</ul>
+<p>For example:</p>
+<pre><code class="language-text">/api/        → application service
+/static/     → object/static service
+/admin/      → separate protected application
+</code></pre>pre
+<p>The client still sees one public origin.</p>
+<p>Behind that origin can be several independent services.</p>
+<p>This is why one URL path can fail while another path on the same hostname remains healthy.</p>
+<h2>The application process owns business logic</h2>
+<p>The application process can:</p>
+<ul>
+<li>authenticate the session;</li>
+<li>authorize the requested operation;</li>
+<li>validate input;</li>
+<li>execute business logic;</li>
+<li>read or write state;</li>
+<li>call dependencies;</li>
+<li>construct the HTTP response.</li>
+</ul>
+<p>It may run as:</p>
+<ul>
+<li>one process;</li>
+<li>many workers;</li>
+<li>containers;</li>
+<li>virtual machines;</li>
+<li>serverless functions;</li>
+<li>processes on multiple hosts.</li>
+</ul>
+<p>A load balancer or reverse proxy can distribute requests across those instances.</p>
+<p>That makes local in-memory state dangerous unless the architecture deliberately handles affinity or replication.</p>
+<h2>Backends are not implementation details during failure</h2>
+<p>An application can depend on:</p>
+<ul>
+<li>relational database;</li>
+<li>key-value cache;</li>
+<li>object storage;</li>
+<li>message queue;</li>
+<li>identity provider;</li>
+<li>search service;</li>
+<li>another API.</li>
+</ul>
+<p>To the user, the service is one page.</p>
+<p>To the application, one request may be a dependency graph.</p>
+<p>Constructed example:</p>
+<pre><code class="language-text">GET /account
+   ↓
+session lookup
+   ↓
+user database
+   ↓
+billing service
+   ↓
+template rendering
+   ↓
+response
+</code></pre>pre
+<p>If the billing service times out, the public request can fail even though the web process and database are healthy.</p>
+<p>Dependencies are part of availability.</p>
+<h2>Connection pools create hidden state</h2>
+<p>Applications rarely create a brand-new database or upstream connection for every request.</p>
+<p>They use pools.</p>
+<p>A connection pool has state:</p>
+<ul>
+<li>maximum size;</li>
+<li>idle connections;</li>
+<li>in-use connections;</li>
+<li>connection lifetime;</li>
+<li>waiting requests;</li>
+<li>health checks;</li>
+<li>retry behavior.</li>
+</ul>
+<p>A database can be healthy while the application cannot acquire a connection because its pool is exhausted.</p>
+<p>Likewise, the network can be healthy while stale pooled connections cause intermittent failures.</p>
+<p>When a system "randomly" fails, shared pools deserve inspection.</p>
+<h2>Timeouts form a chain</h2>
+<p>Consider:</p>
+<pre><code class="language-text">browser timeout:             30 s
+edge timeout:                20 s
+reverse proxy upstream:      10 s
+application DB timeout:       5 s
+database statement timeout:   4 s
+</code></pre>pre
+<p>This ordering can be intentional.</p>
+<p>The inner dependency should often fail before the outer caller gives up, leaving enough time to return a useful error.</p>
+<p>If the proxy times out before the application dependency does, the application may continue working on a request whose client has already gone away.</p>
+<p>Timeouts are therefore architecture, not just tuning constants.</p>
+<h2>502, 503, and 504 point to different boundaries</h2>
+<p>In gateway deployments, several common failures become especially useful:</p>
+<pre><code class="language-text">502 Bad Gateway
+gateway received an invalid response from upstream
+
+503 Service Unavailable
+service cannot currently handle the request
+
+504 Gateway Timeout
+gateway did not receive a timely upstream response
+</code></pre>pre
+<p>These are HTTP semantics.</p>
+<p>A 502 does not mean the user's Internet connection is broken.</p>
+<p>A 504 does not prove the origin process is down.</p>
+<p>It means the component returning the code classified the failure at its upstream boundary.</p>
+<p>Always record <strong>which component generated the status</strong>.</p>
+<h2>Health checks can lie by being too shallow</h2>
+<p>A process can return:</p>
+<pre><code class="language-text">200 /health
+</code></pre>pre
+<p>while its database is unavailable.</p>
+<p>That may be correct if <code>/health</code>code only means "process is alive."</p>
+<p>A readiness check can answer a different question:</p>
+<pre><code class="language-text">should this instance currently receive production traffic?
+</code></pre>pre
+<p>A dependency check can answer another:</p>
+<pre><code class="language-text">can this application currently reach required backends?
+</code></pre>pre
+<p>One green endpoint should not be made to prove every property of the service.</p>
+<p>Name health signals after the contract they actually verify.</p>
+<h2>Request IDs connect evidence</h2>
+<p>When one request crosses several components, logs need a way to be correlated.</p>
+<p>A request or trace identifier can be propagated:</p>
+<pre><code class="language-text">edge
+ ↓ same trace/request context
+proxy
+ ↓
+application
+ ↓
+database/client spans
+</code></pre>pre
+<p>OpenTelemetry defines conventions and context propagation for distributed telemetry.</p>
+<p>The identifier is not the diagnosis.</p>
+<p>It is the thread that lets you gather evidence from multiple boundaries without guessing which log lines belong together.</p>
+<h2>Headers across trust boundaries need policy</h2>
+<p>Reverse proxies often add forwarding metadata such as the original client address or original protocol.</p>
+<p>Those fields become dangerous if the application blindly trusts values supplied directly by an untrusted client.</p>
+<p>The architecture needs a trust rule:</p>
+<pre><code class="language-text">only the trusted proxy may define authoritative forwarding metadata
+</code></pre>pre
+<p>The application should know which upstream proxy is trusted and which fields are sanitized or replaced.</p>
+<p>Never treat a header as trusted merely because its name begins with <code>X-</code>code or looks infrastructure-related.</p>
+<h2>Queues change request timing</h2>
+<p>Some operations should not complete synchronously.</p>
+<p>An application can accept a request, create a job, enqueue it, and return a response before the background work finishes.</p>
+<p>The path becomes:</p>
+<pre><code class="language-text">HTTP request
+   ↓
+application
+   ↓
+job record / queue
+   ↓
+HTTP response: accepted
+             later
+queue → worker → external effect
+</code></pre>pre
+<p>The request can succeed while the eventual job fails.</p>
+<p>That means the API needs a model for job state.</p>
+<p>"HTTP returned 202" and "task completed" are different events.</p>
+<h2>Inspect your own deployment</h2>
+<p>Draw one production or local service as boxes.</p>
+<p>Include:</p>
+<ul>
+<li>public DNS;</li>
+<li>edge/tunnel/load balancer;</li>
+<li>reverse proxy;</li>
+<li>application;</li>
+<li>session store;</li>
+<li>database;</li>
+<li>cache;</li>
+<li>queue;</li>
+<li>external dependency.</li>
+</ul>
+<p>For each arrow write:</p>
+<pre><code class="language-text">protocol
+address/port
+TLS?
+authentication?
+timeout?
+retry?
+owner?
+observable logs/metrics?
+</code></pre>pre
+<p>Any arrow you cannot describe is an operational blind spot.</p>
+<h2>Build a local three-process experiment</h2>
+<p>Create:</p>
+<ol>
+<li>a small backend application on one port;</li>
+<li>a reverse proxy on another port;</li>
+<li>a client using a command-line HTTP tool.</li>
+</ol>
+<p>Then test three failures:</p>
+<ul>
+<li>stop the backend;</li>
+<li>keep backend running but make one route slow;</li>
+<li>return an application 500 deliberately.</li>
+</ul>
+<p>Observe whether the reverse proxy produces a different status for each case.</p>
+<p>The goal is not to learn one proxy product.</p>
+<p>It is to see that the proxy and the application are independent state machines.</p>
+<h2>Build a failure ladder</h2>
+<p>For a public request:</p>
+<pre><code class="language-text">Did the request reach the edge?
+        ↓
+Did the edge select a route?
+        ↓
+Did the proxy reach an application instance?
+        ↓
+Did the application accept the request?
+        ↓
+Did authentication/authorization succeed?
+        ↓
+Could the app acquire backend connections?
+        ↓
+Did dependencies respond before deadlines?
+        ↓
+Did the app generate a response?
+        ↓
+Did the proxy return it to the client?
+</code></pre>pre
+<p>Every line can have its own logs and metrics.</p>
+<p>That is much more useful than saying "backend issue."</p>
+<h2>The lesson to carry forward</h2>
+<p>A production web service is usually a graph of cooperating components.</p>
+<p>The public endpoint, reverse proxy, application, database, cache, queue, and external services have different responsibilities and failure modes.</p>
+<p>The final lesson of this module follows one web request end to end and annotates which state changes at every boundary.</p>
+</div></article></main>
+<footer class="shell site-footer">
+<div>
+<span class="status-dot"></span>
+<strong>Reaz Romen — independent systems engineer.</strong>
+</div>
+<p>Firmware, real-time communications, infrastructure and field notes. First-party HTML/CSS, no analytics, no third-party scripts.</p>
+<nav aria-label="Footer"><a href="https://reazromen.com/topics.html">Topics</a>a<a href="https://reazromen.com/tags.html">Tags</a>a<a href="https://reazromen.com/systems.html">Systems</a>a<a href="https://reazromen.com/archive.html">Archive</a>a<a href="https://reazromen.com/author/reaz-romen.html">Author record</a>a</nav>
+</footer>
+<script src="/assets/site.js?v=3d24d22fb89e"></script><script src="/assets/sitewide.js?v=f45ac90970b1"></script><dialog aria-label="Search and quick navigation" class="command-palette" data-pagefind-ignore="" id="command-palette">
+<div class="command-shell">
+<div class="command-input-row"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg><input aria-label="Search site" autocomplete="off" id="command-input" placeholder="Search writing, work, topics…" type="search"/><button aria-label="Close" class="command-close" data-close-command="" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"></path></svg></button></div>
+<div class="command-hint"><span>Quick navigation</span><kbd>Esc</kbd></div>
+<nav aria-label="Quick navigation" class="command-shortcuts">
+<a href="https://reazromen.com/portfolio.html">Work <span>Projects and systems</span></a>a
+<a href="https://reazromen.com/writing.html">Writing <span>Articles and engineering notes</span></a>a
+<a href="https://reazromen.com/domains/">Domains <span>Browse engineering areas</span></a>a
+<a href="https://reazromen.com/now.html">Now <span>Current public focus</span></a>a
+<a href="https://reazromen.com/systems.html">Stack <span>Tools by engineering layer</span></a>a
+<a href="https://reazromen.com/about.html">About <span>Background and approach</span></a>a
+</nav>
+<div aria-live="polite" class="command-results" id="command-results"></div>
+<div class="command-footer"><span>Search</span><kbd>⌘/Ctrl K</kbd><span>Open result</span><kbd>Enter</kbd></div>
+</div></dialog><script src="/assets/phase1.js?v=88e55e1cc234"></script><script src="/assets/responsive-v3.js?v=3bc1e02c63b2"></script></body>
+</html>
