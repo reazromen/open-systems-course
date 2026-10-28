@@ -23,6 +23,29 @@ Every additional index takes disk space and can increase the cost of inserts, up
 
 Use the database's query plan and performance statistics to check whether the index is used and whether it improves the real workload. A query can remain slow because it returns too much data, performs expensive joins, waits on locks, or competes for resources. Indexes are one tool, not a universal fix.
 
+## Learning Objectives
+
+- Explain how indexes reduce search work and why they consume resources.
+- Propose indexes from actual filter, join, and sort patterns.
+
+## Worked Example
+
+For `SELECT * FROM orders WHERE customer_id = ? ORDER BY created_at DESC`, an index beginning with `(customer_id, created_at)` may help. Confirm the choice with the query plan and workload.
+
+## Check Your Understanding
+
+1. **Should every column receive an index?**
+
+   No. Indexes use storage and add work to inserts, updates, and deletes.
+
+2. **Why might an index on a low-cardinality status column be less useful?**
+
+   If most rows share the same few values, the index may eliminate little work; the query plan and workload decide.
+
+## Common Pitfall
+
+Adding indexes by intuition without measuring query plans, selectivity, and write overhead.
+
 ## Key Takeaways
 
 Index frequent and selective query paths based on evidence. Consider composite-column order, write overhead, storage, and actual query plans.
@@ -31,6 +54,14 @@ Index frequent and selective query paths based on evidence. Consider composite-c
 
 An orders table often filters by customer_id and sorts by created_at. Propose an index to evaluate and explain what trade-off it introduces.
 
+
+### Practice Hint
+
+Start from the slow query: identify equality filters, range conditions, joins, and sort order, then inspect `EXPLAIN` output.
+
+### Self-Check
+
+Can you explain both the read benefit and write/storage cost of your proposed index?
 ## Next Lesson
 
 Lesson 16 — Transactions and ACID
