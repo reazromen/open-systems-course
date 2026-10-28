@@ -27,6 +27,44 @@ Redirect traffic is a natural fit for caching popular code-to-URL mappings, with
 
 Validate schemes and destinations to reduce abuse, provide reporting and takedown paths, and protect creation endpoints with rate limits. Consider phishing reputation, private-link leakage, cache staleness, and high-cardinality analytics. Monitor redirect latency, lookup errors, cache hit ratio, and code-creation failures.
 
+## Learning Objectives
+
+- Translate product requirements into functional and non-functional requirements.
+
+- Design code generation, storage, and redirect paths.
+
+- Evaluate caching, abuse controls, and analytics trade-offs.
+
+## Worked Example
+
+Assume a service receives one million redirects per day and redirects must remain fast. If reads greatly exceed writes, an indexed persistent mapping plus a cache for popular codes can reduce database load.
+
+**Reasoning:** Generate collision-resistant short codes, enforce uniqueness in storage, cache popular mappings with a deliberate invalidation policy, and send click analytics asynchronously.
+
+## Check Your Understanding
+
+What should happen if a short link is disabled while its mapping remains cached?
+
+- A. Ignore the disabled state until the cache expires in all cases.
+
+- B. Use a suitable invalidation or bounded-TTL strategy and ensure the redirect path respects revocation requirements.
+
+- C. Delete the entire database.
+
+**Answer and explanation:** B — cache policy must reflect revocation and correctness requirements; invalidation or short TTLs can limit stale redirects.
+
+## Common Pitfall
+
+Assuming generated codes can never collide is unsafe; enforce uniqueness at the storage layer and retry generation on conflict.
+
+## Practice Hint
+
+Separate create and redirect APIs, estimate read/write volume, identify hot keys, and decide how disabling a link propagates to caches.
+
+## Self-Check
+
+Can you sketch the create and redirect flows and explain how you handle collisions, hot links, and link revocation?
+
 ## Key Takeaways
 
 Start with requirements and traffic patterns. Use a unique code with a uniqueness constraint, indexed lookup, caching for redirects, asynchronous analytics, and abuse controls.

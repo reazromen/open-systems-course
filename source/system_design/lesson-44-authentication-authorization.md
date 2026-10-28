@@ -23,6 +23,44 @@ Give users and services only the permissions needed for their work. Enforce acce
 
 Sessions and bearer tokens have different lifecycle and revocation trade-offs. Short-lived access tokens reduce the exposure window but require refresh and expiry handling. Do not put secrets or unnecessary personal data into token claims, and plan what happens when credentials are stolen or an account is disabled.
 
+## Learning Objectives
+
+- Distinguish authentication from authorization.
+
+- Apply least privilege and object-level access checks.
+
+- Compare session and token considerations.
+
+## Worked Example
+
+A signed-in user changes an account ID in a URL to request another customer's data.
+
+**Reasoning:** The server verifies the authenticated identity and checks permission for that specific account on every request. A valid session or token alone does not grant access to every object.
+
+## Check Your Understanding
+
+What does authentication establish?
+
+- A. What actions the identity is allowed to perform on every resource.
+
+- B. Which identity or principal is making the request.
+
+- C. That every request is safe.
+
+**Answer and explanation:** B — authentication establishes identity; authorization decides what that identity may do.
+
+## Common Pitfall
+
+Checking that a user is logged in but not checking ownership of the requested object can cause insecure direct object reference vulnerabilities.
+
+## Practice Hint
+
+For every endpoint, identify the principal, resource, action, and authorization policy.
+
+## Self-Check
+
+Can you explain authentication versus authorization and name one object-level authorization check?
+
 ## Key Takeaways
 
 Authentication verifies identity; authorization enforces permissions. Use least privilege, server-side object-level checks, secure credential handling, and explicit expiry and revocation behavior.

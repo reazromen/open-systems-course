@@ -23,6 +23,44 @@ A successful copy operation does not prove the application can recover. Test res
 
 Document common failure responses, escalation paths, rollback procedures, and dependencies. Deploy gradually where practical, monitor after changes, and make risky changes reversible. Review incidents for systemic improvements rather than relying only on individual heroics.
 
+## Learning Objectives
+
+- Select backup approaches based on recovery requirements.
+
+- Protect backup integrity and access.
+
+- Validate restore procedures and operational runbooks.
+
+## Worked Example
+
+A database backup job reports success every night, but no restore has been tested.
+
+**Reasoning:** Restore a copy into an isolated environment, verify schema and data integrity, run application-level checks, record elapsed time, and fix missing secrets or dependencies.
+
+## Check Your Understanding
+
+What is the strongest evidence that a backup strategy works?
+
+- A. The backup job exits with code zero.
+
+- B. A restore test succeeds and the recovered system passes validation within the required targets.
+
+- C. The backup files are large.
+
+**Answer and explanation:** B — only a tested restore demonstrates that data, keys, dependencies, and procedures can recover the service.
+
+## Common Pitfall
+
+A backup that shares production credentials or the same failure domain may be deleted or encrypted during the same incident.
+
+## Practice Hint
+
+Include detection, authorization, restore, integrity checks, traffic return, and post-incident review in the runbook.
+
+## Self-Check
+
+Can you outline a restore test and identify one control that protects backups from production compromise?
+
 ## Key Takeaways
 
 Operational readiness combines protected backups, tested restores, monitoring, runbooks, and safe change practices. Measure recovery outcomes against RPO and RTO.

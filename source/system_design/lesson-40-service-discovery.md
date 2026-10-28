@@ -23,6 +23,44 @@ An instance can respond to a TCP connection while being unable to serve requests
 
 Discovery data can be stale, so callers still need timeouts, retries with limits, and connection handling. Restrict who can register services and protect internal naming systems. A discovered address should not be treated as proof that a caller is authorized to use the service.
 
+## Learning Objectives
+
+- Explain why dynamic service instances need discovery.
+
+- Compare client-side and server-side discovery.
+
+- Distinguish liveness from readiness.
+
+## Worked Example
+
+A deployment replaces instances and their IP addresses change.
+
+**Reasoning:** A registry or platform service routes callers to current endpoints. Readiness should exclude instances that cannot serve requests, even if their process is alive.
+
+## Check Your Understanding
+
+What does a readiness check primarily answer?
+
+- A. Is the process running at all?
+
+- B. Can this instance safely receive production traffic now?
+
+- C. Is the host's IP address permanent?
+
+**Answer and explanation:** B — readiness determines whether an instance should receive traffic; liveness determines whether it should be restarted.
+
+## Common Pitfall
+
+A shallow health endpoint that only returns HTTP 200 can mark an overloaded or dependency-starved instance as ready.
+
+## Practice Hint
+
+Consider startup, dependency failure, draining during deployment, and recovery when designing health checks.
+
+## Self-Check
+
+Can you explain the difference between liveness and readiness and name one failure each can detect?
+
 ## Key Takeaways
 
 Discovery maps logical service names to changing instances. Combine it with load balancing, meaningful readiness checks, stale-record handling, and service authentication.
