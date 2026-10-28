@@ -1,12 +1,12 @@
 # Interactive Course Roadmap
 
-**Status:** Phase 0 audit complete with blockers; implementation not started.  
+**Status:** Phase 1 shared foundation implemented and tested; no existing lesson or production output changed. Renderer/source gaps are documented and gate Phase 2.
 **Baseline commit:** 8918b2234dfeb8ceb3759c0964726df8fa8daf00  
 **Rule:** Keep original lesson content and URLs intact. Add interactions as progressive enhancements; the lesson must remain useful without JavaScript or animation.
 
 ## Phase 0 — Audit and implementation plan
 
-**Findings:** 180 canonical Markdown lessons map by stable front-matter URL to 180 posts/ HTML outputs. The repository also deploys 60 System Design and 60 Embedded Systems & IoT HTML-only lessons. Static host deployment copies pre-rendered output; the exact Markdown renderer command/version remains unidentified. Live HTTP probe: 308/308 tested URLs returned 200.
+**Findings:** 180 Open Systems Markdown sources map to 180 rendered pages. System Design also has 60 Markdown sources plus 60 rendered pages; Embedded Systems & IoT has 60 deployed HTML pages but no source Markdown in the inspected repository. No course renderer/build command exists in the repo; the host deploy script only copies pre-rendered output. Browser baseline: Firefox 157.0.1, desktop and emulated 390×844 mobile, reduced-motion and real Tab actions tested; favicon 404 and mobile horizontal overflow observed. HTTP probe: 308/308 tested URLs returned 200.
 
 **Exit checklist**
 - [x] Repository/default branch and audited commit recorded.
@@ -14,17 +14,17 @@
 - [x] Existing JS/CSS and current diagram behavior inventoried.
 - [x] Host copy/sync deployment script and origin service inspected.
 - [x] Representative live pages and shared assets respond successfully; 308-URL HTTP probe passed.
-- [ ] Identify authoritative renderer/build command, dependencies, and generated-output workflow for the 180 canonical lessons.
-- [ ] Establish a browser console, keyboard, reduced-motion, and mobile/desktop visual baseline.
-- [ ] Confirm the authoring source of the 60 System Design and 60 Embedded Systems & IoT companion pages.
+- [x] Confirmed no authoritative Markdown renderer/build command exists in the course repo; safe source/output and deployment workflow documented.
+- [x] Captured browser baseline including console events, real Tab behavior, reduced motion, desktop, and 390×844 viewport. Recorded favicon 404 and mobile overflow.
+- [x] Identified System Design source Markdown (60 files); confirmed no Embedded Systems & IoT Markdown source exists in the inspected repo/deployment tree.
 
-**Gate:** Do not begin Phase 1 until the renderer/output ownership is resolved and baseline browser evidence can be captured or explicitly documented as unavailable.
+**Gate result:** Phase 1 may safely add opt-in JS/CSS without touching generated lesson HTML. Phase 2 and any content rollout remain gated until a reproducible, pinned renderer is introduced and the Embedded Systems & IoT source provenance is recovered or formally migrated.
 
 ## Phase 1 — Shared interactive foundation
 
-Implement a small dependency-free vanilla JavaScript foundation in the existing static architecture. Start only after Phase 0 blockers are closed.
+Implemented in assets/interactive-course.js and assets/interactive-course.css. This foundation is opt-in and is not injected into current lessons.
 
-- Component contract: mount(element, config), reset(), destroy(); add pause() and step() only for components that support them.
+- Component contract: register(name, factory), mount(element, name, config), reset(), destroy(); add pause() and step() only for components that support them.
 - Idempotent initialization and cleanup; one isolated state object per instance; no global mutable simulation state.
 - Semantic controls, keyboard access, labels, live status summaries, focus visibility, and reduced-motion behavior.
 - Progressive enhancement: explanatory HTML remains visible if scripts fail or are disabled.
@@ -32,7 +32,7 @@ Implement a small dependency-free vanilla JavaScript foundation in the existing 
 - No new runtime dependency by default. Evaluate pinned Anime.js only if a prototype demonstrates that timeline choreography materially improves learning; simulation state must not depend on animation completion.
 - Add unit tests for deterministic state transitions and a small browser smoke test for mount/reset/destroy/multiple instances.
 
-**Gate:** representative page remains navigable and readable; no duplicate listeners after remount; keyboard/reduced-motion checks pass; no uncaught exceptions.
+**Gate result:** passed for the shared foundation. Six Node tests pass; a Firefox browser fixture verified two isolated instances, step/reset/destroy, listener cleanup, keyboard focus-visible, reduced-motion CSS, and no teardown errors. Existing live pages were not modified. See docs/interactive-course-framework.md and docs/interactive-course-browser-baseline.md.
 
 ## Phase 2 — Three representative prototypes
 
