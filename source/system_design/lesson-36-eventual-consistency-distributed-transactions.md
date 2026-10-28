@@ -3,34 +3,44 @@
 **Course:** System Design — From the Ground Up  
 **Module 6 — Distributed Systems**
 
-## Lesson Overview
+## Learning Objectives
+- Explain eventual consistency and identify when temporary stale reads are acceptable.
+- Describe why a database transaction usually cannot atomically cover several independent services.
+- Apply sagas, idempotency, transactional outbox, and reconciliation to a multi-step workflow.
 
-Distributed systems often update multiple components that cannot participate in one local database transaction. Eventual consistency and workflow patterns help systems make progress while acknowledging that different components may temporarily disagree.
+## Core Concept
+Eventual consistency allows replicas or services to disagree temporarily, with the expectation that they converge when updates stop and communication and processing recover. It is useful only when the application can tolerate that temporary divergence. A distributed workflow coordinates business steps across systems that may fail independently; it needs explicit state and recovery rules rather than an assumption that one global transaction will undo everything.
 
 ## Eventual Consistency
+A profile update may appear immediately on one replica and a few seconds later on another. That delay can be acceptable for an activity feed or a non-critical profile view. It may not be acceptable for a bank balance, an inventory reservation, or an authorization decision. The system must define which reads may be stale, how users see pending changes, and how conflicts are resolved.
 
-Eventual consistency means replicas may temporarily show different values but converge if updates stop and the system continues making progress. It can suit activity feeds, counters, and some profile views. It is not the same as immediate correctness: the application must decide which stale views are acceptable.
-
-## A Distributed Workflow
-
-Consider an order that reserves inventory, charges a payment provider, and schedules shipment. These actions may live in separate systems with independent failure modes. A local ACID transaction cannot normally roll them all back atomically. The workflow needs explicit progress states, timeouts, and recovery behavior.
+## Worked Example
+An online order must reserve inventory, charge a payment provider, and arrange shipment. The order service commits its own database row, then calls the inventory service. Inventory reserves a unit, but the payment provider times out. The timeout does not prove that payment failed: the provider may have processed the request while its response was lost. Retrying blindly could charge the customer twice. The order therefore needs a pending-payment state, a stable idempotency key, and a way to query or reconcile the provider's final result.
 
 ## Sagas and Compensating Actions
-
-A saga breaks a long workflow into local transactions. If a later step fails, the system may run compensating actions, such as releasing a reservation or issuing a refund. Compensation is a new business operation, not a magical rollback; it can fail too and therefore needs retries, tracking, and reconciliation.
+A saga breaks a long workflow into local transactions. If a later step fails, the workflow runs a compensating business action—for example, releasing reserved inventory after a confirmed payment failure. Compensation is not a database rollback: the original action already happened, and compensation can fail or require human review. Record each step and its outcome so retries can resume safely.
 
 ## Outbox, Idempotency, and Reconciliation
+- **Transactional outbox:** write the business change and an event record in the same local database transaction; a separate publisher sends the event.
+- **Idempotent consumer:** make repeated delivery of the same event safe, commonly by recording a stable event or operation identifier.
+- **Reconciliation:** periodically compare related records across systems and repair or escalate incomplete workflows.
 
-The transactional outbox pattern records a business change and an event in the same local database transaction; a separate publisher sends the event reliably. Consumers should be idempotent so duplicate delivery does not duplicate effects. Reconciliation jobs compare records across systems and resolve incomplete or contradictory workflows.
+Queues often provide at-least-once delivery, so duplicate messages must be expected. An outbox reduces the risk that a database update succeeds while its event is lost, but it does not by itself make every downstream side effect exactly once.
 
-## Key Takeaways
+## Common Pitfall
+Do not treat a timeout as proof of failure, and do not treat compensation as a magical rollback. The remote service may have completed an operation even when the caller never received the response. Use idempotency keys, explicit states, bounded retries, and reconciliation.
 
-Eventual consistency permits temporary divergence. For multi-service workflows, use explicit states, idempotency, outbox or saga patterns, retries, and reconciliation rather than assuming a global transaction exists.
+## Knowledge Check
+1. Inventory is reserved, then the payment request times out. What should the order service do before charging again?
+   - **Answer:** Reuse the same idempotency key and query or reconcile the payment provider's result; keep the order in a pending state until the outcome is known.
+2. Why use a transactional outbox?
+   - **Answer:** It atomically records the local business change and the event to publish, reducing the chance that one commits without the other. Delivery and consumers still need retries and idempotency.
 
-## Practice Exercise
+## Practice Hint
+Draw the order workflow as states: created, inventory-reserved, payment-pending, paid, cancelled, and compensation-pending. Add the timeout path and decide which steps are safe to retry.
 
-An order is created and inventory is reserved, but the payment provider times out. Design the order states and recovery steps so the customer is not charged twice and reserved stock is not held forever.
+## Self-Check
+Can you distinguish eventual consistency from incorrect data, explain why a saga is not a global rollback, and describe how duplicate events are handled?
 
 ## Next Lesson
-
 Batch 4 — Microservices (Lessons 37–41)
