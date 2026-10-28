@@ -186,3 +186,7 @@ What ordering or hierarchy must it preserve?
 What operations must be efficient?
 
 What keeps the shape healthy?
+
+## Interactive companion exercise
+
+Switch the [tree/graph traversal explorer](../prototypes/interactive-system-design.html#graph-title) to Tree and step through breadth-first or depth-first traversal from the root.

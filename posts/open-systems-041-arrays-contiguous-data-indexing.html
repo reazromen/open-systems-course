@@ -24,7 +24,7 @@
 <p>Imagine fixed-size elements stored consecutively.</p>
 <p>If each element occupies four bytes and the array begins at address B, then element i can be located conceptually as:</p>
 <pre><code>address = B + i × 4
-</code></pre>pre
+</code></pre>
 <p>That arithmetic gives direct indexed access.</p>
 <p>No need to scan earlier elements to find item 900,000.</p>
 <p>This is why arrays support constant-time positional access in the standard model.</p>
@@ -34,7 +34,7 @@
 array[1]
 array[2]
 array[3]
-</code></pre>pre
+</code></pre>
 <p>Nearby elements often occupy nearby memory.</p>
 <p>Cache lines fetch blocks of neighbouring bytes.</p>
 <p>Sequential traversal can therefore reuse data already brought into cache.</p>
@@ -47,29 +47,29 @@ array[3]
 <p>Languages expose names such as vector, list, ArrayList, or slice-backed structures depending on their model.</p>
 <p>Appending can be efficient on average when capacity grows geometrically, even though occasional resizing is expensive.</p>
 <p>This introduces amortized analysis: rare expensive operations can be spread across many cheap ones.</p>
-<p>We will not treat "append is O(1)" as magic. It is a statement about a particular implementation and analysis model.</p>
+<p>We will not treat &quot;append is O(1)&quot; as magic. It is a statement about a particular implementation and analysis model.</p>
 <h2>Inserting near the front moves data</h2>
 <p>Suppose an array contains:</p>
 <pre><code>A B C D E
-</code></pre>pre
+</code></pre>
 <p>Insert X at index 1:</p>
 <pre><code>A X B C D E
-</code></pre>pre
+</code></pre>
 <p>If the representation is contiguous, B through E may need to move.</p>
 <p>The operation is structurally different from reading item 1.</p>
 <p>This is the central data-structure lesson:</p>
 <p>Different operations have different costs.</p>
-<p>Do not ask "is array fast?"</p>
+<p>Do not ask &quot;is array fast?&quot;</p>
 <p>Ask:</p>
 <p>Fast for what operation under what workload?</p>
 <h2>Capacity and length are different</h2>
 <p>A dynamic array might reserve space for 16 elements while currently holding 10.</p>
 <p>Length:</p>
 <pre><code>10
-</code></pre>pre
+</code></pre>
 <p>Capacity:</p>
 <pre><code>16
-</code></pre>pre
+</code></pre>
 <p>That extra space allows several appends without reallocating.</p>
 <p>Memory use therefore exceeds the exact payload.</p>
 <p>Data structures trade capacity, speed, and implementation complexity.</p>
@@ -77,8 +77,8 @@ array[3]
 <p>A C array of fixed-width integers is very different from a Python list.</p>
 <p>CPython lists are dynamic arrays of references to Python objects, not a flat packed sequence of arbitrary Python object contents.</p>
 <p>The source syntax:</p>
-<pre><code>items[3]
-</code></pre>pre
+<pre><code>items
+</code></pre>
 <p>does not tell you the physical representation.</p>
 <p>Know the language/runtime implementation before making memory-performance claims.</p>
 <h2>Multidimensional arrays expose layout</h2>
@@ -121,6 +121,8 @@ array[3]
 <li>memory behaviour;</li>
 <li>workload fit.</li>
 </ul>
+<h2>Interactive companion exercise</h2>
+<p>Compare indexed reads, dynamic-array resizing, and front insertion in the <a href="../prototypes/interactive-system-design.html#data-structure-title">data-structure operation explorer</a>. The reported steps are simplified complexity examples, not timing benchmarks.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

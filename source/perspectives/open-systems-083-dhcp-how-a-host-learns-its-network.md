@@ -267,3 +267,7 @@ DHCP turns network configuration into leased distributed state.
 A server can offer parameters. A client can accept them. The operating system can install them. Routers and DNS services can then succeed or fail independently.
 
 The next lesson follows another stateful boundary commonly encountered after a host is configured: address and port translation at a NAT.
+
+## Interactive companion exercise
+
+Use the [DHCP timeline](../prototypes/interactive-system-design.html#protocol-title) to follow the DORA exchange: Discover, Offer, Request, and Acknowledge.

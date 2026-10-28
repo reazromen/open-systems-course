@@ -24,7 +24,7 @@
 <p>A certificate can have a valid cryptographic chain and still be the wrong certificate for the requested service name.</p>
 <h2>A certificate binds a key to assertions</h2>
 <p>An X.509 certificate contains structured information including a public key, identity-related fields, validity information, extensions, issuer information, and a digital signature from its issuer.</p>
-<p>The signature does not mean "this website is good."</p>
+<p>The signature does not mean &quot;this website is good.&quot;</p>
 <p>It means, roughly, that an issuer has signed a particular certificate structure under the rules of the public-key infrastructure being used.</p>
 <p>RFC 5280 defines the Internet X.509 PKI certificate profile and certification-path validation model.</p>
 <p>The client needs policy and trust configuration around that data.</p>
@@ -38,12 +38,12 @@ intermediate CA certificate
 higher CA / trust anchor relationship
       ↓
 locally trusted anchor
-</code></pre>pre
+</code></pre>
 <p>The service certificate is often called the <strong>leaf</strong> or end-entity certificate.</p>
 <p>Intermediate certificate authorities can issue other certificates subject to constraints.</p>
 <p>A trust anchor is configured as trusted by the relying system. It is not trusted merely because a server sent it across the network.</p>
 <p>This distinction is critical.</p>
-<p>If an untrusted server could make itself trusted by sending a self-signed "root" certificate, certificate authentication would collapse.</p>
+<p>If an untrusted server could make itself trusted by sending a self-signed &quot;root&quot; certificate, certificate authentication would collapse.</p>
 <p>Trust anchors arrive through a different administrative path: operating-system trust stores, browser trust programs, enterprise policy, device provisioning, or another controlled mechanism.</p>
 <h2>The server often sends a chain, not the trust decision</h2>
 <p>During a certificate-based TLS handshake, the server can provide its certificate and supporting certificates.</p>
@@ -57,7 +57,7 @@ client has local trust policy
 path construction and validation
         ↓
 acceptable or rejected
-</code></pre>pre
+</code></pre>
 <p>If an intermediate certificate is missing, the client may fail to build a usable path even though the leaf certificate itself has not expired.</p>
 <p>If the client lacks the relevant trust anchor, the same server chain may be accepted on one machine and rejected on another.</p>
 <p>Client state is part of the system.</p>
@@ -68,19 +68,19 @@ acceptable or rejected
 <pre><code class="language-text">signature verifies
 ≠
 certificate path is acceptable
-</code></pre>pre
+</code></pre>
 <p>A certificate can be expired.</p>
 <p>An intermediate may not be authorized to act as a CA.</p>
 <p>A path can violate constraints.</p>
 <p>The selected trust anchor can differ by client policy.</p>
-<p>Do not reduce PKI to "verify one signature."</p>
+<p>Do not reduce PKI to &quot;verify one signature.&quot;</p>
 <h2>Service identity is another check</h2>
 <p>Suppose a client intends to reach:</p>
 <pre><code class="language-text">api.example.com
-</code></pre>pre
+</code></pre>
 <p>The certificate can chain correctly to a trusted root and still identify:</p>
 <pre><code class="language-text">www.example.net
-</code></pre>pre
+</code></pre>
 <p>That is the wrong service identity.</p>
 <p>RFC 9525 defines current procedures for representing and verifying service identity in TLS applications that use PKIX. It obsoletes RFC 6125.</p>
 <p>Modern DNS-name identity matching is based on the identifiers carried in the certificate's Subject Alternative Name extension under the applicable application rules. Treat legacy Common Name matching as historical compatibility behavior, not the current model.</p>
@@ -88,7 +88,7 @@ certificate path is acceptable
 <pre><code class="language-text">trusted path
       +
 matching service identity
-</code></pre>pre
+</code></pre>
 <p>One cannot replace the other.</p>
 <h2>SNI and certificate matching solve different problems</h2>
 <p>The previous lesson introduced Server Name Indication, or SNI.</p>
@@ -96,11 +96,11 @@ matching service identity
 <p>That does not mean SNI itself authenticates the server.</p>
 <p>Conceptually:</p>
 <pre><code class="language-text">SNI:
-"this is the name I am asking the server to serve"
+&quot;this is the name I am asking the server to serve&quot;
 
 certificate verification:
-"does the authenticated certificate represent the service identity I intended?"
-</code></pre>pre
+&quot;does the authenticated certificate represent the service identity I intended?&quot;
+</code></pre>
 <p>A server can select the wrong certificate.</p>
 <p>A client can omit the expected SNI value.</p>
 <p>The selected certificate can still fail identity verification.</p>
@@ -109,7 +109,7 @@ certificate verification:
 <p>Certificates have validity periods.</p>
 <p>A client with a seriously incorrect clock can therefore reject an otherwise appropriate certificate or accept time-related state incorrectly depending on the failure.</p>
 <p>This gives system time a security role.</p>
-<p>When a certificate appears "not yet valid" or "expired," inspect:</p>
+<p>When a certificate appears &quot;not yet valid&quot; or &quot;expired,&quot; inspect:</p>
 <ul>
 <li>the certificate's validity period;</li>
 <li>the client's current time;</li>
@@ -130,10 +130,10 @@ certificate verification:
 <p>An origin server behind that edge can use another TLS connection with another certificate and trust policy.</p>
 <p>Therefore:</p>
 <pre><code class="language-text">client → edge TLS
-</code></pre>pre
+</code></pre>
 <p>and:</p>
 <pre><code class="language-text">edge → origin TLS
-</code></pre>pre
+</code></pre>
 <p>are separate security channels.</p>
 <p>Success on one does not automatically prove the other.</p>
 <h2>Inspect a certificate without guessing</h2>
@@ -142,11 +142,11 @@ certificate verification:
   -connect example.com:443 \
   -servername example.com \
   -showcerts
-</code></pre>pre
+</code></pre>
 <p>Save a certificate to a file only if you know which block you are extracting, then inspect it:</p>
 <pre><code class="language-bash">openssl x509 -in cert.pem -noout \
   -subject -issuer -dates -ext subjectAltName
-</code></pre>pre
+</code></pre>
 <p>Ask:</p>
 <ul>
 <li>Which certificate is the leaf?</li>
@@ -166,7 +166,7 @@ certificate verification:
 <li>name matches but the issuing CA is not in the test client's trust store.</li>
 </ol>
 <p>The failures should be different.</p>
-<p>Do not "fix" them by globally disabling certificate verification.</p>
+<p>Do not &quot;fix&quot; them by globally disabling certificate verification.</p>
 <p>The error is the lesson.</p>
 <h2>Build a verification ladder</h2>
 <p>When TLS identity fails:</p>
@@ -183,7 +183,7 @@ Does it end at a locally trusted anchor?
 Does the service identifier match the intended name?
         ↓
 Are application-specific certificate requirements satisfied?
-</code></pre>pre
+</code></pre>
 <p>That sequence separates endpoint selection, PKI, identity, and application policy.</p>
 <h2>The lesson to carry forward</h2>
 <p>A certificate is structured, signed evidence.</p>
@@ -192,6 +192,8 @@ Are application-specific certificate requirements satisfied?
 <p>Service-name verification checks whether the authenticated identity is the identity the client intended.</p>
 <p>Those pieces work together, but none should be treated as the whole story.</p>
 <p>Next we move below the service again and look at Internet routing between networks: how reachability information crosses autonomous systems and why the Internet does not simply choose the geographically shortest path.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#protocol-title">TLS trust-validation timeline</a> to inspect hostname, chain, and validity checks before encrypted application data is trusted.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

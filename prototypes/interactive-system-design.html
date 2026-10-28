@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Experimental, deterministic system design simulations for load balancing, caching, and CAP trade-offs.">
+<title>Interactive System Design Prototypes | Open Systems Course</title>
+<link rel="stylesheet" href="../assets/interactive-course.css">
+<link rel="stylesheet" href="../assets/interactive-prototypes.css">
+<script defer src="../assets/interactive-course.js"></script>
+<script defer src="../assets/interactive-simulations.js"></script>
+<script defer src="../assets/interactive-prototypes.js"></script>
+</head>
+<body>
+<main class="prototype-page">
+<p><a href="../course.html">← Open Systems Course</a></p>
+<header class="prototype-intro">
+<p class="eyebrow">EXPERIMENTAL LEARNING LAB · PHASE 2</p>
+<h1>Explore system behavior</h1>
+<p>These deterministic models make their assumptions visible. Step through an operation, change a failure condition, and read the event log. They are learning models—not benchmarks or production implementations.</p>
+</header>
+<section class="interactive-region prototype-card" data-interaction="load-balancer" aria-labelledby="lb-title">
+<h2 id="lb-title">1. Load balancing</h2>
+<p>A load balancer routes each new request to a healthy server. Round Robin rotates through healthy servers. Least Connections chooses the server with the fewest active requests, breaking ties in stable A → B → C order. Requests remain active until you complete them.</p>
+<div class="interaction-controls">
+<label>Routing strategy<select data-strategy><option value="round-robin">Round Robin</option><option value="least-connections">Least Connections</option></select></label>
+<button type="button" data-action="step">Send next request</button><button type="button" data-action="complete">Complete oldest request</button><button type="button" data-action="replay">Replay full sequence</button><button type="button" data-action="reset">Reset</button>
+</div>
+<p>Next request: <strong data-next>1</strong> · Active connections: <strong data-pending>0</strong> · Sequence limit: 12</p>
+<div class="server-grid">
+<article class="server-card" data-server="A"><h3>Server A</h3><p>Status: <strong data-health>Healthy</strong></p><label><input type="checkbox" data-health-toggle checked> Healthy</label><p>Requests received: <strong data-requests>0</strong></p><p>Active: <strong data-active>0</strong></p></article>
+<article class="server-card" data-server="B"><h3>Server B</h3><p>Status: <strong data-health>Healthy</strong></p><label><input type="checkbox" data-health-toggle checked> Healthy</label><p>Requests received: <strong data-requests>0</strong></p><p>Active: <strong data-active>0</strong></p></article>
+<article class="server-card" data-server="C"><h3>Server C</h3><p>Status: <strong data-health>Healthy</strong></p><label><input type="checkbox" data-health-toggle checked> Healthy</label><p>Requests received: <strong data-requests>0</strong></p><p>Active: <strong data-active>0</strong></p></article>
+</div>
+<h3>Event log</h3><ol class="interaction-log" data-event-log><li>Ready. Send a request to begin.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="cache-simulator" aria-labelledby="cache-title">
+<h2 id="cache-title">2. Caching, TTL, and stale data</h2>
+<p>The cache stores the value it last read from the database. A hit occurs only while the cached entry is younger than its TTL. Updating the database does not automatically invalidate the cached value.</p>
+<div class="interaction-controls">
+<button type="button" data-action="read">Read key <code>course:example</code></button><button type="button" data-action="advance">Advance clock 1 second</button><button type="button" data-action="update-db">Update database value</button><button type="button" data-action="invalidate">Invalidate cache</button><button type="button" data-action="reset">Reset</button>
+<label>TTL for future cache fills<select data-ttl-input><option value="2">2 seconds</option><option value="5" selected>5 seconds</option><option value="10">10 seconds</option></select></label>
+</div>
+<div class="metric-grid">
+<div><span>Virtual time</span><strong>t=<span data-clock>0</span>s</strong></div><div><span>Database</span><strong data-db-value>v1</strong></div><div><span>Cached value</span><strong data-cache-value>Empty / expired</strong></div><div><span>Cache expires</span><strong data-expiry>—</strong></div><div><span>Hits</span><strong data-hits>0</strong></div><div><span>Misses</span><strong data-misses>0</strong></div><div><span>Database calls</span><strong data-db-calls>0</strong></div>
+</div>
+<p class="stale-indicator" data-stale>No stale cached value currently detected.</p><h3>Event log</h3><ol class="interaction-log" data-event-log><li>Cache empty; database holds value v1.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="queue-simulator" aria-labelledby="queue-title">
+<h2 id="queue-title">3. Queues, workers, and backpressure</h2>
+<p>A queue absorbs bursts by holding work until workers can process it. This deterministic model has two workers, a waiting-queue capacity of six jobs, and a two-tick service time. The queue capacity applies to waiting jobs, not jobs already assigned to workers; rejected jobs illustrate backpressure.</p>
+<div class="interaction-controls"><button type="button" data-action="enqueue">Add one job</button><button type="button" data-action="burst">Add burst of three</button><button type="button" data-action="tick">Advance one tick</button><button type="button" data-action="reset">Reset</button></div>
+<div class="metric-grid"><div><span>Virtual tick</span><strong data-queue-clock>0</strong></div><div><span>Waiting jobs</span><strong><span data-queue-depth>0</span> / <span data-queue-capacity>6</span></strong></div><div><span>Completed</span><strong data-queue-completed>0</strong></div><div><span>Rejected</span><strong data-queue-rejected>0</strong></div></div>
+<div class="server-grid"><article class="server-card" data-worker="W1"><h3>Worker 1</h3><p data-worker-status>Idle</p></article><article class="server-card" data-worker="W2"><h3>Worker 2</h3><p data-worker-status>Idle</p></article></div>
+<h3>Waiting queue</h3><ol class="interaction-log" data-queue-items><li>No waiting jobs.</li></ol><h3>Event log</h3><ol class="interaction-log" data-queue-log><li>Queue empty; workers idle.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="retry-simulator" aria-labelledby="retry-title">
+<h2 id="retry-title">4. Exponential backoff and idempotency</h2>
+<p>The fixed scenario represents a request whose server-side effect commits but whose response times out twice; the third attempt receives success. Backoff grows from one to two seconds. Reusing the same idempotency key lets the server deduplicate the repeated effect. Disabling key reuse demonstrates the duplicate-effect risk. This is a scripted scenario, not a random network simulation.</p>
+<div class="interaction-controls"><label><input type="checkbox" data-idempotency checked> Reuse the same idempotency key</label><button type="button" data-action="send-retry">Send / retry request</button><button type="button" data-action="advance-retry" disabled>Advance to next retry</button><button type="button" data-action="reset">Reset</button></div>
+<div class="metric-grid"><div><span>Virtual time</span><strong>t=<span data-retry-clock>0</span>s</strong></div><div><span>Attempts</span><strong><span data-attempt>0</span> / <span data-max-attempts>3</span></strong></div><div><span>Next retry</span><strong data-next-retry>—</strong></div><div><span>Status</span><strong data-retry-status>ready</strong></div><div><span>Committed effects</span><strong data-side-effects>0</strong></div></div>
+<p data-idempotency-state>Reuses order-42 across attempts</p><h3>Event log</h3><ol class="interaction-log" data-retry-log><li>Ready.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="sip-flow-explorer" aria-labelledby="sip-title">
+<h2 id="sip-title">5. SIP call setup and media flow</h2>
+<p>This simplified call assumes registration has completed and the proxy Record-Routes the dialog. Step through INVITE/SDP offer, provisional ringing, 200 OK/SDP answer, ACK, RTP media, and BYE. Real deployments may add authentication, forking, reliable provisional responses, NAT traversal, SBC behavior, and other protocol details not represented here.</p>
+<div class="interaction-controls"><label><input type="checkbox" data-sip-relay> Relay RTP through an SBC/media relay</label><button type="button" data-action="sip-previous" disabled>Previous step</button><button type="button" data-action="sip-next">Next step</button><button type="button" data-action="reset">Reset</button></div>
+<div class="metric-grid"><div><span>Step</span><strong><span data-sip-step>1</span> / <span data-sip-total>13</span></strong></div><div><span>Plane</span><strong data-sip-plane>Signaling</strong></div></div>
+<div class="sip-message" aria-labelledby="sip-message-heading"><p class="eyebrow" id="sip-message-heading">Current message</p><p><strong data-sip-from>UA-A</strong> <span aria-hidden="true">→</span> <strong data-sip-to>Proxy</strong></p><h3 data-sip-message>INVITE + SDP offer</h3><p data-sip-detail>Caller proposes media addresses, codecs, and session parameters.</p></div>
+<h3>Sequence</h3><ol class="interaction-log" data-sip-sequence><li>Step 1: INVITE + SDP offer — UA-A → Proxy</li></ol><h3>Event log</h3><ol class="interaction-log" data-sip-log><li>Registration is assumed complete.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="cap-explorer" aria-labelledby="cap-title">
+<h2 id="cap-title">6. CAP trade-offs during a network partition</h2>
+<p>CAP concerns the trade-off between linearizable consistency and availability while a network partition prevents replicas from coordinating. It is not a universal instruction to permanently pick any two properties. This model assumes three replicas and a majority quorum of two.</p>
+<div class="interaction-controls">
+<label>Policy<select data-policy><option value="consistency">Consistency-first (quorum)</option><option value="availability">Availability-first (local operations)</option></select></label>
+<label>Client side during partition<select data-side><option value="BC">B/C side</option><option value="A">A side</option></select></label>
+<button type="button" data-action="partition">Toggle network partition</button><button type="button" data-action="write">Write next value</button><button type="button" data-action="read">Read value</button><button type="button" data-action="reset">Reset</button>
+</div>
+<p><strong data-partition-state>Network healed</strong> · <span data-side-state>Client can reach all replicas</span></p><p data-quorum-state>Consistency-first: majority quorum required</p>
+<div class="replica-grid"><article data-replica="A"><h3>Replica A</h3><strong data-value>v1</strong><p data-version>Version 1</p></article><article data-replica="B"><h3>Replica B</h3><strong data-value>v1</strong><p data-version>Version 1</p></article><article data-replica="C"><h3>Replica C</h3><strong data-value>v1</strong><p data-version>Version 1</p></article></div>
+<h3>Event log</h3><ol class="interaction-log" data-event-log><li>All replicas start with value v1.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="data-structure-explorer" aria-labelledby="data-structure-title">
+<h2 id="data-structure-title">7. Data structures and operation costs</h2>
+<p>Choose a structure and operation. The simulator tracks logical contents and reports a simplified cost model. These are complexity illustrations, not timing measurements. The array uses a dynamic-array capacity model; the linked list assumes a tail pointer; the hash table assumes good hashing and does not simulate collisions; the queue assumes a head/tail or circular-buffer implementation.</p>
+<div class="interaction-controls"><label>Data structure<select data-ds-structure><option value="array">Dynamic array</option><option value="linked-list">Linked list</option><option value="hash-table">Hash table</option><option value="stack">Stack</option><option value="queue">Queue</option></select></label><label>Operation<select data-ds-operation><option value="read-index">Read index 2</option></select></label><button type="button" data-action="ds-apply">Apply operation</button><button type="button" data-action="reset">Reset all structures</button></div>
+<div class="metric-grid"><div><span>Selected structure</span><strong data-ds-structure-label>array</strong></div><div><span>Size</span><strong data-ds-size>4</strong></div><div><span>Capacity</span><strong data-ds-capacity>4</strong></div><div><span>Complexity</span><strong data-ds-complexity>—</strong></div><div><span>Estimated primitive steps</span><strong data-ds-steps>—</strong></div></div>
+<h3>Logical contents</h3><ol class="interaction-log" data-ds-items><li>0: A</li><li>1: B</li><li>2: C</li><li>3: D</li></ol>
+<h3>Outcome</h3><p data-ds-outcome>Choose an operation and apply it.</p><p data-ds-note></p><h3>Event log</h3><ol class="interaction-log" data-ds-log><li>Initial contents: A, B, C, D.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="graph-traversal-explorer" aria-labelledby="graph-title">
+<h2 id="graph-title">8. Graph traversal: breadth-first vs depth-first</h2>
+<p>Traverse this fixed undirected graph one node at a time. Breadth-first search (BFS) uses a queue; depth-first search (DFS) uses a stack. Neighbors are considered in a stable order so the example is repeatable. The displayed graph is a simplified learning fixture, not a graph-layout algorithm.</p>
+<div class="interaction-controls"><label>Topology<select data-graph-topology><option value="graph">Graph (includes a cycle)</option><option value="tree">Tree (acyclic)</option></select></label><label>Traversal algorithm<select data-graph-algorithm><option value="bfs">Breadth-first search (BFS)</option><option value="dfs">Depth-first search (DFS)</option></select></label><button type="button" data-action="graph-step">Visit next node</button><button type="button" data-action="reset">Reset traversal</button></div>
+<div class="graph-visual">
+<svg viewBox="0 0 420 250" role="img" aria-labelledby="graph-svg-title graph-svg-desc">
+<title id="graph-svg-title">Five-node undirected graph</title><desc id="graph-svg-desc">Edges connect A to B and C, B to D, C to D and E. Traversal state is also presented in text below.</desc>
+<g class="graph-edges"><line class="graph-edge" x1="70" y1="125" x2="170" y2="65"/><line class="graph-edge" x1="70" y1="125" x2="170" y2="185"/><line class="graph-edge" x1="170" y1="65" x2="300" y2="65"/><line class="graph-edge" data-edge="CD" x1="170" y1="185" x2="300" y2="65"/><line class="graph-edge" x1="170" y1="185" x2="300" y2="185"/></g>
+<g class="graph-node" data-node="A"><circle cx="70" cy="125" r="24"/><text x="70" y="130" text-anchor="middle">A</text></g>
+<g class="graph-node" data-node="B"><circle cx="170" cy="65" r="24"/><text x="170" y="70" text-anchor="middle">B</text></g>
+<g class="graph-node" data-node="C"><circle cx="170" cy="185" r="24"/><text x="170" y="190" text-anchor="middle">C</text></g>
+<g class="graph-node" data-node="D"><circle cx="300" cy="65" r="24"/><text x="300" y="70" text-anchor="middle">D</text></g>
+<g class="graph-node" data-node="E"><circle cx="300" cy="185" r="24"/><text x="300" y="190" text-anchor="middle">E</text></g>
+</svg>
+</div>
+<div class="metric-grid"><div><span>Topology</span><strong data-graph-topology-label>Graph</strong></div><div><span>Algorithm</span><strong data-graph-algorithm-label>BFS</strong></div><div><span>Current node</span><strong data-graph-current>—</strong></div><div><span>Status</span><strong data-graph-complete>In progress</strong></div></div>
+<h3>Visited order</h3><ol class="interaction-log" data-graph-order><li>No nodes visited yet</li></ol><h3>Frontier</h3><ol class="interaction-log" data-graph-frontier><li>A</li></ol><h3>Event log</h3><ol class="interaction-log" data-graph-log><li>Start at node A.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="os-timeline-explorer" aria-labelledby="os-timeline-title">
+<h2 id="os-timeline-title">9. Operating-system boundaries, file I/O, and boot</h2>
+<p>Select a scenario to trace a conceptual sequence. These are simplified teaching timelines; real kernels, boot firmware, filesystems, and service managers have additional branches and platform-specific behavior.</p>
+<div class="interaction-controls"><label>Scenario<select data-timeline-scenario><option value="syscall">User mode → system call → kernel</option><option value="fileio">Open, read, and close a file</option><option value="boot">Linux boot sequence</option></select></label><button type="button" data-action="timeline-previous" disabled>Previous step</button><button type="button" data-action="timeline-next">Next step</button><button type="button" data-action="reset">Reset</button></div>
+<div class="metric-grid"><div><span>Step</span><strong><span data-timeline-step>1</span> / <span data-timeline-total>5</span></strong></div></div>
+<div class="sip-message"><p class="eyebrow">Current boundary</p><p><strong data-timeline-from>User mode</strong> → <strong data-timeline-to>CPU / architecture</strong></p><h3 data-timeline-message>Program requests a privileged operation</h3><p data-timeline-detail>The application calls a system-call wrapper with arguments.</p></div>
+<h3>Sequence</h3><ol class="interaction-log" data-timeline-sequence><li>Step 1</li></ol><h3>Event log</h3><ol class="interaction-log" data-timeline-log><li>Choose a scenario.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="scheduler-explorer" aria-labelledby="scheduler-title">
+<h2 id="scheduler-title">10. CPU scheduling: FCFS vs Round Robin</h2>
+<p>Step through a fixed workload. P1 and P2 arrive at t=0; P3 arrives at t=1. Their CPU bursts are 4, 3, and 2 ticks. Round Robin uses a two-tick quantum. These are discrete teaching ticks, not measured processor time or a model of Linux CFS.</p>
+<div class="interaction-controls"><label>Scheduling policy<select data-scheduler-policy><option value="fcfs">First Come, First Served (FCFS)</option><option value="rr" selected>Round Robin (quantum 2)</option></select></label><button type="button" data-action="scheduler-step">Advance one CPU tick</button><button type="button" data-action="scheduler-reset">Reset schedule</button></div>
+<div class="metric-grid"><div><span>Virtual time</span><strong>t=<span data-scheduler-time>0</span></strong></div><div><span>Running</span><strong data-scheduler-running>CPU idle</strong></div><div><span>Ready queue</span><strong data-scheduler-ready>Empty</strong></div><div><span>Context switches</span><strong data-context-switches>0</strong></div><div><span>Completion</span><strong data-scheduler-complete>In progress</strong></div></div>
+<h3>Processes</h3><table class="scheduler-table"><thead><tr><th>Process</th><th>Arrival</th><th>Burst</th><th>Remaining</th><th>State</th><th>Completed at</th></tr></thead><tbody>
+<tr data-process="P1"><th scope="row">P1</th><td data-process-arrival>0</td><td data-process-burst>4</td><td data-process-remaining>4</td><td data-process-state>new</td><td data-process-completion>—</td></tr>
+<tr data-process="P2"><th scope="row">P2</th><td data-process-arrival>0</td><td data-process-burst>3</td><td data-process-remaining>3</td><td data-process-state>new</td><td data-process-completion>—</td></tr>
+<tr data-process="P3"><th scope="row">P3</th><td data-process-arrival>1</td><td data-process-burst>2</td><td data-process-remaining>2</td><td data-process-state>new</td><td data-process-completion>—</td></tr>
+</tbody></table><h3>Event log</h3><ol class="interaction-log" data-scheduler-log><li>Ready.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="virtual-memory-explorer" aria-labelledby="vm-title">
+<h2 id="vm-title">11. Virtual-address translation</h2>
+<p>This four-byte-page teaching model maps virtual pages to physical frames. A virtual address splits into page number and offset; the page table supplies the frame. Page 2 is intentionally not present to demonstrate a page fault. This does not simulate TLBs, multi-level tables, or real hardware.</p>
+<div class="interaction-controls"><label>Virtual address (0–15)<input type="number" min="0" max="15" step="1" value="6" data-vm-address></label><button type="button" data-action="vm-translate">Translate address</button><button type="button" data-action="vm-reset">Reset result</button></div>
+<div class="metric-grid"><div><span>Virtual page</span><strong data-vm-page>—</strong></div><div><span>Offset</span><strong data-vm-offset>—</strong></div><div><span>Physical frame</span><strong data-vm-frame>—</strong></div><div><span>Physical address</span><strong data-vm-physical>—</strong></div><div><span>Status</span><strong data-vm-status>Ready</strong></div></div>
+<p data-vm-result>Enter an address and translate it.</p><h3>Page table (page size 4 bytes)</h3><ol class="interaction-log" data-page-table><li>Virtual page 0 → frame 2</li><li>Virtual page 1 → frame 0</li><li>Virtual page 2 → not present</li><li>Virtual page 3 → frame 5</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="race-condition-explorer" aria-labelledby="race-title">
+<h2 id="race-title">12. Race conditions and locks</h2>
+<p>Two processes each intend to increment a shared counter once. The unsynchronized schedule lets both read the same old value before either write, producing a lost update. The locked schedule serializes the increments. This is a deterministic interleaving example, not a complete memory-model or lock implementation.</p>
+<div class="interaction-controls"><label>Schedule<select data-race-mode><option value="race">Unsynchronized interleaving</option><option value="lock">Serialized with a lock</option></select></label><button type="button" data-action="race-step">Run next operation</button><button type="button" data-action="race-reset">Reset schedule</button></div>
+<div class="metric-grid"><div><span>Shared counter</span><strong data-race-counter>0</strong></div><div><span>Process A local copy</span><strong data-race-local-a>—</strong></div><div><span>Process B local copy</span><strong data-race-local-b>—</strong></div><div><span>Lock owner</span><strong data-race-lock>Unlocked</strong></div><div><span>Next operation</span><strong data-race-next>A read</strong></div></div>
+<h3>Event log</h3><ol class="interaction-log" data-race-log><li>Shared counter starts at 0.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="network-path-explorer" aria-labelledby="network-title">
+<h2 id="network-title">13. Follow a packet across a LAN or routed network</h2>
+<p>Step through a simplified IPv4/Ethernet path. Compare a same-subnet destination with a remote subnet reached through a router, and switch between TCP and UDP. Documentation-only IP addresses are used. This model explains encapsulation, ARP next-hop resolution, router TTL changes, and MTU constraints; it does not simulate actual packets, checksums, TCP timers, or fragmentation output.</p>
+<div class="interaction-controls"><label>Destination path<select data-network-scenario><option value="lan">Same subnet / local link</option><option value="routed">Remote subnet via router</option></select></label><label>Transport<select data-network-transport><option value="tcp">TCP</option><option value="udp">UDP</option></select></label><label>Payload bytes<select data-network-payload><option value="500">500</option><option value="1200" selected>1200</option><option value="2000">2000</option></select></label><label>Path MTU<select data-network-mtu><option value="900">900 bytes</option><option value="1500" selected>1500 bytes</option></select></label><button type="button" data-action="network-previous" disabled>Previous step</button><button type="button" data-action="network-next">Next step</button><button type="button" data-action="reset">Reset path</button></div>
+<div class="metric-grid"><div><span>Step</span><strong><span data-network-step>1</span> / <span data-network-total>9</span></strong></div><div><span>Path</span><strong data-network-scenario-label>Same subnet</strong></div><div><span>Transport</span><strong data-network-transport-label>TCP</strong></div><div><span>MTU</span><strong data-network-mtu-label>1500 bytes</strong></div></div>
+<div class="sip-message"><p class="eyebrow">Current network hop</p><p><strong data-network-from>Application</strong> → <strong data-network-to>Transport</strong></p><h3 data-network-message>Create application payload</h3><p data-network-detail>The application supplies 1200 bytes.</p></div>
+<h3>Path sequence</h3><ol class="interaction-log" data-network-sequence><li>Step 1: Create application payload</li></ol><h3>Event log</h3><ol class="interaction-log" data-network-log><li>Uses documentation-only addresses and a simplified IPv4/Ethernet path.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<section class="interactive-region prototype-card" data-interaction="protocol-timeline-explorer" aria-labelledby="protocol-title">
+<h2 id="protocol-title">14. Network and web protocol timelines</h2>
+<p>Choose a network or web scenario and step through its messages. These are deterministic teaching sequences, not packet captures or complete protocol state machines. Each scenario states its assumptions; real systems add caching, retries, policy, authentication, and platform-specific behavior.</p>
+<div class="interaction-controls"><label>Protocol scenario<select data-protocol-scenario><option value="dns">DNS recursive resolution</option><option value="dhcp">DHCP address assignment (DORA)</option><option value="nat">Stateful NAT flow mapping</option><option value="tls">TLS handshake and certificate validation</option><option value="routing">Internet routing and next hops</option><option value="proxy">Reverse proxy / CDN / cache</option><option value="http">HTTP request/response messages</option><option value="methods">HTTP method semantics</option><option value="browser">URL to rendered page</option><option value="sessions">Cookies and sessions</option><option value="cors">CORS / preflight</option><option value="headers">Headers and content negotiation</option><option value="api">API validation and contracts</option><option value="connection">Layered connection diagnosis</option></select></label><button type="button" data-action="protocol-previous" disabled>Previous step</button><button type="button" data-action="protocol-next">Next step</button><button type="button" data-action="reset">Reset scenario</button></div>
+<div class="metric-grid"><div><span>Scenario</span><strong data-protocol-scenario-label>DNS</strong></div><div><span>Step</span><strong><span data-protocol-step>1</span> / <span data-protocol-total>6</span></strong></div></div>
+<div class="sip-message"><p class="eyebrow">Current exchange</p><p><strong data-protocol-from>Application / stub</strong> → <strong data-protocol-to>Recursive resolver</strong></p><h3 data-protocol-message>Query name and record type</h3><p data-protocol-detail>The stub asks for an address record.</p></div>
+<h3>Sequence</h3><ol class="interaction-log" data-protocol-sequence><li>Step 1: Query name and record type</li></ol><h3>Event log</h3><ol class="interaction-log" data-protocol-log><li>Choose a protocol scenario.</li></ol><p data-interaction-status role="status" aria-live="polite">Ready.</p>
+</section>
+<footer><p>Prototype status: experimental. The models use deterministic transitions, not random workloads, latency estimates, or benchmark claims. Their assumptions are stated above.</p></footer>
+</main>
+</body></html>

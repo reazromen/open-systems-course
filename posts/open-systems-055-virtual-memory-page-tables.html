@@ -22,7 +22,7 @@
 <p>Suppose a simplified system uses 4 KiB pages.</p>
 <p>A virtual address can be thought of as:</p>
 <pre><code>virtual page number | page offset
-</code></pre>pre
+</code></pre>
 <p>The offset selects a byte within the page.</p>
 <p>The page number selects a mapping.</p>
 <p>Translation replaces the virtual page identity with a physical frame identity while preserving the offset.</p>
@@ -30,7 +30,7 @@
 <pre><code>VPN + offset
    ↓ page table
 PFN + offset
-</code></pre>pre
+</code></pre>
 <p>Real architectures use more detailed multi-level formats.</p>
 <h2>Why multi-level page tables exist</h2>
 <p>A 64-bit virtual address space is enormous.</p>
@@ -87,7 +87,7 @@ PFN + offset
 <p>After fork, parent and child can initially share physical pages marked read-only.</p>
 <p>When one writes:</p>
 <pre><code>page fault
-</code></pre>pre
+</code></pre>
 <p>The kernel allocates a private physical page, copies data, and updates that process's page-table entry.</p>
 <p>From each process's viewpoint:</p>
 <p>separate memory.</p>
@@ -108,7 +108,7 @@ PFN + offset
 <h2>Exercise: inspect mappings, then imagine translations</h2>
 <p>On Linux:</p>
 <pre><code>cat /proc/self/maps
-</code></pre>pre
+</code></pre>
 <p>Choose one mapped region.</p>
 <p>Ask:</p>
 <p>Virtual address range?</p>
@@ -122,8 +122,10 @@ PFN + offset
 <p>Page tables implement the virtual-memory contract.</p>
 <p>They map pages, enforce permissions, support sparse address spaces, and enable mechanisms such as copy-on-write and demand paging.</p>
 <p>The TLB makes repeated translations fast.</p>
-<p>When memory bugs or performance issues cross this boundary, "RAM" is too vague.</p>
+<p>When memory bugs or performance issues cross this boundary, &quot;RAM&quot; is too vague.</p>
 <p>You need to ask about mappings, faults, permissions, and translation behaviour.</p>
+<h2>Interactive companion exercise</h2>
+<p>Translate a virtual address into page number, offset, frame, and physical address in the <a href="../prototypes/interactive-system-design.html#vm-title">virtual-memory page-table explorer</a>. An absent mapping demonstrates a page fault.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

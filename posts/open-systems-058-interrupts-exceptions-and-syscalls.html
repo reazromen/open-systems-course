@@ -42,13 +42,13 @@
 <p>Some exceptions are normal mechanisms.</p>
 <p>A page fault can cause the kernel to map data and resume.</p>
 <p>Others terminate the process.</p>
-<p>"Exception" at CPU architecture level is not identical to a high-level language exception, although language runtimes may build on lower mechanisms.</p>
+<p>&quot;Exception&quot; at CPU architecture level is not identical to a high-level language exception, although language runtimes may build on lower mechanisms.</p>
 <h2>Syscall: software asks for privileged work</h2>
 <p>A user process wants:</p>
 <pre><code>open file
 create socket
 map memory
-</code></pre>pre
+</code></pre>
 <p>It intentionally invokes a system-call interface.</p>
 <p>The transition is synchronous with that instruction path.</p>
 <p>The kernel receives a syscall number and arguments under the platform's ABI.</p>
@@ -70,7 +70,7 @@ interrupt
 network stack
 wakeup
 return
-</code></pre>pre
+</code></pre>
 <p>That is why system performance cannot always be inferred from source code.</p>
 <h2>Interrupt handlers must be controlled</h2>
 <p>Hardware events can arrive rapidly.</p>
@@ -119,8 +119,10 @@ return
 <pre><code>interrupt -&gt; external event
 exception -&gt; current execution condition
 syscall   -&gt; explicit software request
-</code></pre>pre
+</code></pre>
 <p>That distinction helps explain I/O, scheduling, memory faults, devices, security, and process behaviour.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#os-timeline-title">system-call timeline</a> to see a user/kernel privilege transition. It does not model hardware interrupt latency or exception dispatch.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

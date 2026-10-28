@@ -128,3 +128,7 @@ Interrupts let hardware enter software asynchronously.
 They improve responsiveness but create concurrency, priority, and timing constraints.
 
 The next lesson introduces the hardware that often generates those interrupts: clocks, counters, timers, capture/compare, and PWM.
+
+## Interactive companion exercise
+
+For a simplified view of how event bursts wait for processing capacity, use the [queue-and-worker simulator](../prototypes/interactive-system-design.html#queue-title). It models queued work and backpressure, not hardware interrupt latency.

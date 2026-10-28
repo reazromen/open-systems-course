@@ -21,7 +21,7 @@
 <p>That does not mean the server must read a static file. The resource could be computed, database-backed, proxied, or generated.</p>
 <p>What matters is the semantic contract: GET is a retrieval method and is defined as safe.</p>
 <p>A safe method is one whose defined semantics are essentially read-only from the client's perspective. Servers may still perform logging, metrics, cache updates, or other incidental work.</p>
-<p>So "safe" does not mean "nothing anywhere changes."</p>
+<p>So &quot;safe&quot; does not mean &quot;nothing anywhere changes.&quot;</p>
 <p>It means the client is not requesting a state-changing operation as the purpose of the request.</p>
 <h2>POST is intentionally broad</h2>
 <p>POST asks the target resource to process the enclosed representation according to the resource's own semantics.</p>
@@ -47,13 +47,13 @@
 <p>A PATCH operation may or may not be idempotent depending on the patch document and application semantics.</p>
 <p>For example:</p>
 <pre><code class="language-text">set counter to 10
-</code></pre>pre
+</code></pre>
 <p>can be idempotent.</p>
 <p>But:</p>
 <pre><code class="language-text">increment counter by 1
-</code></pre>pre
+</code></pre>
 <p>is not.</p>
-<p>Do not infer idempotency from the word "update."</p>
+<p>Do not infer idempotency from the word &quot;update.&quot;</p>
 <h2>Status codes describe the HTTP result</h2>
 <p>HTTP status codes are grouped into classes:</p>
 <ul>
@@ -81,7 +81,7 @@
 <li>503 Service Unavailable — service temporarily unable to handle the request;</li>
 <li>504 Gateway Timeout — gateway/proxy timed out waiting for upstream.</li>
 </ul>
-<p>A 4xx code does not mean "the user's laptop is broken." It means the server is classifying the request as a client-side protocol/application problem at that boundary.</p>
+<p>A 4xx code does not mean &quot;the user's laptop is broken.&quot; It means the server is classifying the request as a client-side protocol/application problem at that boundary.</p>
 <p>A 5xx code does not necessarily mean the process that returned it is itself the failing component. A gateway can report an upstream failure.</p>
 <h2>Retries must respect semantics</h2>
 <p>Suppose a client times out after sending a request.</p>
@@ -102,10 +102,10 @@
 <p>Next, simulate a client timeout after the server has already processed the POST. Retry the request manually.</p>
 <p>The goal is to distinguish:</p>
 <pre><code class="language-text">message delivered twice
-</code></pre>pre
+</code></pre>
 <p>from:</p>
 <pre><code class="language-text">business effect applied twice
-</code></pre>pre
+</code></pre>
 <p>Those are not the same system property.</p>
 <h2>Status codes are evidence, not prose</h2>
 <p>When diagnosing a failed request, preserve:</p>
@@ -115,12 +115,14 @@ status
 response fields
 response content
 which component returned it
-</code></pre>pre
-<p>A <code>502</code>code from an edge proxy and a <code>500</code>code from the origin application are different failure boundaries.</p>
-<p>Do not rewrite every non-200 response into "API down."</p>
+</code></pre>
+<p>A <code>502</code> from an edge proxy and a <code>500</code> from the origin application are different failure boundaries.</p>
+<p>Do not rewrite every non-200 response into &quot;API down.&quot;</p>
 <h2>The lesson to carry forward</h2>
 <p>Methods tell the server what kind of operation the client is requesting. Safety and idempotency constrain what clients and intermediaries can assume. Status codes report the HTTP-level outcome.</p>
 <p>The next lesson adds representation metadata, headers, content negotiation, and caching-related fields.</p>
+<h2>Interactive companion exercise</h2>
+<p>Compare GET, PUT, POST, and DELETE semantics in the <a href="../prototypes/interactive-system-design.html#protocol-title">HTTP method explorer</a>. It distinguishes safe from idempotent behavior and explains why POST retries can duplicate work.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

@@ -219,3 +219,7 @@ HTTP fields are not decoration around a body. They carry protocol state about re
 Content negotiation separates the identity of a resource from the format chosen for a particular exchange.
 
 The next lesson moves into the browser itself: what happens after a user enters a URL, from navigation and fetching through parsing, subresource discovery, script execution, layout, and painting.
+
+## Interactive companion exercise
+
+Use the [HTTP header/content-negotiation timeline](../prototypes/interactive-system-design.html#protocol-title) to explore Accept, Content-Type, Vary, and Cache-Control roles.

@@ -215,3 +215,7 @@ It uses:
 That is a lot of machinery so applications can pretend they have one continuous stream.
 
 Respect the abstraction, but remember what it does not provide: message framing, application success, security, or user-level meaning.
+
+## Interactive companion exercise
+
+Switch the [network path explorer](../prototypes/interactive-system-design.html#network-title) to TCP to see the modeled reliable byte-stream path and the need to segment data to fit the path MTU.

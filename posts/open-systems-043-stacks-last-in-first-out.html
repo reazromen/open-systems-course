@@ -17,7 +17,7 @@
 <pre><code>A
 B on A
 C on B
-</code></pre>pre
+</code></pre>
 <p>Which plate is easiest to remove?</p>
 <p>C.</p>
 <p>Last in, first out.</p>
@@ -25,13 +25,13 @@ C on B
 <h2>Two essential operations</h2>
 <p>Push:</p>
 <pre><code>add item to top
-</code></pre>pre
+</code></pre>
 <p>Pop:</p>
 <pre><code>remove item from top
-</code></pre>pre
+</code></pre>
 <p>Peek:</p>
 <pre><code>inspect top without removing
-</code></pre>pre
+</code></pre>
 <p>A stack does not promise efficient arbitrary access to item 500.</p>
 <p>Its interface matches one ordering policy.</p>
 <p>That limited interface is its strength.</p>
@@ -48,7 +48,7 @@ C on B
 <h2>Parsing uses stacks for nesting</h2>
 <p>Expression:</p>
 <pre><code>(a + (b * c))
-</code></pre>pre
+</code></pre>
 <p>Nested parentheses create scopes that close in reverse order.</p>
 <p>Push opening structures.</p>
 <p>Pop when closing.</p>
@@ -60,7 +60,7 @@ C on B
 <pre><code>type A
 type B
 delete C
-</code></pre>pre
+</code></pre>
 <p>Undo should first reverse delete C.</p>
 <p>Then type B.</p>
 <p>Then type A.</p>
@@ -87,7 +87,7 @@ delete C
 <h2>Exercise: balanced parentheses</h2>
 <p>Input:</p>
 <pre><code>(()())
-</code></pre>pre
+</code></pre>
 <p>Scan left to right.</p>
 <p>Push on open parenthesis.</p>
 <p>Pop on close.</p>
@@ -98,6 +98,8 @@ delete C
 <p>A stack is not important because interview questions ask about it.</p>
 <p>It is important because last-in-first-out order appears naturally in nested execution and reversible context.</p>
 <p>Whenever the newest unfinished thing should be handled first, a stack deserves consideration.</p>
+<h2>Interactive companion exercise</h2>
+<p>Try the stack operations in the <a href="../prototypes/interactive-system-design.html#data-structure-title">data-structure explorer</a> and observe last-in, first-out behavior.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

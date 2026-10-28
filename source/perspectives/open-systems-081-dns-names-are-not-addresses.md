@@ -249,3 +249,7 @@ It is:
 **At which contract did the path stop being true?**
 
 The next lesson follows DNS resolution itself, including recursion, referrals, delegation, caching, and negative answers.
+
+## Interactive companion exercise
+
+Explore why a DNS name is resolved to an address in the [protocol timeline explorer](../prototypes/interactive-system-design.html#protocol-title). The DNS sequence separates the stub, recursive cache, root/TLD referrals, and authoritative answer.

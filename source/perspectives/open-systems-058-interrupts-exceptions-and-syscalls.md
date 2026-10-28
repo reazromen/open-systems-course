@@ -190,3 +190,7 @@ But their causes differ:
     syscall   -> explicit software request
 
 That distinction helps explain I/O, scheduling, memory faults, devices, security, and process behaviour.
+
+## Interactive companion exercise
+
+Use the [system-call timeline](../prototypes/interactive-system-design.html#os-timeline-title) to see a user/kernel privilege transition. It does not model hardware interrupt latency or exception dispatch.

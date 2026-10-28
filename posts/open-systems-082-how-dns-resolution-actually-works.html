@@ -26,7 +26,7 @@
 recursive resolver
       ↓
 final answer or error
-</code></pre>pre
+</code></pre>
 <p>RFC 9499 describes recursive mode as the mode in which a server answers from local cache or sends other queries to obtain the final answer rather than merely returning a referral.</p>
 <p>When a resolver follows referrals through DNS servers, the conceptual path can look like:</p>
 <pre><code class="language-text">recursive resolver
@@ -40,15 +40,15 @@ authoritative server for the child zone
 recursive resolver cache
       ↓
 stub resolver
-</code></pre>pre
+</code></pre>
 <p>That is a model of a cache miss, not a packet trace of every DNS lookup.</p>
 <h2>Start with the cache</h2>
 <p>Suppose the resolver is asked for:</p>
 <pre><code class="language-text">www.example.com. A
-</code></pre>pre
+</code></pre>
 <p>Before it performs external resolution, it can check whether it already has usable cached data.</p>
 <p>If a valid cached answer exists, it can reply immediately.</p>
-<p>It might also have cached pieces of the path: for example, which servers are authoritative for <code>.com</code>code or for <code>example.com</code>code. A partial cache can let it start closer to the destination instead of repeating the entire hierarchy.</p>
+<p>It might also have cached pieces of the path: for example, which servers are authoritative for <code>.com</code> or for <code>example.com</code>. A partial cache can let it start closer to the destination instead of repeating the entire hierarchy.</p>
 <p>This is why two queries for the same name can have very different latency without anything being wrong.</p>
 <h2>Delegation connects zones</h2>
 <p>DNS is hierarchical, but the hierarchy is divided into zones.</p>
@@ -60,7 +60,7 @@ stub resolver
   ↓ delegates example.com
 example.com
   ↓ contains authoritative data
-</code></pre>pre
+</code></pre>
 <p>A referral tells the resolver which name servers it should ask next.</p>
 <p>Sometimes the resolver also needs an address for one of those name servers. DNS can include address information called <strong>glue</strong> where it is needed to make a delegation usable without creating a circular dependency.</p>
 <p>The exact rules matter to DNS operators, but the systems lesson is simpler: resolution is a graph of dependencies. Even discovering the server that knows an answer can itself require DNS data.</p>
@@ -75,10 +75,10 @@ example.com
 <p>Constructed example:</p>
 <pre><code class="language-text">app.example.       CNAME  edge.example.net.
 edge.example.net.  A      192.0.2.80
-</code></pre>pre
+</code></pre>
 <p>The resolver has to obtain the address data associated with the canonical target.</p>
 <p>That target can live in another zone with another authority.</p>
-<p>So "one name lookup" at the application boundary can depend on several DNS names and several zones.</p>
+<p>So &quot;one name lookup&quot; at the application boundary can depend on several DNS names and several zones.</p>
 <p>RFC 1034 and RFC 1035 describe the core DNS resolution model and protocol data structures.</p>
 <h2>Negative answers are cached too</h2>
 <p>Caching is not only for successful answers.</p>
@@ -89,10 +89,10 @@ edge.example.net.  A      192.0.2.80
 <p>The authoritative server may now contain the record while the recursive resolver still has a valid negative cached result.</p>
 <p>From one viewpoint:</p>
 <pre><code class="language-text">authoritative zone: record exists
-</code></pre>pre
+</code></pre>
 <p>From another:</p>
 <pre><code class="language-text">recursive cache: earlier negative answer still valid
-</code></pre>pre
+</code></pre>
 <p>Those observations can coexist.</p>
 <h2>NXDOMAIN and no data are not identical</h2>
 <p>At a high level:</p>
@@ -101,11 +101,11 @@ edge.example.net.  A      192.0.2.80
 <li>a <strong>no-data</strong> response means the name exists but no record of the requested type is available in the answer.</li>
 </ul>
 <p>That distinction matters for caching and diagnosis.</p>
-<p>If an A query has no data but an AAAA record exists, saying "the domain does not exist" would be wrong.</p>
+<p>If an A query has no data but an AAAA record exists, saying &quot;the domain does not exist&quot; would be wrong.</p>
 <p>When debugging DNS, always preserve:</p>
 <pre><code class="language-text">query name + query type + response code + returned sections
-</code></pre>pre
-<p>Do not reduce all failures to "DNS error."</p>
+</code></pre>
+<p>Do not reduce all failures to &quot;DNS error.&quot;</p>
 <h2>TTL is remaining permission to reuse data</h2>
 <p>A TTL tells a cache how long a resource record may be retained.</p>
 <p>When you inspect a cached reply, the displayed TTL may be lower than the value configured at the authoritative source because time has already passed since the resolver cached it.</p>
@@ -116,10 +116,10 @@ edge.example.net.  A      192.0.2.80
 <p>Use a public test domain or a domain you control.</p>
 <p>A normal query through your configured resolver:</p>
 <pre><code class="language-bash">dig example.com A
-</code></pre>pre
+</code></pre>
 <p>Ask a specific resolver you are authorized to query:</p>
 <pre><code class="language-bash">dig @192.0.2.53 example.com A
-</code></pre>pre
+</code></pre>
 <p>The address above is documentation space; replace it only with a resolver you are allowed to use.</p>
 <p>Inspect:</p>
 <ul>
@@ -131,14 +131,14 @@ edge.example.net.  A      192.0.2.80
 <li>TTL;</li>
 <li>responding server.</li>
 </ul>
-<p>A tool such as <code>drill</code>code can provide similar evidence.</p>
+<p>A tool such as <code>drill</code> can provide similar evidence.</p>
 <h2>Understand what +trace actually proves</h2>
-<p><code>dig +trace</code>code is useful, but its name can cause a bad mental model.</p>
+<p><code>dig +trace</code> is useful, but its name can cause a bad mental model.</p>
 <p>It does not ask your normal recursive resolver to print the exact historical path it followed.</p>
-<p>Instead, it performs iterative-style queries from the machine running <code>dig</code>code, beginning from root information and following delegations.</p>
+<p>Instead, it performs iterative-style queries from the machine running <code>dig</code>, beginning from root information and following delegations.</p>
 <p>Use it to study the DNS hierarchy:</p>
 <pre><code class="language-bash">dig +trace example.com
-</code></pre>pre
+</code></pre>
 <p>Do not present its output as a packet-for-packet trace of some other resolver's internal work.</p>
 <h2>Build a DNS failure ladder</h2>
 <p>If an application fails to resolve a name, ask in this order:</p>
@@ -155,7 +155,7 @@ Is the delegation correct?
 Does the authoritative zone contain the requested data?
         ↓
 Is a cached positive or negative answer still valid?
-</code></pre>pre
+</code></pre>
 <p>That is more useful than repeatedly clearing caches.</p>
 <p>Cache flushing destroys evidence and can make a transient symptom disappear before you understand it.</p>
 <h2>Break it safely</h2>
@@ -169,12 +169,14 @@ Is a cached positive or negative answer still valid?
 <li>Wait for the relevant cache lifetime to expire and repeat.</li>
 </ol>
 <p>Then create a new test name only after first querying it while it does not exist. Observe how a cached negative answer changes the experiment.</p>
-<p>This turns "DNS propagation" from a vague phrase into observable distributed cache state.</p>
+<p>This turns &quot;DNS propagation&quot; from a vague phrase into observable distributed cache state.</p>
 <h2>The lesson to carry forward</h2>
 <p>DNS resolution is not one global database read.</p>
 <p>It is a distributed process involving caches, delegations, referrals, authoritative data, and time.</p>
 <p>A recursive resolver hides much of that work from the client, which is useful. Troubleshooting sometimes requires revealing the hidden boundaries again.</p>
 <p>The next lesson moves earlier in a host's network life: before DNS can be useful, the machine often needs local configuration such as an address, a route, and a resolver. DHCP is one way IPv4 hosts obtain that configuration.</p>
+<h2>Interactive companion exercise</h2>
+<p>Step through recursive DNS resolution in the <a href="../prototypes/interactive-system-design.html#protocol-title">protocol timeline explorer</a>, including cache lookup, referrals, authoritative response, and TTL-based caching.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

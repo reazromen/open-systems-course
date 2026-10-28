@@ -171,3 +171,7 @@ The best choice depends on:
 - update pattern.
 
 Complexity gives us language for predicting that growth.
+
+## Interactive companion exercise
+
+Use the [operation-cost explorer](../prototypes/interactive-system-design.html#data-structure-title) to compare linear search with indexed reads and structure-specific operations. Sorting algorithms are not simulated in this companion.

@@ -25,7 +25,7 @@
 <pre><code>running
 runnable
 waiting
-</code></pre>pre
+</code></pre>
 <p>Running means a CPU is currently executing it.</p>
 <p>Runnable means it could execute if given a CPU.</p>
 <p>Waiting means it is blocked on some event such as I/O, a lock, or timer.</p>
@@ -50,7 +50,7 @@ waiting
 <p>A UI thread delayed too long feels frozen.</p>
 <p>A real-time control loop may have explicit deadlines.</p>
 <p>Schedulers therefore support different policy classes and priorities.</p>
-<p>"Fair" background throughput and "respond within this deadline" are different goals.</p>
+<p>&quot;Fair&quot; background throughput and &quot;respond within this deadline&quot; are different goals.</p>
 <p>Operating systems expose mechanisms so applications with legitimate timing requirements can request different treatment.</p>
 <p>Those mechanisms must be used carefully because high-priority work can starve lower-priority work.</p>
 <h2>Context switches have cost</h2>
@@ -69,14 +69,14 @@ waiting
 <pre><code>compute
 compute
 compute
-</code></pre>pre
+</code></pre>
 <p>I/O-bound task:</p>
 <pre><code>compute briefly
 wait for network
 wake
 compute briefly
 wait again
-</code></pre>pre
+</code></pre>
 <p>Interactive and I/O-heavy work often needs fast wake-up response despite using little total CPU.</p>
 <p>Schedulers need to account for behaviour across time.</p>
 <p>That is why one snapshot of CPU percentage does not explain latency.</p>
@@ -90,7 +90,7 @@ wait again
 <p>Priority inversion can also occur when a high-priority task waits on a resource held by lower-priority work.</p>
 <p>Synchronization and scheduling interact.</p>
 <h2>Real-time means bounded timing requirements</h2>
-<p>Real-time computing is not simply "very fast."</p>
+<p>Real-time computing is not simply &quot;very fast.&quot;</p>
 <p>A real-time requirement concerns completing work within timing constraints.</p>
 <p>A 1 ms response that occasionally becomes 500 ms may be unacceptable for a hard deadline even if average latency is excellent.</p>
 <p>Operating systems provide real-time scheduling classes for specialized workloads.</p>
@@ -125,6 +125,8 @@ wait again
 </ul>
 <p>When a process is slow, do not ask only whether it is running.</p>
 <p>Ask whether it is runnable, waiting, preempted, or blocked.</p>
+<h2>Interactive companion exercise</h2>
+<p>Compare FCFS and Round Robin with a fixed three-process workload in the <a href="../prototypes/interactive-system-design.html#scheduler-title">CPU scheduler simulator</a>. The two-tick Round Robin quantum is a teaching assumption, not Linux CFS behavior.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

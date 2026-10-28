@@ -118,3 +118,7 @@ If you cannot name the anomaly, the consistency requirement is not yet concrete.
 Consistency models describe what histories clients are allowed to observe.
 
 The next lesson examines one way systems agree on shared order and leadership: consensus.
+
+## Companion exercise: consistency during partitions
+
+For a focused example of quorum behavior during a network partition, use the [CAP trade-off explorer](../prototypes/interactive-system-design.html#cap-title). It is a simplified teaching model, not a complete consensus protocol, and complements rather than replaces the consistency models discussed above.

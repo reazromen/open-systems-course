@@ -373,3 +373,7 @@ A response has semantics.
 Connections, caches, browsers, proxies, servers, databases, and sessions add more state around those messages.
 
 The next lesson opens the HTTP message itself and examines request targets, fields, content, response status, and how message framing differs from semantics.
+
+## Interactive companion exercise
+
+Inspect the request-line, headers, status, and response body in the [HTTP message timeline](../prototypes/interactive-system-design.html#protocol-title). HTTP message semantics are distinct from browser rendering behavior.

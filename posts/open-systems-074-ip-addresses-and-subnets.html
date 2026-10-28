@@ -15,7 +15,7 @@
 <header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
 <main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>IP Addresses and Subnets</h1><p class="lede">An IP address identifies an interface in an IP topology; the prefix tells a host which destinations are on-link and which need routing. CIDR is arithmetic over address prefixes, not decorative slash notation.</p><div class="article-meta"><span>Published 2026-10-06</span><span>13 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Your laptop has:</p>
 <pre><code>192.168.1.20/24
-</code></pre>pre
+</code></pre>
 <p>What does the slash mean?</p>
 <p>It tells the host which leading address bits form the network prefix for routing decisions.</p>
 <p>The address alone is not enough.</p>
@@ -24,29 +24,29 @@
 <p>An IPv4 address contains 32 bits.</p>
 <p>Dotted decimal such as:</p>
 <pre><code>192.168.1.20
-</code></pre>pre
+</code></pre>
 <p>is a human-readable representation of four octets.</p>
 <p>A /24 prefix means the first 24 bits are the network prefix.</p>
 <p>For this example:</p>
 <pre><code>network: 192.168.1.0/24
-</code></pre>pre
+</code></pre>
 <p>Addresses sharing that prefix are ordinarily considered on the same subnet under the configured route.</p>
 <h2>On-link versus routed is the important question</h2>
 <p>Destination:</p>
 <pre><code>192.168.1.50
-</code></pre>pre
+</code></pre>
 <p>With 192.168.1.20/24, that destination is on the local subnet.</p>
 <p>The host can resolve the neighbor directly.</p>
 <p>Destination:</p>
 <pre><code>192.168.2.50
-</code></pre>pre
+</code></pre>
 <p>does not share the /24 prefix.</p>
 <p>The host needs a route, often through a gateway.</p>
 <p>Subnetting therefore directly determines whether the next hop is the destination or a router.</p>
 <h2>Masks are just another representation</h2>
 <p>IPv4 /24 corresponds to:</p>
 <pre><code>255.255.255.0
-</code></pre>pre
+</code></pre>
 <p>The binary mask has 24 leading ones followed by zeros.</p>
 <p>CIDR prefix notation is usually clearer.</p>
 <p>The core operation is a bitwise prefix match.</p>
@@ -56,10 +56,10 @@
 <pre><code>10.0.0.0/8
 10.20.0.0/16
 10.20.30.0/24
-</code></pre>pre
+</code></pre>
 <p>Destination:</p>
 <pre><code>10.20.30.40
-</code></pre>pre
+</code></pre>
 <p>matches all three.</p>
 <p>Routing normally selects the longest matching prefix, subject to route policy and implementation.</p>
 <p>The most specific route wins among these prefix matches.</p>
@@ -68,7 +68,7 @@
 <p>IPv6 addresses are 128 bits and commonly written in hexadecimal groups.</p>
 <p>Example:</p>
 <pre><code>2001:db8::1
-</code></pre>pre
+</code></pre>
 <p>IPv6 also uses prefix lengths.</p>
 <p>A common subnet prefix is /64, though network design has additional rules and exceptions.</p>
 <p>Do not apply IPv4 broadcast assumptions to IPv6.</p>
@@ -78,7 +78,7 @@
 <pre><code>10.0.0.0/8
 172.16.0.0/12
 192.168.0.0/16
-</code></pre>pre
+</code></pre>
 <p>These addresses are not globally routable in the ordinary public Internet.</p>
 <p>That does not make traffic encrypted or authenticated.</p>
 <p>Private addressing is an addressing/routing property.</p>
@@ -86,10 +86,10 @@
 <h2>Overlapping subnets create routing ambiguity</h2>
 <p>Network A uses:</p>
 <pre><code>10.0.0.0/24
-</code></pre>pre
+</code></pre>
 <p>Remote VPN also uses:</p>
 <pre><code>10.0.0.0/24
-</code></pre>pre
+</code></pre>
 <p>Which 10.0.0.5 do you mean?</p>
 <p>Overlapping private ranges are common in VPN and merger scenarios.</p>
 <p>The problem is not that IP failed.</p>
@@ -98,14 +98,14 @@
 <h2>Exercise: calculate the next hop</h2>
 <p>Host:</p>
 <pre><code>192.168.10.37/24
-</code></pre>pre
+</code></pre>
 <p>Gateway:</p>
 <pre><code>192.168.10.1
-</code></pre>pre
+</code></pre>
 <p>Destinations:</p>
 <pre><code>192.168.10.80
 192.168.11.80
-</code></pre>pre
+</code></pre>
 <p>First is on-link under /24.</p>
 <p>Second requires a route.</p>
 <p>Now change host prefix to /16.</p>
@@ -117,6 +117,8 @@
 <p>Subnetting answers the first forwarding question:</p>
 <p>Is the destination local, or do I send toward a router?</p>
 <p>Once that is clear, routing stops feeling like magic.</p>
+<h2>Interactive companion exercise</h2>
+<p>Follow source/destination IP addressing and the same-subnet versus remote-subnet decision in the <a href="../prototypes/interactive-system-design.html#network-title">packet path explorer</a>.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

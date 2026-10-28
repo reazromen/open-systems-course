@@ -83,7 +83,7 @@
 <h2>Process creation can be cheap enough</h2>
 <p>Modern systems optimize process creation using copy-on-write, shared libraries, and efficient IPC mechanisms.</p>
 <p>Do not assume a process always means duplicating all memory immediately.</p>
-<p>Likewise, do not assume threads are "free."</p>
+<p>Likewise, do not assume threads are &quot;free.&quot;</p>
 <p>Thread stacks, scheduler entries, runtime state, synchronization, and cache effects all cost resources.</p>
 <p>Architecture needs measurement, not folklore.</p>
 <h2>Security favors boundaries</h2>
@@ -91,7 +91,7 @@
 <p>Moving untrusted work to a restricted process can create a stronger boundary enforced by the OS.</p>
 <p>Sandboxes build on this idea.</p>
 <p>The trade-off is more communication infrastructure.</p>
-<p>Security changes what "cheap" means.</p>
+<p>Security changes what &quot;cheap&quot; means.</p>
 <h2>Exercise: choose the boundary</h2>
 <p>Scenario A:</p>
 <p>Image-processing workers occasionally crash due to third-party native libraries.</p>
@@ -120,7 +120,9 @@
 <li>runtime model;</li>
 <li>workload.</li>
 </ul>
-<p>"Threads are faster" and "processes are safer" are useful starting intuitions, not complete designs.</p>
+<p>&quot;Threads are faster&quot; and &quot;processes are safer&quot; are useful starting intuitions, not complete designs.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#scheduler-title">process scheduler simulator</a> to inspect ready/running/completed states. It models processes, not the full kernel data structures or scheduling semantics for threads.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

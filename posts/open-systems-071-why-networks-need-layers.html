@@ -31,7 +31,7 @@ IP
 link
     ↓
 physical medium
-</code></pre>pre
+</code></pre>
 <p>This is not a demand that every implementation expose exactly five software boxes.</p>
 <p>It is a reasoning model.</p>
 <p>RFC 1122 organizes Internet host requirements around link, IP, transport, and application/support layers.</p>
@@ -79,7 +79,7 @@ physical medium
 <p>On receive, layers interpret and remove the corresponding encapsulation.</p>
 <p>Conceptually:</p>
 <pre><code>[link [IP [TCP [application data]]]]
-</code></pre>pre
+</code></pre>
 <p>The payload of one layer becomes data carried by the layer below.</p>
 <h2>Layer success does not prove upper-layer success</h2>
 <p>Ethernet frame arrived.</p>
@@ -121,7 +121,9 @@ physical medium
 <p>The important habit is not reciting seven OSI names.</p>
 <p>It is asking:</p>
 <p>Which layer's contract failed?</p>
-<p>That question lets you move from physical link to local frame, IP route, transport endpoint, security, and application meaning without blaming "the network" for everything.</p>
+<p>That question lets you move from physical link to local frame, IP route, transport endpoint, security, and application meaning without blaming &quot;the network&quot; for everything.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#network-title">packet-path explorer</a> to trace application payload, transport, IP, Ethernet, and delivery steps across a local or routed network.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

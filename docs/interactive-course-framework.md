@@ -1,6 +1,6 @@
 # Interactive Course Framework
 
-**Status:** Phase 1 implementation; no lesson content or production pages changed.
+**Status:** Phase 1 foundation plus Phase 2 prototype adapters. Prototype links are committed to sixty-five lesson source/output pairs on the working branch; production has not been deployed.
 
 ## Contract
 
@@ -40,7 +40,7 @@ Use native controls, explicit labels, visible :focus-visible, keyboard operation
 
 ## Verification
 
-Run **node --test tests/interactive-course.test.cjs**. Tests cover registration, duplicate registration, per-root idempotence and isolation, invalid lifecycle objects, listener cleanup, reset/destroy, and optional pause()/step(). The browser smoke fixture is tests/interactive-course-fixture.html; Firefox verified two isolated instances, step/reset/destroy, listener cleanup, keyboard focus-visible, reduced-motion CSS, and no teardown errors.
+Run **node --test tests/interactive-course.test.cjs tests/interactive-simulations.test.cjs**. Tests cover framework lifecycle and all fourteen deterministic models, including load balancing, caching, queues, retries, SIP, data structures, graph/tree traversal, OS timelines, scheduling, virtual memory, race conditions, network paths, DNS/DHCP/NAT/TLS/HTTP, and CAP/quorum. Run **python3 -m pip install -r requirements-renderer.txt** to install the pinned renderer dependencies; use **python3 tools/render_course.py --check** for the full source/output audit, and explicit **--write --lesson N** arguments for reviewed, selected pages only. The minimal lifecycle fixture is `tests/interactive-course-fixture.html`; the full prototype browser smoke is `tests/interactive-course-browser-smoke.cjs`. Firefox verified all fourteen models, 390×844 layout, keyboard focus-visible, reduced motion, and no prototype console errors.
 
 ## Non-goals
 

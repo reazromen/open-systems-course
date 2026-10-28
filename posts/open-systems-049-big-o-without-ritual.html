@@ -19,7 +19,7 @@ O(log n)
 O(n)
 O(n log n)
 O(n²)
-</code></pre>pre
+</code></pre>
 <p>Then algorithm analysis becomes vocabulary.</p>
 <p>The real question is simpler:</p>
 <p><strong>How does required work grow as the problem grows?</strong></p>
@@ -30,7 +30,7 @@ O(n²)
 <pre><code>1 ns
 1 ms
 1 second
-</code></pre>pre
+</code></pre>
 <p>If the time does not grow with N, it can still be O(1).</p>
 <p>Complexity describes scaling.</p>
 <p>Benchmarking measures actual performance.</p>
@@ -48,25 +48,25 @@ O(n²)
 <pre><code>for each user:
     for each user:
         compare pair
-</code></pre>pre
+</code></pre>
 <p>N users create roughly N² comparisons.</p>
 <p>At N = 100:</p>
 <pre><code>10,000
-</code></pre>pre
+</code></pre>
 <p>At N = 1,000,000:</p>
 <pre><code>10^12
-</code></pre>pre
+</code></pre>
 <p>Scale transforms acceptable code into impossible code.</p>
 <p>The syntax did not change.</p>
 <p>The workload did.</p>
 <h2>Drop constants carefully</h2>
 <p>An algorithm doing:</p>
 <pre><code>100n
-</code></pre>pre
+</code></pre>
 <p>is still O(n).</p>
 <p>Another doing:</p>
 <pre><code>n²
-</code></pre>pre
+</code></pre>
 <p>is asymptotically worse.</p>
 <p>But at small N, 100n can exceed n².</p>
 <p>Big O intentionally ignores constant factors and lower-order terms for growth analysis.</p>
@@ -77,7 +77,7 @@ O(n²)
 <p>Dynamic-array append may be O(1) amortized even though resize operations are O(n).</p>
 <p>An algorithm can have different best, average, expected, or worst-case complexity.</p>
 <p>Always ask which claim is being made.</p>
-<p>"Hash map is O(1)" without qualifiers is a teaching shortcut.</p>
+<p>&quot;Hash map is O(1)&quot; without qualifiers is a teaching shortcut.</p>
 <h2>Complexity can measure more than time</h2>
 <p>We can analyze:</p>
 <ul>
@@ -101,13 +101,13 @@ O(n²)
 <p>Two functions:</p>
 <p>A:</p>
 <pre><code>scan every element once
-</code></pre>pre
+</code></pre>
 <p>B:</p>
 <pre><code>compare every pair
-</code></pre>pre
+</code></pre>
 <p>Predict scaling when N changes:</p>
 <pre><code>1,000 -&gt; 10,000
-</code></pre>pre
+</code></pre>
 <p>A increases about 10×.</p>
 <p>B increases about 100×.</p>
 <p>Now benchmark if you can.</p>
@@ -125,6 +125,8 @@ O(n²)
 </ul>
 <p>The mature workflow is:</p>
 <p>analyze growth, measure reality, understand both.</p>
+<h2>Interactive companion exercise</h2>
+<p>Apply operations in the <a href="../prototypes/interactive-system-design.html#data-structure-title">data-structure complexity explorer</a> and compare the modelled primitive-step count with the stated Big-O class.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

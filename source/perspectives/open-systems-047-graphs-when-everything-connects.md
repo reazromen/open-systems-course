@@ -165,3 +165,7 @@ Graphs model relationships when nodes can connect arbitrarily.
 Their power comes from making paths, cycles, reachability, and connectivity explicit.
 
 When the real question is "how are these things connected?" you are probably already thinking in graphs, whether or not you use the word.
+
+## Interactive companion exercise
+
+Switch the [graph traversal explorer](../prototypes/interactive-system-design.html#graph-title) between BFS and DFS and inspect the visited order and frontier at each step.

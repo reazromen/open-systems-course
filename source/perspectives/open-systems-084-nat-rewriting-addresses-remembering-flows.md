@@ -276,3 +276,7 @@ That state has ownership, lifetime, transport-specific behavior, and failure mod
 Once the path is translated correctly, another question remains: if a client reaches a remote service, how can it protect the conversation and authenticate the service it intended to contact?
 
 That is the next boundary: TLS.
+
+## Interactive companion exercise
+
+Trace a stateful address/port mapping and reverse translation in the [NAT flow timeline](../prototypes/interactive-system-design.html#protocol-title). The addresses are documentation examples, not a real network capture.

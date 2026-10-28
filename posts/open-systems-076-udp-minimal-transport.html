@@ -45,7 +45,7 @@
 <li>flow control;</li>
 <li>congestion control.</li>
 </ul>
-<p>That does not mean UDP is "unreliable junk."</p>
+<p>That does not mean UDP is &quot;unreliable junk.&quot;</p>
 <p>It means those properties are not provided by UDP itself.</p>
 <p>An application can add whatever reliability semantics it needs.</p>
 <p>Protocols such as QUIC build sophisticated reliable transport over UDP while controlling their own loss recovery and congestion behaviour.</p>
@@ -85,10 +85,10 @@
 <p>On two local processes, use a safe UDP test tool such as netcat if available.</p>
 <p>Receiver:</p>
 <pre><code>nc -u -l 9999
-</code></pre>pre
+</code></pre>
 <p>Sender:</p>
 <pre><code>echo hello | nc -u 127.0.0.1 9999
-</code></pre>pre
+</code></pre>
 <p>Observe with packet capture if desired.</p>
 <p>Then stop receiver and send again.</p>
 <p>The sender may not immediately know nobody consumed the datagram.</p>
@@ -96,12 +96,14 @@
 <h2>The lesson to carry forward</h2>
 <p>UDP provides a small transport abstraction:</p>
 <pre><code>ports + datagrams + checksum
-</code></pre>pre
+</code></pre>
 <p>It does not promise reliable ordered delivery.</p>
 <p>That simplicity is valuable when applications want their own timing or recovery semantics.</p>
-<p>The question is not "UDP or TCP, which is better?"</p>
+<p>The question is not &quot;UDP or TCP, which is better?&quot;</p>
 <p>It is:</p>
 <p>Which transport contract matches the application?</p>
+<h2>Interactive companion exercise</h2>
+<p>Switch the <a href="../prototypes/interactive-system-design.html#network-title">network path explorer</a> to UDP to review datagram delivery and the absence of transport-level delivery guarantees or retransmission.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

@@ -214,3 +214,7 @@ The kernel manages global resources and protection.
 System calls, exceptions, and interrupts cross into privileged execution under defined rules.
 
 This boundary is one of the reasons many independent programs can share one computer without treating every process as fully trusted.
+
+## Interactive companion exercise
+
+Step through the [user/kernel boundary timeline](../prototypes/interactive-system-design.html#os-timeline-title) to see where privilege changes and kernel validation occur.

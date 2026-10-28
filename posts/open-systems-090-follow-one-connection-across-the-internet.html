@@ -18,7 +18,7 @@
 <p>Consider a constructed example:</p>
 <p>A laptop on a small IPv4 LAN opens:</p>
 <pre><code class="language-text">https://service.example/
-</code></pre>pre
+</code></pre>
 <p>The public service is fronted by an edge reverse proxy. The laptop's network uses DHCP and IPv4 NAT.</p>
 <p>No single real provider is being described. The addresses below use documentation ranges. The purpose is to connect mechanisms.</p>
 <h2>0. State exists before the click</h2>
@@ -26,17 +26,17 @@
 <pre><code class="language-text">address:       192.168.1.20/24
 default route: 192.168.1.1
 DNS resolver:  192.168.1.53
-</code></pre>pre
+</code></pre>
 <p>That state might have come from DHCP.</p>
 <p>The resolver can already contain cached answers.</p>
 <p>The router can already contain NAT/connection-tracking state for other flows.</p>
 <p>The operating system has routing and neighbor caches.</p>
 <p>The browser can have connection pools and application caches.</p>
-<p>"Start the request" does not mean "start from an empty system."</p>
+<p>&quot;Start the request&quot; does not mean &quot;start from an empty system.&quot;</p>
 <h2>1. The application begins with a name</h2>
 <p>The URL contains:</p>
 <pre><code class="language-text">service.example
-</code></pre>pre
+</code></pre>
 <p>not an IP route.</p>
 <p>The application asks the host's resolver path for address information.</p>
 <p>Conceptually:</p>
@@ -45,24 +45,24 @@ DNS resolver:  192.168.1.53
 system resolver / stub
   ↓
 configured recursive resolver
-</code></pre>pre
+</code></pre>
 <p>If the answer is cached, the resolver may reply without walking the DNS hierarchy.</p>
 <p>Assume the result is:</p>
 <pre><code class="language-text">198.51.100.80
-</code></pre>pre
+</code></pre>
 <p>DNS has now produced address data.</p>
 <p>It has not opened a connection.</p>
 <h2>2. The host selects a route</h2>
 <p>The kernel performs a route lookup for the destination.</p>
-<p>Because <code>198.51.100.80</code>code is not on the local subnet, the default route selects:</p>
+<p>Because <code>198.51.100.80</code> is not on the local subnet, the default route selects:</p>
 <pre><code class="language-text">next hop: 192.168.1.1
-</code></pre>pre
+</code></pre>
 <p>The IP destination remains the remote edge address.</p>
 <p>The local link destination is the gateway.</p>
 <p>This is the distinction from lesson 80:</p>
 <pre><code class="language-text">destination IP  = remote endpoint
 destination MAC = local next hop
-</code></pre>pre
+</code></pre>
 <p>on the first Ethernet link.</p>
 <h2>3. The host resolves the next-hop link address</h2>
 <p>If the ARP/neighbor cache lacks the gateway's MAC address, the host can use ARP on this IPv4 LAN.</p>
@@ -70,7 +70,7 @@ destination MAC = local next hop
 <pre><code class="language-text">Ethernet destination = gateway MAC
 IPv4 destination     = 198.51.100.80
 TCP destination      = 443
-</code></pre>pre
+</code></pre>
 <p>Different layers identify different things.</p>
 <p>The switch forwards the frame locally.</p>
 <p>The gateway receives it because the Ethernet destination is local to that link.</p>
@@ -79,25 +79,25 @@ TCP destination      = 443
 <pre><code class="language-text">192.168.1.20:51000
         →
 198.51.100.80:443
-</code></pre>pre
+</code></pre>
 <p>The router translates the source to:</p>
 <pre><code class="language-text">203.0.113.25:62044
         →
 198.51.100.80:443
-</code></pre>pre
+</code></pre>
 <p>and remembers the mapping.</p>
 <p>The private tuple and public tuple now represent one logical outbound connection on different sides of the translator.</p>
-<p>The remote edge will not see <code>192.168.1.20</code>code as the Internet source of this TCP flow.</p>
+<p>The remote edge will not see <code>192.168.1.20</code> as the Internet source of this TCP flow.</p>
 <h2>5. Routers forward toward the advertised prefix</h2>
 <p>The packet enters the provider network.</p>
 <p>Routers forward according to installed forwarding state.</p>
 <p>Across administrative domains, BGP advertisements and policy contribute to how reachability to the destination prefix is learned and selected.</p>
 <p>The packet does not carry a list saying:</p>
 <pre><code class="language-text">visit AS A, then AS B, then AS C
-</code></pre>pre
+</code></pre>
 <p>Each router makes a forwarding decision based on local state.</p>
 <p>At each routed hop, the IPv4 TTL is decremented according to IP forwarding rules. Link-layer framing changes as the packet moves onto new links.</p>
-<p>The destination IP can remain <code>198.51.100.80</code>code while Ethernet or other link-layer headers are replaced hop by hop.</p>
+<p>The destination IP can remain <code>198.51.100.80</code> while Ethernet or other link-layer headers are replaced hop by hop.</p>
 <p>NAT is the deliberate exception in this constructed path that changes the IP/port representation.</p>
 <h2>6. TCP establishes transport state</h2>
 <p>The client sends a SYN.</p>
@@ -109,7 +109,7 @@ TCP destination      = 443
 SYN      -------------------&gt;
          &lt;------------------- SYN-ACK
 ACK      -------------------&gt;
-</code></pre>pre
+</code></pre>
 <p>TCP state now exists at both endpoints.</p>
 <p>That proves a transport connection was established.</p>
 <p>It does not yet prove the TLS service identity.</p>
@@ -123,7 +123,7 @@ ACK      -------------------&gt;
 local trust anchors
       +
 service identity for service.example
-</code></pre>pre
+</code></pre>
 <p>If those checks and the handshake succeed, the connection gains TLS traffic keys and protected application data can flow.</p>
 <p>The TLS endpoint in this example is the edge.</p>
 <p>The browser has not authenticated the private origin directly.</p>
@@ -136,7 +136,7 @@ service identity for service.example
 edge
   ↓ connection B
 origin
-</code></pre>pre
+</code></pre>
 <p>Connection B has its own:</p>
 <ul>
 <li>DNS or service-discovery state;</li>
@@ -156,7 +156,7 @@ origin
 <pre><code class="language-text">a successful application request depends on
 many lower-layer contracts,
 but is not equivalent to any one of them
-</code></pre>pre
+</code></pre>
 <h2>10. The reply follows state back</h2>
 <p>The response travels through the established connections.</p>
 <p>For the client-facing leg:</p>
@@ -171,7 +171,7 @@ public NAT address and mapped port
 client socket
   ↓
 application
-</code></pre>pre
+</code></pre>
 <p>The NAT recognizes the returning tuple and mapping state.</p>
 <p>Routers forward toward the client's public address according to their own routing state.</p>
 <p>The local router rewrites the packet back toward the internal endpoint.</p>
@@ -200,23 +200,23 @@ application
 <pre><code class="language-bash">resolvectl status
 ip address
 ip route
-</code></pre>pre
+</code></pre>
 <p>Resolve:</p>
 <pre><code class="language-bash">dig example.com A
 dig example.com AAAA
-</code></pre>pre
+</code></pre>
 <p>Inspect route selection:</p>
 <pre><code class="language-bash">ip route get &lt;resolved-address&gt;
-</code></pre>pre
+</code></pre>
 <p>Observe transport and TLS:</p>
 <pre><code class="language-bash">curl -v https://example.com/
-</code></pre>pre
+</code></pre>
 <p>While connecting, inspect local sockets:</p>
 <pre><code class="language-bash">ss -tnp
-</code></pre>pre
+</code></pre>
 <p>On your own host or lab network, a packet capture can connect the model to frames and packets:</p>
 <pre><code class="language-bash">sudo tcpdump -ni &lt;interface&gt; host &lt;resolved-address&gt;
-</code></pre>pre
+</code></pre>
 <p>Do not capture traffic you are not authorized to inspect.</p>
 <h2>Build an evidence notebook</h2>
 <p>For one request, record:</p>
@@ -232,7 +232,7 @@ TLS version
 certificate service identity
 application response status
 known proxy/CDN boundary
-</code></pre>pre
+</code></pre>
 <p>If you control the gateway, add the NAT mapping.</p>
 <p>If you control the edge, add the origin connection.</p>
 <p>If you control the origin, add server-side socket and application logs.</p>
@@ -248,7 +248,7 @@ known proxy/CDN boundary
 <li>restore the origin and return a deliberate application error.</li>
 </ol>
 <p>Record the client symptom at each stage.</p>
-<p>The visible phrase "site does not work" remains similar.</p>
+<p>The visible phrase &quot;site does not work&quot; remains similar.</p>
 <p>The evidence changes completely.</p>
 <h2>The module to carry forward</h2>
 <p>Networking is not a cloud between two programs.</p>
@@ -263,12 +263,14 @@ transport
 cryptographic identity and protection
 intermediaries
 application semantics
-</code></pre>pre
+</code></pre>
 <p>A systems engineer learns to move through those layers without confusing one contract for another.</p>
 <p>That is the real purpose of packet tracing, DNS tools, route inspection, socket state, TLS diagnostics, and proxy logs.</p>
 <p>The tools are not the skill.</p>
 <p>The skill is knowing <strong>what each observation proves</strong>.</p>
 <p>Module 10 begins above this path with Web Systems: HTTP, browsers, APIs, servers, sessions, and backends.</p>
+<h2>Interactive companion exercise</h2>
+<p>Follow a simplified connection across DNS, TCP, TLS, and HTTP in the <a href="../prototypes/interactive-system-design.html#protocol-title">protocol timeline explorer</a>. Each layer must succeed before later-layer diagnostics make sense.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

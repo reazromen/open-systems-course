@@ -24,16 +24,16 @@
 session identifier or token
       ↓
 server-side or cryptographically protected application state
-</code></pre>pre
-<p>The important lesson is not simply "cookies store sessions."</p>
+</code></pre>
+<p>The important lesson is not simply &quot;cookies store sessions.&quot;</p>
 <p>It is that <strong>identity continuity is an application protocol layered on top of HTTP</strong>.</p>
 <h2>A cookie is browser-managed state</h2>
 <p>A server can ask a browser to store a cookie using a response field such as:</p>
 <pre><code class="language-http">Set-Cookie: session_id=abc123; Secure; HttpOnly
-</code></pre>pre
+</code></pre>
 <p>On later requests that match the cookie's scope and policy, the browser can send:</p>
 <pre><code class="language-http">Cookie: session_id=abc123
-</code></pre>pre
+</code></pre>
 <p>RFC 6265 defines the HTTP state-management mechanism for cookies.</p>
 <p>The value might be:</p>
 <ul>
@@ -47,7 +47,7 @@ server-side or cryptographically protected application state
 <h2>A session identifier is not the session itself</h2>
 <p>Suppose the browser stores:</p>
 <pre><code class="language-text">session_id = abc123
-</code></pre>pre
+</code></pre>
 <p>The server might maintain:</p>
 <pre><code class="language-text">abc123
   ↓
@@ -56,13 +56,13 @@ created_at = ...
 last_seen = ...
 permissions_snapshot = ...
 csrf_state = ...
-</code></pre>pre
+</code></pre>
 <p>in a database or cache.</p>
 <p>In that design, the cookie contains a handle.</p>
 <p>The actual session state lives on the server.</p>
 <p>A different design can place more state inside a signed or encrypted token sent by the client.</p>
 <p>Those designs have different trade-offs around revocation, storage, size, synchronization, and failure.</p>
-<p>Do not confuse "cookie-based session" with "all session state is inside the cookie."</p>
+<p>Do not confuse &quot;cookie-based session&quot; with &quot;all session state is inside the cookie.&quot;</p>
 <h2>Cookie scope matters</h2>
 <p>Cookies have attributes that control when browsers send them.</p>
 <p>Important concepts include:</p>
@@ -74,8 +74,8 @@ csrf_state = ...
 <li>expiration or lifetime;</li>
 <li>SameSite behavior in modern browsers.</li>
 </ul>
-<p><code>Secure</code>code restricts cookie transmission to secure contexts according to browser rules.</p>
-<p><code>HttpOnly</code>code prevents ordinary client-side script access to the cookie through document cookie APIs, which helps reduce one class of exposure if script execution is compromised.</p>
+<p><code>Secure</code> restricts cookie transmission to secure contexts according to browser rules.</p>
+<p><code>HttpOnly</code> prevents ordinary client-side script access to the cookie through document cookie APIs, which helps reduce one class of exposure if script execution is compromised.</p>
 <p>Domain and Path influence which requests receive the cookie.</p>
 <p>These are scope controls, not complete authorization policy.</p>
 <p>A cookie reaching a server does not prove the request is allowed to perform an operation.</p>
@@ -98,7 +98,7 @@ Cookie sent
 server loads session
   ↓
 account response
-</code></pre>pre
+</code></pre>
 <p>The second request can arrive over another connection.</p>
 <p>It can be processed by another application instance.</p>
 <p>The continuity comes from the session mechanism, not from connection affinity unless the architecture deliberately adds that dependency.</p>
@@ -118,7 +118,7 @@ idle timeout
 cookie expiration
 server-side record expiration
 token expiration
-</code></pre>pre
+</code></pre>
 <p>These can disagree.</p>
 <p>For example:</p>
 <pre><code class="language-text">browser still has cookie
@@ -128,7 +128,7 @@ server session expired
 request arrives
         ↓
 application rejects session
-</code></pre>pre
+</code></pre>
 <p>The browser retaining a cookie does not guarantee the server still considers the session valid.</p>
 <p>Likewise, deleting a browser cookie does not necessarily destroy server-side state unless the logout path also revokes or expires that state.</p>
 <p>Client state and server state must be reasoned about separately.</p>
@@ -171,7 +171,7 @@ application rejects session
 <h2>Build a small session experiment</h2>
 <p>Create a local application with an in-memory session map:</p>
 <pre><code class="language-text">random session id → username
-</code></pre>pre
+</code></pre>
 <p>On login:</p>
 <ol>
 <li>generate a high-entropy random session identifier;</li>
@@ -186,7 +186,7 @@ application rejects session
 <pre><code class="language-text">session persistence
 depends on
 session storage
-</code></pre>pre
+</code></pre>
 <p>Move the session store to a shared database or cache and the behavior changes again.</p>
 <h2>The lesson to carry forward</h2>
 <p>Cookies let a browser carry small pieces of state across requests.</p>
@@ -196,6 +196,8 @@ session storage
 <p>The session record is not automatically authorization.</p>
 <p>Each layer needs its own validation and lifetime.</p>
 <p>The next lesson explains the browser boundary that makes many web security rules necessary: origins, same-origin policy, and CORS.</p>
+<h2>Interactive companion exercise</h2>
+<p>Trace session creation, Set-Cookie, later Cookie transmission, server-side session lookup, and logout invalidation in the <a href="../prototypes/interactive-system-design.html#protocol-title">cookie/session timeline</a>.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

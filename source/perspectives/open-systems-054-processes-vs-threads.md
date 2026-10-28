@@ -195,3 +195,7 @@ The choice should follow:
 - workload.
 
 "Threads are faster" and "processes are safer" are useful starting intuitions, not complete designs.
+
+## Interactive companion exercise
+
+Use the [process scheduler simulator](../prototypes/interactive-system-design.html#scheduler-title) to inspect ready/running/completed states. It models processes, not the full kernel data structures or scheduling semantics for threads.

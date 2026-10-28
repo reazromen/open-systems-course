@@ -25,3 +25,7 @@ An earlier Hserver probe checked 308 URLs and reported HTTP 200 for all 308: cou
 ## Change boundary
 
 Framework assets are not linked from existing lessons during Phase 1. No lesson content, URL, course index, companion HTML, deployment directory, or indexing policy is changed by this branch. Treat the favicon and any confirmed layout issue as pre-existing baseline findings.
+
+## Follow-up fix on the interactive-course branch
+
+A course-scoped mobile header rule was added to `assets/open-systems-course.css` and included by `course.html`. The Firefox 157.0.1 smoke test now checks the course index plus 25 linked lesson pages at 390×844 CSS pixels; each tested page reports body width ≤ 390 px. The original baseline widths (405 px index / 418 px Lesson 107) are historical pre-fix observations. The favicon 404 remains unresolved.

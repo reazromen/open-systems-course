@@ -220,3 +220,7 @@ It is a sequence:
 Each handoff has its own state, logs, configuration, and failure modes.
 
 Module 7 now stays inside a running Linux system and learns to inspect those mechanisms directly.
+
+## Interactive companion exercise
+
+Step through a simplified firmware → bootloader → kernel → PID 1 → services sequence in the [Linux boot timeline](../prototypes/interactive-system-design.html#os-timeline-title). Actual boot paths vary by platform and configuration.

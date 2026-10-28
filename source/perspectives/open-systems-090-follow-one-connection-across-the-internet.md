@@ -446,3 +446,7 @@ The tools are not the skill.
 The skill is knowing **what each observation proves**.
 
 Module 10 begins above this path with Web Systems: HTTP, browsers, APIs, servers, sessions, and backends.
+
+## Interactive companion exercise
+
+Follow a simplified connection across DNS, TCP, TLS, and HTTP in the [protocol timeline explorer](../prototypes/interactive-system-design.html#protocol-title). Each layer must succeed before later-layer diagnostics make sense.

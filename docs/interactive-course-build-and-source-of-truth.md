@@ -8,15 +8,17 @@
 - Published HTML: posts/open-systems-NNN-*.html.
 - course.html is the course index. Markdown front matter includes the stable output URL and lesson title; source and HTML are both tracked in Git.
 
-**Renderer finding:** no Markdown-to-HTML renderer or build command is present in this repository. The repository workflow validates course files but does not regenerate HTML. The sibling /home/romen/private-course-preview/repo/cms/build_content.py belongs to the separate reazromen.com CMS and reads that site's content/ and templates. It is not the course renderer and must not be run against the shared dist/.
+**Original renderer finding:** no Markdown-to-HTML renderer or build command was present in the audited repository. The sibling `/home/romen/private-course-preview/repo/cms/build_content.py` belongs to the separate reazromen.com CMS and must not be used to render this course or run against shared `dist/`.
 
-Current safe process: edit the Markdown source, produce and review the corresponding rendered HTML artifact, commit both, then deploy the committed HTML. There is no version-pinned reproducible renderer command today; do not imply Markdown edits automatically update live HTML or run an unverified renderer over the lesson set. Renderer provenance is a reproducibility gap, now explicitly documented.
+**New controlled renderer pilot (this branch):** `tools/render_course.py` uses pinned `markdown-it-py==3.0.0` and `PyYAML==6.0.3` to regenerate the `.prose` body inside an existing HTML template. It deliberately does not rebuild page metadata or create new page templates. Install with `python3 -m pip install -r requirements-renderer.txt`. Check the full corpus with `python3 tools/render_course.py --check`; render selected pages only with `python3 tools/render_course.py --write --lesson 107 --lesson 143 --lesson 147`. The write mode refuses unexplained output drift and only falls back to the committed source baseline when that baseline exactly matches the current rendered body. Never use `--all` without reviewing a complete output diff.
+
+The initial full-corpus check found **two source/output discrepancies**. Lesson 035 had a list that CommonMark interpreted differently because the source omitted a blank line after the label; the Markdown was corrected to make the list explicit. Lesson 041 had generic repeated `array` examples in source while the output showed indexed examples; the source was corrected to match the intended `array[0]`–`array[3]` explanation. Both outputs were regenerated with the explicit `--reconcile-known-drift` flag after reviewing those two source changes. The current `python3 tools/render_course.py --check` reports **180 source/output pairs checked, 0 drift findings**. This is a newly introduced reproducible body renderer, not evidence that the historical renderer has been recovered.
 
 ## System Design — 60 lessons
 
 - Markdown sources: source/system_design/lesson-NN-*.md (60).
 - Rendered pages: system_design/lesson-NN.html (60), plus system_design/index.html.
-- No renderer/build script was found. Deployment copies pre-rendered HTML. Treat Markdown as content authority, but do not regenerate until a renderer/template is tested against existing pages.
+- The original checkout had no renderer/build script. This branch adds a pinned body-only renderer and now verifies 180/180 canonical Open Systems source/output pairs. Deployment still copies pre-rendered HTML; the separate System Design and Embedded Systems & IoT tracks remain unresolved.
 
 ## Embedded Systems & IoT — 60 lessons
 
@@ -37,6 +39,6 @@ Host script: /home/romen/private-course-preview/deploy-course.sh.
 
 It does not render Markdown, run tests, delete old output, or replace shared dist/ wholesale. The site is served by learn-course-preview.service through serve_domain.py and exposed through Cloudflare Tunnel. Preserve X-Robots-Tag: noindex, nofollow, noarchive.
 
-## Phase 1 implication
+## Phase 1–2 implications
 
-The framework is plain JS/CSS and needs no Markdown rendering. Its assets are opt-in and do not change lesson HTML. Before course-wide content changes, establish a pinned renderer plus source/output validation. Recover or formally migrate the IoT source before editing that track.
+The framework is plain JS/CSS and does not require Markdown rendering. The new renderer safely updates selected Open Systems lesson bodies, and the full 180-page text-integrity check now passes with zero drift. System Design has 60 Markdown sources but still has no verified template/build workflow. Embedded Systems & IoT has no discoverable Markdown source. Do not regenerate those tracks or run a broad deployment until their provenance and integrity checks are resolved.

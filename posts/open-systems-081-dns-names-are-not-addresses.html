@@ -13,7 +13,7 @@
 <link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-081-dns-names-are-not-addresses.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="DNS: Names Are Not Addresses" property="og:title"/><meta content="DNS maps names to structured data such as addresses, but naming and routing are separate systems. A correct DNS answer is only one step toward a working connection." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-081-dns-names-are-not-addresses.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
 <body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
 <header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
-<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>DNS: Names Are Not Addresses</h1><p class="lede">DNS maps names to structured data such as addresses, but naming and routing are separate systems. A correct DNS answer is only one step toward a working connection.</p><div class="article-meta"><span>Published 2026-10-07</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Typing a name such as <code>example.com</code>code feels like choosing a destination.</p>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>DNS: Names Are Not Addresses</h1><p class="lede">DNS maps names to structured data such as addresses, but naming and routing are separate systems. A correct DNS answer is only one step toward a working connection.</p><div class="article-meta"><span>Published 2026-10-07</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Typing a name such as <code>example.com</code> feels like choosing a destination.</p>
 <p>The network does not route packets by that name.</p>
 <p>IP forwarding works with IP addresses. DNS is a separate distributed naming system that helps software discover information associated with names. That distinction matters because a DNS lookup can succeed while the connection still fails, and a connection to an IP address can succeed even when a particular DNS name is broken.</p>
 <p>A useful first model is:</p>
@@ -28,16 +28,16 @@ route lookup
 transport connection or datagram
   ↓
 application protocol
-</code></pre>pre
+</code></pre>
 <p>Each arrow is a different contract.</p>
 <h2>A name is not an address</h2>
 <p>Consider the constructed example:</p>
 <pre><code class="language-text">service.example
-</code></pre>pre
+</code></pre>
 <p>A DNS answer might associate that name with:</p>
 <pre><code class="language-text">192.0.2.40
 2001:db8::40
-</code></pre>pre
+</code></pre>
 <p>Those are documentation addresses, not real service endpoints.</p>
 <p>The name is an identifier in the DNS namespace. The IPv4 and IPv6 addresses are data returned for particular record types. Routing decisions happen later, after the host has an address to send toward.</p>
 <p>This separation is useful. A service can change addresses without changing the name users type. One name can have multiple addresses. Different record types can carry different kinds of information.</p>
@@ -53,12 +53,12 @@ stub resolver
 recursive resolver
     ↓
 cache or DNS hierarchy
-</code></pre>pre
+</code></pre>
 <p>RFC 9499 defines current DNS terminology, including stub resolvers, recursive mode, recursive resolvers, and authoritative servers.</p>
 <p>The recursive resolver may already know the answer from its cache. If so, the lookup can stop there. If not, the resolver may perform the work needed to discover the answer from authoritative DNS data.</p>
 <p>The authoritative server has local knowledge of a zone for which it is configured to answer. It is not the same role as a recursive resolver, even though one software package can technically support multiple roles.</p>
 <h2>Records have types</h2>
-<p>DNS does not return a generic "destination."</p>
+<p>DNS does not return a generic &quot;destination.&quot;</p>
 <p>It returns resource records.</p>
 <p>Three common types are:</p>
 <ul>
@@ -67,11 +67,11 @@ cache or DNS hierarchy
 <li><strong>CNAME</strong> — an alias pointing from one DNS name to another canonical name.</li>
 </ul>
 <p>RFC 1035 defines the original DNS protocol and the A and CNAME record types. IPv6 address records are defined by RFC 3596.</p>
-<p>Suppose a query for <code>app.example</code>code returns a CNAME:</p>
+<p>Suppose a query for <code>app.example</code> returns a CNAME:</p>
 <pre><code class="language-text">app.example.  CNAME  edge.example.net.
-</code></pre>pre
+</code></pre>
 <p>Resolution then has another name to resolve before an address is available.</p>
-<p>That is another reason "DNS maps names to IP addresses" is only a beginner's shortcut. Sometimes it does. Sometimes the answer is a delegation, an alias, mail-routing information, a service-related record, a negative answer, or another kind of DNS data.</p>
+<p>That is another reason &quot;DNS maps names to IP addresses&quot; is only a beginner's shortcut. Sometimes it does. Sometimes the answer is a delegation, an alias, mail-routing information, a service-related record, a negative answer, or another kind of DNS data.</p>
 <h2>TTL creates cached state</h2>
 <p>DNS records carry a time-to-live value, usually called TTL.</p>
 <p>A resolver can cache an answer for a limited period rather than repeating the entire resolution process for every application request. That reduces latency and load on the DNS hierarchy.</p>
@@ -84,13 +84,13 @@ cache or DNS hierarchy
 resolver caches with independent remaining lifetimes
       ↓
 clients asking at different times
-</code></pre>pre
-<p>This is why "the DNS record has been changed" and "every client will now receive the new answer" are different claims.</p>
+</code></pre>
+<p>This is why &quot;the DNS record has been changed&quot; and &quot;every client will now receive the new answer&quot; are different claims.</p>
 <h2>DNS success proves less than people think</h2>
 <p>Imagine:</p>
 <pre><code class="language-text">$ getent ahosts service.example
 192.0.2.40 ...
-</code></pre>pre
+</code></pre>
 <p>A returned address proves that name resolution produced an answer through the resolver path used by that command.</p>
 <p>It does <strong>not</strong> prove:</p>
 <ul>
@@ -112,8 +112,8 @@ Can I establish the transport?
 Can I establish TLS if required?
         ↓
 Does the application protocol succeed?
-</code></pre>pre
-<p>"DNS works" is one rung.</p>
+</code></pre>
+<p>&quot;DNS works&quot; is one rung.</p>
 <h2>Multiple answers are normal</h2>
 <p>A name can return more than one A or AAAA record.</p>
 <p>That does not mean every client will necessarily use the same address or try them in the same order. Address selection and connection behavior are host and application concerns layered above DNS data.</p>
@@ -125,12 +125,12 @@ Does the application protocol succeed?
 <pre><code class="language-bash">resolvectl status
 cat /etc/resolv.conf
 getent ahosts example.com
-</code></pre>pre
-<p>Then inspect DNS directly with a tool such as <code>dig</code>code or <code>drill</code>code:</p>
+</code></pre>
+<p>Then inspect DNS directly with a tool such as <code>dig</code> or <code>drill</code>:</p>
 <pre><code class="language-bash">dig example.com A
 dig example.com AAAA
 dig example.com CNAME
-</code></pre>pre
+</code></pre>
 <p>Look for:</p>
 <ul>
 <li>the queried name;</li>
@@ -139,7 +139,7 @@ dig example.com CNAME
 <li>TTL values;</li>
 <li>which resolver answered.</li>
 </ul>
-<p>Do not assume <code>/etc/resolv.conf</code>code always contains the final upstream resolver. On systems using a local caching or management service, it may point to a local stub.</p>
+<p>Do not assume <code>/etc/resolv.conf</code> always contains the final upstream resolver. On systems using a local caching or management service, it may point to a local stub.</p>
 <p>The point of the exercise is not to memorize command output. It is to connect the application-visible name to the resolver component that produced the address data.</p>
 <h2>Break the model safely</h2>
 <p>Use a test name or system you control.</p>
@@ -159,10 +159,12 @@ dig example.com CNAME
 <p>TLS can add authenticated encryption.</p>
 <p>The application protocol gives exchanged data meaning.</p>
 <p>Those systems cooperate, but none of them should be used as evidence for all the others.</p>
-<p>When a user says, "the site does not open," the engineering question is not "is the network broken?"</p>
+<p>When a user says, &quot;the site does not open,&quot; the engineering question is not &quot;is the network broken?&quot;</p>
 <p>It is:</p>
 <p><strong>At which contract did the path stop being true?</strong></p>
 <p>The next lesson follows DNS resolution itself, including recursion, referrals, delegation, caching, and negative answers.</p>
+<h2>Interactive companion exercise</h2>
+<p>Explore why a DNS name is resolved to an address in the <a href="../prototypes/interactive-system-design.html#protocol-title">protocol timeline explorer</a>. The DNS sequence separates the stub, recursive cache, root/TLD referrals, and authoritative answer.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

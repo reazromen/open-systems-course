@@ -163,3 +163,7 @@ The question is not "UDP or TCP, which is better?"
 It is:
 
 Which transport contract matches the application?
+
+## Interactive companion exercise
+
+Switch the [network path explorer](../prototypes/interactive-system-design.html#network-title) to UDP to review datagram delivery and the absence of transport-level delivery guarantees or retransmission.

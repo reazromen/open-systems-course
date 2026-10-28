@@ -38,14 +38,14 @@
 <p>It does not literally own a CPU continuously.</p>
 <p>The abstraction is:</p>
 <pre><code>process -&gt; appears to execute
-</code></pre>pre
+</code></pre>
 <p>The mechanism includes:</p>
 <pre><code>scheduling
 context switching
 timers
 interrupts
 processor privilege
-</code></pre>pre
+</code></pre>
 <p>The illusion is useful enough that most application code can ignore the exact schedule.</p>
 <h2>The OS virtualizes memory</h2>
 <p>A process sees a virtual address space.</p>
@@ -60,10 +60,10 @@ processor privilege
 <p>An SSD exposes persistent blocks through a device interface.</p>
 <p>Applications generally want:</p>
 <pre><code>/home/user/report.txt
-</code></pre>pre
+</code></pre>
 <p>not:</p>
 <pre><code>block 98122, offset 4096
-</code></pre>pre
+</code></pre>
 <p>A filesystem turns storage into names, directories, metadata, permissions, and file operations.</p>
 <p>The kernel can then expose a common file interface even when underlying filesystems differ.</p>
 <p>The name is an abstraction over storage layout.</p>
@@ -76,7 +76,7 @@ processor privilege
   -&gt; OS interface
   -&gt; driver
   -&gt; hardware
-</code></pre>pre
+</code></pre>
 <p>When a device fails, the investigation can move through those layers.</p>
 <h2>The OS is a protection boundary</h2>
 <p>The kernel runs with privileges ordinary applications do not have.</p>
@@ -92,7 +92,7 @@ processor privilege
 <p>A desktop environment decides how windows look.</p>
 <p>A package manager installs software.</p>
 <p>A shell interprets commands.</p>
-<p>People casually call all of these "the operating system."</p>
+<p>People casually call all of these &quot;the operating system.&quot;</p>
 <p>That can be fine in ordinary conversation.</p>
 <p>For engineering, separate the layers.</p>
 <p>Linux is a kernel.</p>
@@ -103,7 +103,7 @@ processor privilege
 <p>One main loop may control everything.</p>
 <p>A real-time operating system may provide tasks, queues, timers, and synchronization with much smaller scope.</p>
 <p>An embedded Linux system may run a full kernel and user space.</p>
-<p>"Needs an OS" is therefore a system-design question.</p>
+<p>&quot;Needs an OS&quot; is therefore a system-design question.</p>
 <p>If one program controls one simple device, direct firmware may be enough.</p>
 <p>If many isolated applications share hardware, operating-system abstractions become increasingly valuable.</p>
 <h2>Exercise: remove the OS mentally</h2>
@@ -135,6 +135,8 @@ processor privilege
 <li>clocks.</li>
 </ul>
 <p>The rest of this module opens those mechanisms one by one.</p>
+<h2>Interactive companion exercise</h2>
+<p>Follow the user-mode to kernel-mode boundary in the <a href="../prototypes/interactive-system-design.html#os-timeline-title">operating-system timeline explorer</a>. It illustrates one common system-call path rather than every OS responsibility.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

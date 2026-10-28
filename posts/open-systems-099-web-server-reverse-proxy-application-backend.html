@@ -25,9 +25,9 @@ reverse proxy / gateway
 application process
   ↓
 cache / database / queue / other service
-</code></pre>pre
+</code></pre>
 <p>Each arrow can cross a process boundary, a host boundary, a network boundary, or an administrative boundary.</p>
-<p>The most important habit is to stop calling all of it "the server."</p>
+<p>The most important habit is to stop calling all of it &quot;the server.&quot;</p>
 <h2>A web server can mean several things</h2>
 <p>The phrase <strong>web server</strong> is overloaded.</p>
 <p>It can mean:</p>
@@ -41,7 +41,7 @@ cache / database / queue / other service
 <p>That ambiguity causes bad incident conversations.</p>
 <p>Instead of saying:</p>
 <pre><code class="language-text">the web server is broken
-</code></pre>pre
+</code></pre>
 <p>say what is actually failing:</p>
 <pre><code class="language-text">public TLS listener
 reverse-proxy route
@@ -49,7 +49,7 @@ application worker
 database dependency
 cache cluster
 upstream API
-</code></pre>pre
+</code></pre>
 <p>Precise component names produce smaller hypotheses.</p>
 <h2>The edge terminates the public path</h2>
 <p>A public service often has an edge component such as a CDN, load balancer, or ingress proxy.</p>
@@ -66,7 +66,7 @@ upstream API
 <p>The public DNS name may resolve to the edge, not the origin application host.</p>
 <p>That means:</p>
 <pre><code class="language-text">client reached public IP
-</code></pre>pre
+</code></pre>
 <p>proves only the client-to-edge portion of the architecture.</p>
 <p>The edge still needs a healthy path inward.</p>
 <h2>A reverse proxy creates another request boundary</h2>
@@ -75,7 +75,7 @@ upstream API
 <p>That creates two relationships:</p>
 <pre><code class="language-text">client → reverse proxy
 reverse proxy → upstream
-</code></pre>pre
+</code></pre>
 <p>Those relationships can use different:</p>
 <ul>
 <li>addresses;</li>
@@ -101,7 +101,7 @@ reverse proxy → upstream
 <pre><code class="language-text">/api/        → application service
 /static/     → object/static service
 /admin/      → separate protected application
-</code></pre>pre
+</code></pre>
 <p>The client still sees one public origin.</p>
 <p>Behind that origin can be several independent services.</p>
 <p>This is why one URL path can fail while another path on the same hostname remains healthy.</p>
@@ -152,7 +152,7 @@ billing service
 template rendering
    ↓
 response
-</code></pre>pre
+</code></pre>
 <p>If the billing service times out, the public request can fail even though the web process and database are healthy.</p>
 <p>Dependencies are part of availability.</p>
 <h2>Connection pools create hidden state</h2>
@@ -170,7 +170,7 @@ response
 </ul>
 <p>A database can be healthy while the application cannot acquire a connection because its pool is exhausted.</p>
 <p>Likewise, the network can be healthy while stale pooled connections cause intermittent failures.</p>
-<p>When a system "randomly" fails, shared pools deserve inspection.</p>
+<p>When a system &quot;randomly&quot; fails, shared pools deserve inspection.</p>
 <h2>Timeouts form a chain</h2>
 <p>Consider:</p>
 <pre><code class="language-text">browser timeout:             30 s
@@ -178,7 +178,7 @@ edge timeout:                20 s
 reverse proxy upstream:      10 s
 application DB timeout:       5 s
 database statement timeout:   4 s
-</code></pre>pre
+</code></pre>
 <p>This ordering can be intentional.</p>
 <p>The inner dependency should often fail before the outer caller gives up, leaving enough time to return a useful error.</p>
 <p>If the proxy times out before the application dependency does, the application may continue working on a request whose client has already gone away.</p>
@@ -193,7 +193,7 @@ service cannot currently handle the request
 
 504 Gateway Timeout
 gateway did not receive a timely upstream response
-</code></pre>pre
+</code></pre>
 <p>These are HTTP semantics.</p>
 <p>A 502 does not mean the user's Internet connection is broken.</p>
 <p>A 504 does not prove the origin process is down.</p>
@@ -202,15 +202,15 @@ gateway did not receive a timely upstream response
 <h2>Health checks can lie by being too shallow</h2>
 <p>A process can return:</p>
 <pre><code class="language-text">200 /health
-</code></pre>pre
+</code></pre>
 <p>while its database is unavailable.</p>
-<p>That may be correct if <code>/health</code>code only means "process is alive."</p>
+<p>That may be correct if <code>/health</code> only means &quot;process is alive.&quot;</p>
 <p>A readiness check can answer a different question:</p>
 <pre><code class="language-text">should this instance currently receive production traffic?
-</code></pre>pre
+</code></pre>
 <p>A dependency check can answer another:</p>
 <pre><code class="language-text">can this application currently reach required backends?
-</code></pre>pre
+</code></pre>
 <p>One green endpoint should not be made to prove every property of the service.</p>
 <p>Name health signals after the contract they actually verify.</p>
 <h2>Request IDs connect evidence</h2>
@@ -223,7 +223,7 @@ proxy
 application
  ↓
 database/client spans
-</code></pre>pre
+</code></pre>
 <p>OpenTelemetry defines conventions and context propagation for distributed telemetry.</p>
 <p>The identifier is not the diagnosis.</p>
 <p>It is the thread that lets you gather evidence from multiple boundaries without guessing which log lines belong together.</p>
@@ -232,9 +232,9 @@ database/client spans
 <p>Those fields become dangerous if the application blindly trusts values supplied directly by an untrusted client.</p>
 <p>The architecture needs a trust rule:</p>
 <pre><code class="language-text">only the trusted proxy may define authoritative forwarding metadata
-</code></pre>pre
+</code></pre>
 <p>The application should know which upstream proxy is trusted and which fields are sanitized or replaced.</p>
-<p>Never treat a header as trusted merely because its name begins with <code>X-</code>code or looks infrastructure-related.</p>
+<p>Never treat a header as trusted merely because its name begins with <code>X-</code> or looks infrastructure-related.</p>
 <h2>Queues change request timing</h2>
 <p>Some operations should not complete synchronously.</p>
 <p>An application can accept a request, create a job, enqueue it, and return a response before the background work finishes.</p>
@@ -248,10 +248,10 @@ job record / queue
 HTTP response: accepted
              later
 queue → worker → external effect
-</code></pre>pre
+</code></pre>
 <p>The request can succeed while the eventual job fails.</p>
 <p>That means the API needs a model for job state.</p>
-<p>"HTTP returned 202" and "task completed" are different events.</p>
+<p>&quot;HTTP returned 202&quot; and &quot;task completed&quot; are different events.</p>
 <h2>Inspect your own deployment</h2>
 <p>Draw one production or local service as boxes.</p>
 <p>Include:</p>
@@ -275,7 +275,7 @@ timeout?
 retry?
 owner?
 observable logs/metrics?
-</code></pre>pre
+</code></pre>
 <p>Any arrow you cannot describe is an operational blind spot.</p>
 <h2>Build a local three-process experiment</h2>
 <p>Create:</p>
@@ -312,13 +312,15 @@ Did dependencies respond before deadlines?
 Did the app generate a response?
         ↓
 Did the proxy return it to the client?
-</code></pre>pre
+</code></pre>
 <p>Every line can have its own logs and metrics.</p>
-<p>That is much more useful than saying "backend issue."</p>
+<p>That is much more useful than saying &quot;backend issue.&quot;</p>
 <h2>The lesson to carry forward</h2>
 <p>A production web service is usually a graph of cooperating components.</p>
 <p>The public endpoint, reverse proxy, application, database, cache, queue, and external services have different responsibilities and failure modes.</p>
 <p>The final lesson of this module follows one web request end to end and annotates which state changes at every boundary.</p>
+<h2>Interactive companion exercise</h2>
+<p>Trace a request through a reverse proxy/CDN cache decision, origin forwarding, and response return in the <a href="../prototypes/interactive-system-design.html#protocol-title">proxy timeline</a>.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

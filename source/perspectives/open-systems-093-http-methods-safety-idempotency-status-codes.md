@@ -184,3 +184,7 @@ Do not rewrite every non-200 response into "API down."
 Methods tell the server what kind of operation the client is requesting. Safety and idempotency constrain what clients and intermediaries can assume. Status codes report the HTTP-level outcome.
 
 The next lesson adds representation metadata, headers, content negotiation, and caching-related fields.
+
+## Interactive companion exercise
+
+Compare GET, PUT, POST, and DELETE semantics in the [HTTP method explorer](../prototypes/interactive-system-design.html#protocol-title). It distinguishes safe from idempotent behavior and explains why POST retries can duplicate work.

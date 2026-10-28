@@ -17,12 +17,12 @@
 <p>That looks like one action.</p>
 <p>The browser performs a sequence of operations across several subsystems: URL processing, network fetching, HTTP, document parsing, subresource loading, script execution, style processing, layout, painting, and browser security policy.</p>
 <p>The useful systems lesson is not to memorize one browser's internal function names.</p>
-<p>It is to stop treating "the page loaded" as one event.</p>
+<p>It is to stop treating &quot;the page loaded&quot; as one event.</p>
 <h2>Start with the URL</h2>
 <p>A URL contains structured components such as scheme, host, port, path, query, and fragment according to the URL processing model.</p>
 <p>For example:</p>
 <pre><code class="language-text">https://example.com:443/docs?id=7#section
-</code></pre>pre
+</code></pre>
 <p>contains several different pieces of information.</p>
 <p>The scheme influences how the resource is fetched.</p>
 <p>The host participates in name resolution and origin calculations.</p>
@@ -48,7 +48,7 @@ TLS
 HTTP
         ↓
 response
-</code></pre>pre
+</code></pre>
 <p>The Fetch Standard defines the web platform's fetching model above those lower-level mechanisms.</p>
 <p>A browser can reuse DNS state, TLS sessions, connections, caches, or service-worker results. Therefore a navigation does not necessarily create a fresh network connection.</p>
 <p>The visible page load begins in a system that already has state.</p>
@@ -68,10 +68,10 @@ response
 <p>So:</p>
 <pre><code class="language-text">one navigation
 → many resource requests
-</code></pre>pre
+</code></pre>
 <p>is normal.</p>
 <p>The browser network panel makes this visible immediately.</p>
-<p>A page that appears to be "one document" can depend on dozens or hundreds of resources.</p>
+<p>A page that appears to be &quot;one document&quot; can depend on dozens or hundreds of resources.</p>
 <h2>Parsing can overlap with fetching</h2>
 <p>The browser does not necessarily wait for the complete HTML file before noticing every subresource.</p>
 <p>As parsing progresses, resource discovery can begin early.</p>
@@ -92,7 +92,7 @@ computed style
 layout
        ↓
 paint
-</code></pre>pre
+</code></pre>
 <p>Real rendering engines contain more stages and optimizations.</p>
 <p>Do not treat this diagram as one universal internal implementation.</p>
 <p>It is a reasoning model.</p>
@@ -108,13 +108,13 @@ paint
 </ul>
 <p>This means the final visible page is not simply the HTML response painted once.</p>
 <p>It can be the result of ongoing program execution.</p>
-<p>Some scripts can also delay parsing depending on how they are included and scheduled. Attributes such as <code>defer</code>code and <code>async</code>code change script-fetching and execution relationships for appropriate script types under HTML rules.</p>
-<p>A performance problem that appears to be "slow network" can therefore be CPU work or blocking script behavior after the response has arrived.</p>
+<p>Some scripts can also delay parsing depending on how they are included and scheduled. Attributes such as <code>defer</code> and <code>async</code> change script-fetching and execution relationships for appropriate script types under HTML rules.</p>
+<p>A performance problem that appears to be &quot;slow network&quot; can therefore be CPU work or blocking script behavior after the response has arrived.</p>
 <h2>DOMContentLoaded is not the same as every resource being finished</h2>
 <p>Browsers expose several lifecycle events.</p>
-<p><code>DOMContentLoaded</code>code is associated with the document being parsed and deferred-script processing reaching the relevant state.</p>
-<p>The window <code>load</code>code event occurs later, after additional load-event-delaying resources have completed according to the platform rules.</p>
-<p>Neither event means "the application is now correct."</p>
+<p><code>DOMContentLoaded</code> is associated with the document being parsed and deferred-script processing reaching the relevant state.</p>
+<p>The window <code>load</code> event occurs later, after additional load-event-delaying resources have completed according to the platform rules.</p>
+<p>Neither event means &quot;the application is now correct.&quot;</p>
 <p>A single-page application can continue fetching data and rendering after both.</p>
 <p>This distinction matters when monitoring user experience.</p>
 <h2>The browser applies security policy throughout</h2>
@@ -144,10 +144,10 @@ paint
 TLS: good
 HTTP: good
 resources: loaded
-</code></pre>pre
+</code></pre>
 <p>From the application perspective:</p>
 <pre><code class="language-text">rendering logic: failed
-</code></pre>pre
+</code></pre>
 <p>This is why a green network waterfall does not prove a healthy page.</p>
 <h2>Practical inspection</h2>
 <p>Open a simple page you are authorized to inspect and use browser developer tools.</p>
@@ -184,13 +184,15 @@ missing image
 
 missing script
 → static content can load while behavior fails
-</code></pre>pre
+</code></pre>
 <p>One page load can therefore contain partial successes.</p>
 <h2>The lesson to carry forward</h2>
 <p>A rendered page is the output of many cooperating systems.</p>
 <p>The browser parses a URL, applies navigation policy, fetches resources, interprets HTTP, parses documents, loads dependencies, executes scripts, applies styles, performs layout, and paints.</p>
-<p>"The website is slow" is therefore not yet a diagnosis.</p>
+<p>&quot;The website is slow&quot; is therefore not yet a diagnosis.</p>
 <p>The next half of this module moves from loading pages into application state: cookies, sessions, same-origin policy, CORS, APIs, and backend request paths.</p>
+<h2>Interactive companion exercise</h2>
+<p>Follow URL parsing, DNS/connection setup, HTTP response, subresource discovery, and layout/paint in the <a href="../prototypes/interactive-system-design.html#protocol-title">browser loading timeline</a>.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

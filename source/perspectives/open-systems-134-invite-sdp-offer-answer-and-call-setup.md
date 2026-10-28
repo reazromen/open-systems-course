@@ -149,3 +149,7 @@ If the packets go somewhere else, an intermediary may be rewriting or relaying m
 SIP creates signaling state; SDP negotiates media parameters.
 
 The next lesson leaves signaling temporarily and follows the audio packets themselves through RTP and RTCP.
+
+## Interactive companion exercise
+
+Explore the INVITE with SDP offer, the 200 OK with SDP answer, and ACK in the [SIP call setup explorer](../prototypes/interactive-system-design.html#sip-title). This is a teaching sequence, not a complete SIP state machine.

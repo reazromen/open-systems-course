@@ -22,12 +22,12 @@
 <h2>One line can be several machine actions</h2>
 <p>Source:</p>
 <pre><code>counter += 1
-</code></pre>pre
+</code></pre>
 <p>Conceptually:</p>
 <pre><code>load counter
 add 1
 store counter
-</code></pre>pre
+</code></pre>
 <p>Thread A loads 10.</p>
 <p>Thread B loads 10.</p>
 <p>A stores 11.</p>
@@ -47,7 +47,7 @@ store counter
 <pre><code>lock
 counter += 1
 unlock
-</code></pre>pre
+</code></pre>
 <p>Only one cooperating thread enters at a time.</p>
 <p>Now increment is serialized.</p>
 <p>Correctness improves.</p>
@@ -62,7 +62,7 @@ unlock
 <p>Suppose:</p>
 <pre><code>debit account A
 credit account B
-</code></pre>pre
+</code></pre>
 <p>Two independent atomics do not make the transfer transactionally atomic as a pair.</p>
 <p>Choose synchronization at the invariant boundary.</p>
 <h2>Deadlock is coordination that cannot progress</h2>
@@ -82,7 +82,7 @@ credit account B
 <p>On multicore systems, processors and compilers can reorder operations within constraints.</p>
 <p>Atomic and synchronization primitives also define visibility and ordering relationships.</p>
 <p>This is why correct lock-free programming is difficult.</p>
-<p>"Both cores eventually see the value" is not a sufficient memory model.</p>
+<p>&quot;Both cores eventually see the value&quot; is not a sufficient memory model.</p>
 <p>Use language-defined concurrency primitives rather than inventing synchronization from ordinary variables.</p>
 <h2>Concurrency is not parallelism</h2>
 <p>Concurrency:</p>
@@ -96,7 +96,7 @@ credit account B
 <h2>Message passing moves the boundary</h2>
 <p>Instead of shared memory:</p>
 <pre><code>worker A -&gt; message -&gt; owner
-</code></pre>pre
+</code></pre>
 <p>One task owns state.</p>
 <p>Others request changes through messages.</p>
 <p>This can reduce shared-memory races.</p>
@@ -106,7 +106,7 @@ credit account B
 <h2>Exercise: find the invariant</h2>
 <p>Bank balance:</p>
 <pre><code>balance = 100
-</code></pre>pre
+</code></pre>
 <p>Two threads withdraw 80 after checking balance &gt;= 80.</p>
 <p>Both read 100.</p>
 <p>Both approve.</p>
@@ -126,6 +126,8 @@ credit account B
 <p>What ordering establishes it?</p>
 <p>What happens when participants wait or fail?</p>
 <p>These questions recur in threads, databases, networks, and distributed systems.</p>
+<h2>Interactive companion exercise</h2>
+<p>Step through a lost-update interleaving, then switch to the locked schedule in the <a href="../prototypes/interactive-system-design.html#race-title">race-condition simulator</a>. Compare the final shared counter values.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

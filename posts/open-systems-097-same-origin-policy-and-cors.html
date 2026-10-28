@@ -20,13 +20,13 @@
 <h2>An origin is more specific than a domain name</h2>
 <p>At a practical level, an origin is determined by the tuple:</p>
 <pre><code class="language-text">scheme + host + port
-</code></pre>pre
+</code></pre>
 <p>For example:</p>
 <pre><code class="language-text">https://example.com
 https://api.example.com
 http://example.com
 https://example.com:8443
-</code></pre>pre
+</code></pre>
 <p>are not all the same origin.</p>
 <p>RFC 6454 defines the web-origin concept, and the HTML and Fetch standards define the current browser behavior around origins and fetching.</p>
 <p>This matters because two services owned by the same organization can still be cross-origin to the browser.</p>
@@ -40,18 +40,18 @@ https://example.com:8443
 script execution
         ↓
 browser asks:
-"may this context read or manipulate data from origin B?"
-</code></pre>pre
+&quot;may this context read or manipulate data from origin B?&quot;
+</code></pre>
 <p>Many cross-origin operations are restricted.</p>
 <p>Some cross-origin actions are still allowed. For example, pages have long been able to embed images, navigate to other sites, and submit certain forms.</p>
-<p>The important distinction is often not "can a request be sent?" but:</p>
+<p>The important distinction is often not &quot;can a request be sent?&quot; but:</p>
 <p><strong>can script read the response or access the other origin's protected state?</strong></p>
 <h2>CORS relaxes one browser boundary</h2>
 <p>Cross-Origin Resource Sharing, or CORS, is integrated into the Fetch standard.</p>
 <p>A server can return response fields that tell a browser which origins are permitted to access a response through CORS-enabled fetch APIs.</p>
 <p>A simple conceptual response might include:</p>
 <pre><code class="language-http">Access-Control-Allow-Origin: https://app.example
-</code></pre>pre
+</code></pre>
 <p>That tells a conforming browser that the specified origin is allowed to access the response under the applicable CORS rules.</p>
 <p>CORS does not create network reachability.</p>
 <p>CORS does not authenticate the user.</p>
@@ -67,12 +67,12 @@ browser asks:
 <p>From the server:</p>
 <pre><code class="language-text">request received
 response sent
-</code></pre>pre
+</code></pre>
 <p>From JavaScript:</p>
 <pre><code class="language-text">fetch failed due to browser policy
-</code></pre>pre
+</code></pre>
 <p>Both observations can be true.</p>
-<p>This is why "CORS error" does not automatically mean the API never saw the request.</p>
+<p>This is why &quot;CORS error&quot; does not automatically mean the API never saw the request.</p>
 <h2>Some requests trigger a preflight</h2>
 <p>For certain cross-origin requests, the browser first sends a CORS preflight request, normally using the OPTIONS method.</p>
 <p>The browser is asking whether the intended cross-origin request is permitted.</p>
@@ -86,7 +86,7 @@ server CORS policy response
 browser decision
    ↓
 actual request, if permitted
-</code></pre>pre
+</code></pre>
 <p>The Fetch standard defines which requests are CORS-safelisted and when preflight is required.</p>
 <p>Do not memorize a tiny list without understanding the reason.</p>
 <p>A preflight exists because some cross-origin requests can carry methods or fields that web pages historically could not send through simpler mechanisms.</p>
@@ -96,7 +96,7 @@ actual request, if permitted
 <pre><code class="language-text">origin: https://app.example
 method: PUT
 field: Authorization
-</code></pre>pre
+</code></pre>
 <p>That does not mean every PUT request is authorized.</p>
 <p>The actual request still needs normal authentication, authorization, validation, and application policy.</p>
 <p>Think of the layers:</p>
@@ -111,8 +111,8 @@ may that identity perform this operation?
 
 application validation:
 is the requested state transition valid?
-</code></pre>pre
-<p>Combining these into one "security check" makes systems harder to reason about.</p>
+</code></pre>
+<p>Combining these into one &quot;security check&quot; makes systems harder to reason about.</p>
 <h2>Credentials make policy stricter</h2>
 <p>Cross-origin requests can interact with cookies and other credentials.</p>
 <p>When credentials are involved, CORS rules require more explicit handling. A wildcard origin is not a substitute for deliberate credentialed access policy.</p>
@@ -123,8 +123,8 @@ is the requested state transition valid?
 <p>A command-line client, backend service, or custom program is not required to enforce browser CORS policy.</p>
 <p>That means this request can succeed from a server-side HTTP client even when browser JavaScript is blocked.</p>
 <p>Therefore:</p>
-<pre><code class="language-text">"CORS blocks unauthorized API access"
-</code></pre>pre
+<pre><code class="language-text">&quot;CORS blocks unauthorized API access&quot;
+</code></pre>
 <p>is false as a security model.</p>
 <p>The API must still authenticate and authorize requests independently.</p>
 <p>CORS protects a browser interaction boundary.</p>
@@ -134,7 +134,7 @@ is the requested state transition valid?
 <p>SameSite cookie behavior uses a site concept that is not identical to same-origin.</p>
 <p>Two URLs can be cross-origin while still belonging to the same site under browser cookie rules.</p>
 <p>This distinction becomes important in authentication and CSRF design.</p>
-<p>Do not use "same-site" and "same-origin" interchangeably.</p>
+<p>Do not use &quot;same-site&quot; and &quot;same-origin&quot; interchangeably.</p>
 <p>They solve related but different web-security problems.</p>
 <h2>Inspect a CORS exchange</h2>
 <p>Use a test API you control.</p>
@@ -155,7 +155,7 @@ is the requested state transition valid?
 <p>You can observe:</p>
 <pre><code class="language-text">server works
 browser policy rejects cross-origin access
-</code></pre>pre
+</code></pre>
 <p>That is the boundary made visible.</p>
 <h2>Build a failure ladder</h2>
 <p>For a browser cross-origin failure:</p>
@@ -178,7 +178,7 @@ Did authorization succeed?
 Did application processing succeed?
         ↓
 Did the browser expose the response to script?
-</code></pre>pre
+</code></pre>
 <p>This prevents a 401 authentication error from being misdiagnosed as CORS, or a CORS rejection from being treated as network failure.</p>
 <h2>The lesson to carry forward</h2>
 <p>The browser is an active security participant.</p>
@@ -186,6 +186,8 @@ Did the browser expose the response to script?
 <p>CORS provides controlled exceptions for HTTP access across those origins.</p>
 <p>Neither one replaces server-side authentication or authorization.</p>
 <p>The next lesson moves into the API contract itself: resources, validation, error formats, compatibility, and versioning.</p>
+<h2>Interactive companion exercise</h2>
+<p>Step through a required CORS preflight and the browser decision to expose or block a cross-origin response in the <a href="../prototypes/interactive-system-design.html#protocol-title">CORS timeline</a>. CORS is not a server-to-server firewall.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

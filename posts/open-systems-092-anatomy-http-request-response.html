@@ -22,11 +22,11 @@ Host: api.example.com
 Content-Type: application/json
 Accept: application/json
 
-{"text":"hello systems"}
-</code></pre>pre
+{&quot;text&quot;:&quot;hello systems&quot;}
+</code></pre>
 <p>At the semantic level it contains a method, a request target, fields, and content. RFC 9110 defines these HTTP semantics.</p>
 <p>The method describes the requested action semantics. The target identifies the resource or operation context. Fields carry metadata and control information. The content carries representation data when appropriate.</p>
-<p>The target path does not reveal the server's implementation. A path such as <code>/api/messages</code>code might map to application code, a database-backed resource, a queue, a reverse-proxy route, or another service.</p>
+<p>The target path does not reveal the server's implementation. A path such as <code>/api/messages</code> might map to application code, a database-backed resource, a queue, a reverse-proxy route, or another service.</p>
 <h2>Fields are structured metadata</h2>
 <p>Examples include:</p>
 <pre><code class="language-http">Host: api.example.com
@@ -34,24 +34,24 @@ Accept: application/json
 Content-Type: application/json
 Authorization: Bearer ...
 Cache-Control: no-cache
-</code></pre>pre
+</code></pre>
 <p>Some fields affect routing. Some affect authentication. Some describe representations. Some influence caching. They are not interchangeable free-form annotations.</p>
 <p>A particularly useful distinction is:</p>
 <pre><code class="language-text">Content-Type:
-"this message content is JSON"
+&quot;this message content is JSON&quot;
 
 Accept:
-"I prefer a response representation such as JSON"
-</code></pre>pre
-<p>Sending <code>Accept: application/json</code>code does not force a server to support JSON. It expresses a preference under HTTP content-negotiation rules.</p>
+&quot;I prefer a response representation such as JSON&quot;
+</code></pre>
+<p>Sending <code>Accept: application/json</code> does not force a server to support JSON. It expresses a preference under HTTP content-negotiation rules.</p>
 <h2>A response begins with status</h2>
 <p>A constructed response might be:</p>
 <pre><code class="language-http">HTTP/1.1 201 Created
 Content-Type: application/json
 Location: /api/messages/784
 
-{"id":784,"state":"queued"}
-</code></pre>pre
+{&quot;id&quot;:784,&quot;state&quot;:&quot;queued&quot;}
+</code></pre>
 <p>The status code communicates the HTTP outcome. Fields add metadata. The body can carry richer application detail.</p>
 <p>A successful status does not prove a business operation succeeded in every domain-specific sense, and a failed status does not reveal the entire root cause.</p>
 <h2>Message length matters in HTTP/1.1</h2>
@@ -64,10 +64,10 @@ Location: /api/messages/784
 <pre><code class="language-text">client-side request view
 ≠
 byte-for-byte origin-side request view
-</code></pre>pre
+</code></pre>
 <p>If you need to know what the origin actually received, inspect origin-side logs or traces. Browser developer tools prove the client-facing boundary. Proxy logs prove another boundary.</p>
 <h2>Bodies can be absent</h2>
-<p>Many requests and responses do not contain message content. A GET request can be complete without a body. A <code>204 No Content</code>code response intentionally carries no response content under its semantics.</p>
+<p>Many requests and responses do not contain message content. A GET request can be complete without a body. A <code>204 No Content</code> response intentionally carries no response content under its semantics.</p>
 <p>Do not build a mental model in which every successful response must contain JSON.</p>
 <h2>Practical inspection</h2>
 <p>On a site or service you are authorized to inspect, open the browser network panel and choose one request. Record:</p>
@@ -83,8 +83,10 @@ byte-for-byte origin-side request view
 <p>Then compare the browser's view with server or reverse-proxy logs if you control them.</p>
 <p>The point is to see that one user action creates several different protocol observations at different boundaries.</p>
 <h2>The lesson to carry forward</h2>
-<p>An HTTP exchange is a structured protocol message, not just "data over the web."</p>
+<p>An HTTP exchange is a structured protocol message, not just &quot;data over the web.&quot;</p>
 <p>Method, target, fields, status, and content each carry separate meaning. The next lesson focuses on methods, safety, idempotency, and status codes.</p>
+<h2>Interactive companion exercise</h2>
+<p>Step through the <a href="../prototypes/interactive-system-design.html#protocol-title">HTTP request/response anatomy scenario</a> to see how the request line, headers, status line, and body fit together.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

@@ -300,3 +300,7 @@ CORS provides controlled exceptions for HTTP access across those origins.
 Neither one replaces server-side authentication or authorization.
 
 The next lesson moves into the API contract itself: resources, validation, error formats, compatibility, and versioning.
+
+## Interactive companion exercise
+
+Step through a required CORS preflight and the browser decision to expose or block a cross-origin response in the [CORS timeline](../prototypes/interactive-system-design.html#protocol-title). CORS is not a server-to-server firewall.

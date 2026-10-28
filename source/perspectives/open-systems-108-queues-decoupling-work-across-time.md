@@ -180,3 +180,7 @@ Queues decouple producers and consumers across time and load.
 They also introduce delivery semantics, acknowledgements, duplicates, retries, ordering scope, retention, and backpressure.
 
 The next lesson returns to durability directly: write-ahead logs, replication, backups, and recovery.
+
+## Interactive companion exercise
+
+Explore queue depth, worker throughput, and backpressure in the [queue-and-worker simulator](../prototypes/interactive-system-design.html#queue-title). Its job durations and capacity are fixed teaching assumptions, not production measurements.

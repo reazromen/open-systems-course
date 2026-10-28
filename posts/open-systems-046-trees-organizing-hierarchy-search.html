@@ -29,15 +29,15 @@
 │   ├── C
 │   └── D
 └── B
-</code></pre>pre
+</code></pre>
 <p>The path from root to D is:</p>
 <pre><code>root -&gt; A -&gt; D
-</code></pre>pre
+</code></pre>
 <p>That structural language is more important than one implementation.</p>
 <h2>Binary search trees add an ordering invariant</h2>
 <p>A binary search tree can enforce:</p>
 <pre><code>left subtree &lt; node &lt; right subtree
-</code></pre>pre
+</code></pre>
 <p>for keys under a chosen ordering rule.</p>
 <p>Lookup compares the desired key and chooses one branch.</p>
 <p>If the tree remains balanced, each decision can discard a large fraction of possibilities.</p>
@@ -49,7 +49,7 @@
        2
            3
                4
-</code></pre>pre
+</code></pre>
 <p>The tree has degenerated.</p>
 <p>Search becomes linear.</p>
 <p>Balanced-tree designs such as AVL or red-black trees maintain shape constraints to keep height controlled.</p>
@@ -78,12 +78,12 @@
 <h2>Syntax trees represent programs</h2>
 <p>Consider:</p>
 <pre><code>a + b * c
-</code></pre>pre
+</code></pre>
 <p>A parser can represent structure as:</p>
 <pre><code>    +
    /       a   *
      /         b   c
-</code></pre>pre
+</code></pre>
 <p>Multiplication is nested beneath addition according to precedence.</p>
 <p>This tree gives compilers a structural representation of source meaning.</p>
 <p>Trees are therefore not only containers for user data.</p>
@@ -91,7 +91,7 @@
 <h2>Filesystems are tree-like but not always pure trees</h2>
 <p>Directory paths look hierarchical:</p>
 <pre><code>/home/user/project/file
-</code></pre>pre
+</code></pre>
 <p>But hard links, mount points, symbolic links, and special filesystem features complicate the pure-tree model.</p>
 <p>This is a useful warning.</p>
 <p>A tree can be a helpful abstraction even when the real system contains graph-like relationships.</p>
@@ -115,6 +115,8 @@
 <p>What ordering or hierarchy must it preserve?</p>
 <p>What operations must be efficient?</p>
 <p>What keeps the shape healthy?</p>
+<h2>Interactive companion exercise</h2>
+<p>Switch the <a href="../prototypes/interactive-system-design.html#graph-title">tree/graph traversal explorer</a> to Tree and step through breadth-first or depth-first traversal from the root.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

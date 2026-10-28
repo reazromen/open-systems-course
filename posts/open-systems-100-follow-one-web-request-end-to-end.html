@@ -18,7 +18,7 @@
 <p>Consider a constructed example:</p>
 <p>A signed-in user opens:</p>
 <pre><code class="language-text">https://app.example/account
-</code></pre>pre
+</code></pre>
 <p>The application is fronted by an edge proxy. The user's browser already has a session cookie. The account page needs one database query and one internal API call.</p>
 <p>No real company or provider is being described.</p>
 <p>The goal is to follow one request across the entire stack and ask what each observation proves.</p>
@@ -56,7 +56,7 @@
 <pre><code class="language-text">scheme: https
 host:   app.example
 path:   /account
-</code></pre>pre
+</code></pre>
 <p>The scheme implies HTTPS semantics.</p>
 <p>The host becomes part of DNS resolution, TLS service identity, HTTP authority, and browser-origin calculations.</p>
 <p>The path identifies the target resource within the web application.</p>
@@ -64,7 +64,7 @@ path:   /account
 <h2>2. Name resolution finds an address</h2>
 <p>The browser or operating system resolver obtains address data for:</p>
 <pre><code class="language-text">app.example
-</code></pre>pre
+</code></pre>
 <p>The answer can come from cache.</p>
 <p>If not, the configured recursive resolver may perform DNS resolution.</p>
 <p>Suppose it returns a public edge address.</p>
@@ -100,7 +100,7 @@ path:   /account
 <li>an acceptable certificate path;</li>
 <li>trust-anchor policy;</li>
 <li>certificate validity;</li>
-<li>service identity for <code>app.example</code>code.</li>
+<li>service identity for <code>app.example</code>.</li>
 </ul>
 <p>If TLS succeeds, protected application traffic can begin.</p>
 <p>This authenticates the TLS endpoint reached by the browser.</p>
@@ -110,14 +110,14 @@ path:   /account
 <pre><code class="language-text">method: GET
 target: /account
 authority: app.example
-</code></pre>pre
+</code></pre>
 <p>Additional request fields can describe accepted representations, browser context, caching state, and other metadata.</p>
 <p>The browser can also attach matching cookies.</p>
 <p>A simplified conceptual request is:</p>
 <pre><code class="language-http">GET /account
 Host: app.example
 Cookie: session_id=...
-</code></pre>pre
+</code></pre>
 <p>The exact wire format depends on the negotiated HTTP version.</p>
 <p>Do not copy HTTP/1.1 text formatting onto HTTP/2 or HTTP/3 framing.</p>
 <h2>7. The session cookie carries continuity</h2>
@@ -128,7 +128,7 @@ Cookie: session_id=...
 session record
    ↓
 authenticated user identity
-</code></pre>pre
+</code></pre>
 <p>The server then checks whether the session is:</p>
 <ul>
 <li>present;</li>
@@ -154,7 +154,7 @@ authenticated user identity
 <p>Now there are two connection contexts:</p>
 <pre><code class="language-text">browser → edge
 edge → application
-</code></pre>pre
+</code></pre>
 <p>They can have different addresses, timeouts, TLS policies, and connection reuse behavior.</p>
 <p>The user still experiences one page load.</p>
 <h2>9. The application processes the request</h2>
@@ -173,7 +173,7 @@ query account data
 call billing/profile service
    ↓
 render response
-</code></pre>pre
+</code></pre>
 <p>Each step can fail independently.</p>
 <p>An HTTP 500 from the application can occur after DNS, routing, TCP, TLS, proxying, session lookup, and authorization all succeeded.</p>
 <p>That is why lower-layer success does not prove application correctness.</p>
@@ -189,7 +189,7 @@ database connection is usable
 query executes
         ↓
 result is returned
-</code></pre>pre
+</code></pre>
 <p>If the pool is exhausted, the database itself can still be healthy.</p>
 <p>If the query times out, the network to the browser can still be healthy.</p>
 <p>The public request is a graph of dependencies.</p>
@@ -203,7 +203,7 @@ internal DNS/service discovery
 internal transport/TLS
    ↓
 billing API
-</code></pre>pre
+</code></pre>
 <p>That is a new network transaction nested inside the original user request.</p>
 <p>The browser never sees the internal address.</p>
 <p>If the billing call fails, the application must decide whether to:</p>
@@ -220,7 +220,7 @@ billing API
 <p>It might be HTML:</p>
 <pre><code class="language-text">200 OK
 Content-Type: text/html
-</code></pre>pre
+</code></pre>
 <p>or JSON for a browser application.</p>
 <p>The response can include:</p>
 <ul>
@@ -254,11 +254,11 @@ Content-Type: text/html
 <li>a later API request returns 401;</li>
 <li>rendering logic is wrong.</li>
 </ul>
-<p>"HTTP 200" is not a user-experience guarantee.</p>
+<p>&quot;HTTP 200&quot; is not a user-experience guarantee.</p>
 <h2>14. CORS may appear on later API calls</h2>
 <p>Suppose the rendered page calls:</p>
 <pre><code class="language-text">https://api.example/account/preferences
-</code></pre>pre
+</code></pre>
 <p>If that is another origin, browser CORS policy applies.</p>
 <p>The API may receive an Origin field.</p>
 <p>A preflight can occur depending on the request.</p>
@@ -268,7 +268,7 @@ Content-Type: text/html
 <h2>15. Caches can remove parts of the path</h2>
 <p>Suppose the page references:</p>
 <pre><code class="language-text">/app.css
-</code></pre>pre
+</code></pre>
 <p>A fresh browser cache can reuse the representation without another full transfer.</p>
 <p>A CDN can also serve a cached object without reaching the origin.</p>
 <p>Therefore two resources on the same page can have different effective paths:</p>
@@ -277,11 +277,11 @@ browser → edge → application → database
 
 CSS:
 browser → local cache
-</code></pre>pre
+</code></pre>
 <p>or:</p>
 <pre><code class="language-text">image:
 browser → CDN cache
-</code></pre>pre
+</code></pre>
 <p>A page load is not one topology.</p>
 <p>It is a set of resource-specific paths.</p>
 <h2>16. Observability should follow the request across boundaries</h2>
@@ -297,7 +297,7 @@ application trace
 database span
         ↓
 internal API span
-</code></pre>pre
+</code></pre>
 <p>The goal is to answer:</p>
 <p><strong>Where did time go, and where did the first failure occur?</strong></p>
 <p>Logs answer discrete events.</p>
@@ -324,7 +324,7 @@ database              pool wait + query result
 internal service      downstream status/latency
 response              content type/cache fields
 browser               subresource/CORS/script/render state
-</code></pre>pre
+</code></pre>
 <p>The table is not a checklist to run for every normal request.</p>
 <p>It is a map for when something goes wrong.</p>
 <h2>Break one boundary at a time</h2>
@@ -347,7 +347,7 @@ browser               subresource/CORS/script/render state
 <li>proxy evidence;</li>
 <li>application evidence.</li>
 </ul>
-<p>The visible symptom can remain "page does not work."</p>
+<p>The visible symptom can remain &quot;page does not work.&quot;</p>
 <p>The failure boundary moves completely.</p>
 <h2>What the entire Web Systems module added</h2>
 <p>The previous networking module got bytes to an endpoint.</p>
@@ -362,7 +362,7 @@ same-origin policy and CORS
 API contracts
 reverse proxies and backends
 end-to-end request tracing
-</code></pre>pre
+</code></pre>
 <p>The web is not one protocol.</p>
 <p>It is a stack of protocols, browser rules, application state, deployment architecture, and data dependencies.</p>
 <h2>The module to carry forward</h2>
@@ -379,9 +379,11 @@ Was the operation authorized?
 Which backend dependency was used?
 What response was produced?
 What did the browser do with it?
-</code></pre>pre
-<p>That turns "the website is broken" into a sequence of testable contracts.</p>
+</code></pre>
+<p>That turns &quot;the website is broken&quot; into a sequence of testable contracts.</p>
 <p>Module 11 moves below the application into <strong>Data Systems</strong>: filesystems, relational databases, indexes, transactions, caches, queues, durability, and one complete write path from application state to persistent storage.</p>
+<h2>Interactive companion exercise</h2>
+<p>Follow a web request from URL parsing through DNS/TCP/TLS, HTTP, subresource loading, and paint in the <a href="../prototypes/interactive-system-design.html#protocol-title">end-to-end browser timeline</a>.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

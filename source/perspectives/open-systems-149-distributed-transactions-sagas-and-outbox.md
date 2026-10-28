@@ -151,3 +151,7 @@ The system now has durable evidence that publication is pending.
 Distributed transactions are about preserving business intent when no single atomic boundary covers every system.
 
 The final lesson of this module follows one request across services, replicas, retries, queues, and storage.
+
+## Interactive companion exercise
+
+The [retry and idempotency companion exercise](../prototypes/interactive-system-design.html#retry-title) demonstrates one failure mode relevant to distributed workflows: a side effect commits but the response is lost. It is not a saga or outbox implementation.

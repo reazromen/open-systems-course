@@ -36,23 +36,23 @@
 <pre><code class="language-text">POST /doThing
 POST /getThing
 POST /updateThing
-</code></pre>pre
+</code></pre>
 <p>A stronger design asks what the resources are and how HTTP semantics fit them.</p>
 <p>For example:</p>
 <pre><code class="language-text">GET    /messages/784
 POST   /messages
 DELETE /messages/784
-</code></pre>pre
+</code></pre>
 <p>That does not mean every API must be perfectly REST-shaped.</p>
 <p>The point is to make the protocol semantics and domain model reinforce each other rather than fight each other.</p>
 <p>A resource-oriented design can make caching, idempotency, observability, authorization, and documentation easier to reason about.</p>
 <h2>A schema is part of the contract</h2>
 <p>Suppose a client sends:</p>
 <pre><code class="language-json">{
-  "recipient": "user-42",
-  "text": "hello"
+  &quot;recipient&quot;: &quot;user-42&quot;,
+  &quot;text&quot;: &quot;hello&quot;
 }
-</code></pre>pre
+</code></pre>
 <p>The server needs rules for:</p>
 <ul>
 <li>required fields;</li>
@@ -72,10 +72,10 @@ DELETE /messages/784
 <p>A request can be syntactically valid JSON and still be invalid for the application.</p>
 <p>For example:</p>
 <pre><code class="language-json">{
-  "recipient": "",
-  "text": "hello"
+  &quot;recipient&quot;: &quot;&quot;,
+  &quot;text&quot;: &quot;hello&quot;
 }
-</code></pre>pre
+</code></pre>
 <p>The parser can succeed.</p>
 <p>The application validator can reject the empty recipient.</p>
 <p>A useful processing model is:</p>
@@ -92,20 +92,20 @@ business validation
 authorization
   ↓
 state transition
-</code></pre>pre
+</code></pre>
 <p>Different systems can order some policy checks differently, but the distinction remains valuable.</p>
-<p>"Invalid JSON" is not the same failure as "valid JSON with an invalid business value."</p>
+<p>&quot;Invalid JSON&quot; is not the same failure as &quot;valid JSON with an invalid business value.&quot;</p>
 <h2>Error responses need stable structure</h2>
 <p>If every endpoint invents its own error shape, clients become fragile.</p>
 <p>One endpoint returns:</p>
-<pre><code class="language-json">{"error":"bad request"}
-</code></pre>pre
+<pre><code class="language-json">{&quot;error&quot;:&quot;bad request&quot;}
+</code></pre>
 <p>another:</p>
-<pre><code class="language-json">{"message":"failed"}
-</code></pre>pre
+<pre><code class="language-json">{&quot;message&quot;:&quot;failed&quot;}
+</code></pre>
 <p>another:</p>
-<pre><code class="language-json">{"code":17,"detail":"recipient missing"}
-</code></pre>pre
+<pre><code class="language-json">{&quot;code&quot;:17,&quot;detail&quot;:&quot;recipient missing&quot;}
+</code></pre>
 <p>A consistent error model helps clients distinguish machine-readable categories from human-readable details.</p>
 <p>RFC 9457 defines Problem Details for HTTP APIs.</p>
 <p>A problem response can contain standardized members such as:</p>
@@ -121,8 +121,8 @@ state transition
 <p>The goal is to make errors part of the documented contract rather than ad-hoc strings.</p>
 <h2>HTTP status and application error should agree</h2>
 <p>If validation fails, returning HTTP 200 with:</p>
-<pre><code class="language-json">{"success":false}
-</code></pre>pre
+<pre><code class="language-json">{&quot;success&quot;:false}
+</code></pre>
 <p>throws away useful HTTP semantics.</p>
 <p>Sometimes application protocols deliberately define such behavior, but it should be an explicit decision.</p>
 <p>Usually, a client benefits when the HTTP status represents the request outcome class and the body provides richer detail.</p>
@@ -150,7 +150,7 @@ rate limit exceeded
 
 500
 unexpected server failure
-</code></pre>pre
+</code></pre>
 <p>The exact choice depends on the contract and current HTTP semantics.</p>
 <p>Do not select status codes based only on English wording.</p>
 <h2>Validation errors should point to the failing field</h2>
@@ -163,21 +163,21 @@ unexpected server failure
 </ul>
 <p>Constructed example:</p>
 <pre><code class="language-json">{
-  "type": "https://api.example/problems/validation",
-  "title": "Request validation failed",
-  "status": 422,
-  "errors": [
+  &quot;type&quot;: &quot;https://api.example/problems/validation&quot;,
+  &quot;title&quot;: &quot;Request validation failed&quot;,
+  &quot;status&quot;: 422,
+  &quot;errors&quot;: [
     {
-      "path": "recipient",
-      "code": "required",
-      "message": "recipient must not be empty"
+      &quot;path&quot;: &quot;recipient&quot;,
+      &quot;code&quot;: &quot;required&quot;,
+      &quot;message&quot;: &quot;recipient must not be empty&quot;
     }
   ]
 }
-</code></pre>pre
+</code></pre>
 <p>The URL and content are constructed.</p>
 <p>The important property is stability.</p>
-<p>Client code can reason about <code>code</code>code and <code>path</code>code without parsing prose.</p>
+<p>Client code can reason about <code>code</code> and <code>path</code> without parsing prose.</p>
 <h2>Idempotency belongs in the API contract</h2>
 <p>A payment, job submission, or message-send API can receive the same operation more than once because of retries.</p>
 <p>The API must define whether repeated delivery can create repeated effects.</p>
@@ -191,9 +191,9 @@ server remembers completed/requested operation
 duplicate delivery
       ↓
 same logical outcome instead of duplicate effect
-</code></pre>pre
+</code></pre>
 <p>This is not free.</p>
-<p>The server needs storage, expiration policy, conflict handling, and a definition of what counts as "the same operation."</p>
+<p>The server needs storage, expiration policy, conflict handling, and a definition of what counts as &quot;the same operation.&quot;</p>
 <p>Retry semantics belong in the contract, not in a hidden client library assumption.</p>
 <h2>Pagination is also protocol state</h2>
 <p>A list endpoint can become enormous.</p>
@@ -206,7 +206,7 @@ same logical outcome instead of duplicate effect
 </ul>
 <p>Offset pagination:</p>
 <pre><code class="language-text">?page=5&amp;limit=20
-</code></pre>pre
+</code></pre>
 <p>is easy to understand but can shift when records are inserted or deleted.</p>
 <p>Cursor pagination can represent continuation based on ordered state.</p>
 <p>Neither is universally better.</p>
@@ -216,7 +216,7 @@ same logical outcome instead of duplicate effect
 <p>Teams often jump directly to:</p>
 <pre><code class="language-text">/v1/
 /v2/
-</code></pre>pre
+</code></pre>
 <p>But versioning is not fundamentally about the URL.</p>
 <p>It is about compatibility.</p>
 <p>A change can be:</p>
@@ -246,7 +246,7 @@ deprecated
 migration window
   ↓
 retired
-</code></pre>pre
+</code></pre>
 <p>Clients need enough information to migrate.</p>
 <p>That can include:</p>
 <ul>
@@ -285,7 +285,7 @@ retry behavior
 rate-limit behavior
 pagination, if any
 versioning rule
-</code></pre>pre
+</code></pre>
 <p>Then compare the written contract with the actual implementation and logs.</p>
 <p>Every mismatch is technical debt.</p>
 <p>Do not start by generating documentation automatically.</p>
@@ -304,13 +304,15 @@ versioning rule
 <p>Record both:</p>
 <pre><code class="language-text">HTTP status
 error representation
-</code></pre>pre
+</code></pre>
 <p>The goal is to make failure as predictable as success.</p>
 <h2>The lesson to carry forward</h2>
 <p>An API contract is a compatibility boundary.</p>
 <p>HTTP provides methods, statuses, fields, and representations.</p>
 <p>The application adds schemas, validation, domain semantics, authorization, retries, pagination, and change policy.</p>
 <p>The next lesson places that API inside a deployment: web server, reverse proxy, application process, database, cache, queue, and upstream services.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#protocol-title">API contract timeline</a> to follow payload validation, structured validation errors, and documented response/version compatibility.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

@@ -23,16 +23,16 @@
 <pre><code>A arrives
 B arrives
 C arrives
-</code></pre>pre
+</code></pre>
 <p>Processing order:</p>
 <pre><code>A
 B
 C
-</code></pre>pre
+</code></pre>
 <p>This is fair for many workloads.</p>
 <p>Not all queues are FIFO.</p>
 <p>Priority queues, deadline queues, weighted queues, and topic partitions use different policies.</p>
-<p>"Queue" describes waiting plus ordering, not one universal algorithm.</p>
+<p>&quot;Queue&quot; describes waiting plus ordering, not one universal algorithm.</p>
 <h2>Queues decouple timing</h2>
 <p>A producer can create work now.</p>
 <p>A consumer can process it later.</p>
@@ -47,20 +47,20 @@ C
 <p>Web request submits image processing.</p>
 <p>Instead of keeping the user connection open for two minutes:</p>
 <pre><code>web -&gt; queue -&gt; worker
-</code></pre>pre
+</code></pre>
 <p>The web service acknowledges accepted work.</p>
 <p>The worker processes later.</p>
 <p>The architecture changed user-facing latency and failure behaviour.</p>
 <h2>A queue does not create throughput</h2>
 <p>If arrival rate is continuously:</p>
 <pre><code>1000 jobs/s
-</code></pre>pre
+</code></pre>
 <p>and processing capacity is:</p>
 <pre><code>700 jobs/s
-</code></pre>pre
+</code></pre>
 <p>the queue grows:</p>
 <pre><code>+300 jobs/s
-</code></pre>pre
+</code></pre>
 <p>Buffering postpones failure.</p>
 <p>It does not solve insufficient capacity.</p>
 <p>Eventually you need:</p>
@@ -83,7 +83,7 @@ C
 <li>failure rate;</li>
 <li>retry count.</li>
 </ul>
-<p>A queue being "up" tells little about whether work is timely.</p>
+<p>A queue being &quot;up&quot; tells little about whether work is timely.</p>
 <h2>Delivery and processing are separate states</h2>
 <p>A broker may deliver a message.</p>
 <p>Consumer crashes before finishing.</p>
@@ -124,13 +124,13 @@ C
 <h2>Exercise: calculate backlog</h2>
 <p>Arrival:</p>
 <pre><code>100 jobs/s
-</code></pre>pre
+</code></pre>
 <p>Consumer capacity:</p>
 <pre><code>80 jobs/s
-</code></pre>pre
+</code></pre>
 <p>After 60 seconds, ignoring bursts and retries:</p>
 <pre><code>backlog growth = 20 × 60 = 1200 jobs
-</code></pre>pre
+</code></pre>
 <p>If average service capacity remains below arrival, the system is unstable.</p>
 <p>No queue setting fixes that arithmetic.</p>
 <h2>The lesson to carry forward</h2>
@@ -139,6 +139,8 @@ C
 <p>They also create backlog, duplicate-delivery, retry, persistence, and monitoring problems.</p>
 <p>A queue is not storage you can ignore.</p>
 <p>It is delayed work with semantics.</p>
+<h2>Interactive companion exercise</h2>
+<p>Try enqueue and dequeue in the <a href="../prototypes/interactive-system-design.html#data-structure-title">queue operation explorer</a>. Its O(1) dequeue assumption requires a head/tail or circular-buffer implementation; it is not JavaScript Array.shift() timing.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

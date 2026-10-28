@@ -148,3 +148,7 @@ If they are the same path, that is an architectural result. Do not assume it in 
 A VoIP call is a distributed session with separate control and media planes.
 
 The next lesson opens the signaling protocol itself: SIP requests, responses, transactions, dialogs, and identifiers.
+
+## Interactive companion exercise
+
+Use the [SIP call-flow explorer](../prototypes/interactive-system-design.html#sip-title) to step through signaling messages and then see when RTP media begins. The sequence is simplified and explicitly separates the signaling and media planes.

@@ -202,3 +202,7 @@ The TLB makes repeated translations fast.
 When memory bugs or performance issues cross this boundary, "RAM" is too vague.
 
 You need to ask about mappings, faults, permissions, and translation behaviour.
+
+## Interactive companion exercise
+
+Translate a virtual address into page number, offset, frame, and physical address in the [virtual-memory page-table explorer](../prototypes/interactive-system-design.html#vm-title). An absent mapping demonstrates a page fault.

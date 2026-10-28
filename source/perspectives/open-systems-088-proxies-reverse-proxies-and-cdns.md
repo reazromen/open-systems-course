@@ -330,3 +330,7 @@ That can improve performance, availability, security, and operational control.
 It also creates more places where state can disagree.
 
 The next lesson builds a disciplined failure model across DNS, routing, transport, TLS, intermediaries, and applications so that "the Internet is down" becomes a set of testable hypotheses.
+
+## Interactive companion exercise
+
+Trace a client request through a CDN/reverse proxy, cache decision, origin, and response in the [proxy timeline](../prototypes/interactive-system-design.html#protocol-title).

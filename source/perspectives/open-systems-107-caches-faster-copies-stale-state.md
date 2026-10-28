@@ -189,3 +189,7 @@ A cache trades stronger freshness for cheaper access.
 Every cache needs an authority model, invalidation policy, expiration behavior, miss strategy, and failure plan.
 
 The next lesson introduces another stateful intermediary: queues, which decouple producers and consumers across time.
+
+## Interactive exercise: cache behavior
+
+Explore cache hits, TTL expiry, stale values, database updates, and explicit invalidation in the [interactive system-design lab](../prototypes/interactive-system-design.html#cache-title). The model is deterministic and illustrates behavior rather than measured performance.
