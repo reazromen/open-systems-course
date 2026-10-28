@@ -1,49 +1,49 @@
-# Lesson 02 — একটি Software System কীভাবে কাজ করে?
+# Lesson 02 — How Does a Software System Work?
 
-**কোর্স:** System Design বাংলা — একেবারে বেসিক থেকে  
-**মডিউল ১:** System Design-এর ভিত্তি  
-**আগের পাঠ:** System Design কী?
+**Course:** System Design — From the Ground Up  
+**Module 1:** System Design Fundamentals  
+**Previous lesson:** What Is System Design?
 
-## ভিডিও স্ক্রিপ্ট
+## Video Script
 
-আগের পাঠে আমরা জেনেছি, System Design হলো একটি সফটওয়্যার সিস্টেমের বিভিন্ন অংশ কীভাবে একসঙ্গে কাজ করবে তার পরিকল্পনা। আজ দেখব, একটি সাধারণ সফটওয়্যার সিস্টেমের ভেতরে বাস্তবে কী ঘটে।
+In the previous lesson, we learned that system design is about planning how the parts of a software system work together. In this lesson, we will follow the basic flow inside a typical software system.
 
-ধরুন, আপনি মোবাইলে একটি অনলাইন দোকানের অ্যাপ খুলে “একটি বই খুঁজুন” লিখলেন। আপনার চোখে দেখা যাচ্ছে একটি search box এবং কিছু ফলাফল। কিন্তু পেছনে একাধিক ধাপ কাজ করতে পারে।
+Imagine opening an online store on your phone and searching for a book. You see a search box and a list of results, but several steps may be happening behind the scenes.
 
-প্রথমে **client**—অর্থাৎ আপনার মোবাইল অ্যাপ বা browser—ব্যবহারকারীর ইনপুট নেয়। এরপর client নেটওয়ার্কের মাধ্যমে একটি request পাঠায়। request যায় কোনো server-এর কাছে। server অনুরোধটি বোঝে, প্রয়োজনীয় নিয়ম যাচাই করে, ডেটাবেসে বইয়ের তথ্য খুঁজতে পারে, তারপর ফলাফল তৈরি করে response পাঠায়। client সেই response ব্যবহার করে পর্দায় বইয়ের তালিকা দেখায়।
+First, the **client**—your mobile app or web browser—collects your input. The client sends a request across the network to a server. The server interprets the request, applies the relevant rules, and may query a database for book information. It then prepares a response and sends it back. The client uses that response to display the results on your screen.
 
-এই প্রবাহকে সরলভাবে লেখা যায়:
+A simplified flow looks like this:
 
-**User → Client → Network → Server → Database (প্রয়োজনে) → Server → Client → User**
+**User → Client → Network → Server → Database (if needed) → Server → Client → User**
 
-এটি একটি ধারণাগত চিত্র; বাস্তব সিস্টেমে load balancer, cache, API gateway বা একাধিক service থাকতে পারে। প্রতিটি অ্যাপের জন্য সব component দরকার হয় না।
+This is a conceptual model. A real system may also use a load balancer, cache, API gateway, or multiple services. Not every application needs all of these components.
 
-এখন কয়েকটি শব্দ বুঝে নিই।
+Let's define the core terms.
 
-**Client:** যে অংশ ব্যবহারকারীর সঙ্গে সরাসরি কাজ করে এবং server-এ request পাঠায়। Browser, Android app—দুটিই client হতে পারে।
+**Client:** The part that interacts with the user and sends requests to a server. A web browser and an Android app can both be clients.
 
-**Server:** যে কম্পিউটার বা software অন্য পক্ষের request গ্রহণ করে এবং response দেয়। “Server” শব্দটি কখনও hardware বোঝায়, কখনও সেই hardware-এ চলা software—প্রসঙ্গ দেখে বুঝতে হবে।
+**Server:** A computer or software process that receives requests and provides responses. The word *server* can refer to the machine itself or to the software running on it; context tells us which meaning is intended.
 
-**Request:** client-এর পাঠানো অনুরোধ। এতে কী কাজ করতে হবে, কোন resource দরকার, এবং প্রয়োজনীয় data থাকতে পারে।
+**Request:** A message sent by a client asking for an operation or resource. It may include data needed to complete the operation.
 
-**Response:** server-এর উত্তর। কাজ সফল হয়েছে কি না এবং চাওয়া তথ্য—দুটিই এতে থাকতে পারে।
+**Response:** The server's reply. It can contain requested information, a result, or an indication of whether the operation succeeded.
 
-**Database:** সংগঠিতভাবে data সংরক্ষণ ও খুঁজে পাওয়ার ব্যবস্থা। যেমন বইয়ের নাম, লেখক, দাম এবং stock-এর তথ্য।
+**Database:** A system for storing and retrieving organized data, such as book titles, authors, prices, and inventory levels.
 
-একটি গুরুত্বপূর্ণ ধারণা হলো, client-কে সব নিয়মের চূড়ান্ত কর্তৃপক্ষ বানানো যায় না। মোবাইল অ্যাপে কোনো বইয়ের দাম ৫০০ টাকা দেখালেও server-কে নিজস্ব নির্ভরযোগ্য তথ্য দিয়ে দাম যাচাই করতে হবে। কারণ client পরিবর্তন করা বা ভুল request পাঠানো সম্ভব। পেমেন্ট, অনুমতি এবং গুরুত্বপূর্ণ business rules সাধারণত server-side-এ যাচাই করা হয়।
+One important principle is that the client should not be the final authority for critical decisions. A mobile app might display a book price of $5, but the server should verify the price using trusted data. Clients can be modified and requests can be malformed or manipulated. Payments, permissions, and important business rules therefore need server-side validation.
 
-আরেকটি বিষয়: প্রতিটি request-এর জন্য database-এ যেতে হবে, এমন নয়। কিছু তথ্য cache থেকে পাওয়া যেতে পারে। আবার কিছু কাজ সময়সাপেক্ষ হলে server তা queue-তে রেখে পরে process করতে পারে। আমরা পরের মডিউলগুলোতে এসব ধারণা ধাপে ধাপে শিখব।
+Not every request needs to reach the database. Frequently accessed information may be served from a cache. A time-consuming task may be placed on a queue and processed later. We will study these approaches in later modules.
 
-সিস্টেম ডিজাইন করার সময় শুধু “কোন সার্ভার ব্যবহার করব?” প্রশ্নটি করলেই হয় না। বরং জিজ্ঞেস করতে হবে: request কোথা থেকে আসছে? কোন component সেটি যাচাই করছে? data কোথায় আছে? response কীভাবে ফেরত যাচ্ছে? কোনো ধাপে ব্যর্থ হলে ব্যবহারকারী কী দেখবে? একই request আবার এলে ভুল করে একই কাজ দুবার হয়ে যাবে কি?
+When designing a system, do not ask only, “Which server should we use?” Ask a broader set of questions: Where does the request originate? Which component validates it? Where is the data stored? How does the response return to the user? What does the user experience if a step fails? If the same request arrives twice, could the system accidentally perform the operation twice?
 
-### আজকের সারাংশ
+### Key Takeaways
 
-একটি সাধারণ software system-এ client request পাঠায়, server সেটি process করে, প্রয়োজনে database বা অন্য service ব্যবহার করে এবং response ফেরত দেয়। এই request-response flow বোঝা System Design-এর অন্যতম ভিত্তি।
+In a typical software system, a client sends a request, a server processes it, the server may use a database or another service, and then a response returns to the client. Understanding this request-response flow is one of the foundations of system design.
 
-### নিজে ভাবুন
+### Practice Exercise
 
-আপনি আবহাওয়ার অ্যাপে নিজের শহরের আবহাওয়া দেখছেন। Client, server এবং database বা external weather service—এই অংশগুলো কীভাবে যোগাযোগ করতে পারে, নিজের ভাষায় লিখুন।
+Imagine checking the weather for your city in a weather app. Describe how the client, application server, and database or external weather service might communicate.
 
-### পরের পাঠ
+### Next Lesson
 
-Lesson 03 — Client, Server, Request ও Response: মূল ধারণাগুলো আরও ভালোভাবে বোঝা।
+Lesson 03 — Client, Server, Request, and Response: The Core Concepts
