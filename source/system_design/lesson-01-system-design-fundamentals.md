@@ -1,44 +1,45 @@
-# Lesson 01 — System Design কী? | System Design Fundamentals
+# Lesson 01 — What Is System Design? | System Design Fundamentals
 
-**কোর্স:** System Design বাংলা — একেবারে বেসিক থেকে  
-**মডিউল ১:** System Design-এর ভিত্তি  
-**লক্ষ্য:** System Design কী, কেন দরকার, এবং একটি বাস্তব সিস্টেমকে কীভাবে ভাবতে হয় তা বোঝা।
+**Course:** System Design — From the Ground Up  
+**Module 1:** System Design Fundamentals  
+**Learning goal:** Understand what system design means, why it matters, and how to approach a real system.
 
-## ভিডিও স্ক্রিপ্ট
+## Video Script
 
-আসসালামু আলাইকুম। স্বাগতম System Design বাংলা কোর্সে। এই কোর্সে আমরা একেবারে বেসিক থেকে শিখব—একটি সফটওয়্যার সিস্টেম কীভাবে পরিকল্পনা করতে হয়, কীভাবে তার বিভিন্ন অংশ একসঙ্গে কাজ করে, আর ব্যবহারকারী বাড়লে বা কোনো অংশ নষ্ট হলে সিস্টেমকে কীভাবে নির্ভরযোগ্য রাখা যায়।
+Welcome to this System Design course. We will start from the fundamentals and gradually learn how to plan software systems, how their components communicate, and how to keep them reliable as usage grows or parts fail.
 
-প্রথম প্রশ্ন: **System Design আসলে কী?**
+First, what exactly is **system design**?
 
-ধরুন, আপনি একটি অনলাইন বইয়ের দোকান বানাতে চান। ব্যবহারকারী বই খুঁজবে, বইয়ের বিস্তারিত দেখবে, কার্টে যোগ করবে, অর্ডার করবে এবং পেমেন্ট দেবে। শুধু একটি সুন্দর ওয়েবপেজ বানালেই কি পুরো দোকান তৈরি হয়ে যায়? না। পেছনে লাগবে ব্যবহারকারীর অনুরোধ গ্রহণ করার ব্যবস্থা, বইয়ের তথ্য রাখার ডেটাবেস, অর্ডার সংরক্ষণ, পেমেন্ট সেবার সঙ্গে যোগাযোগ, এবং ব্যর্থতা হলে কী হবে তার পরিকল্পনা।
+Imagine you want to build an online bookstore. Customers should be able to search for books, view details, add books to a cart, place orders, and pay. Is a good-looking web page enough to build the whole store? Not quite. Behind the interface, you need a way to receive requests, store book information, record orders, communicate with a payment provider, and decide what happens when something fails.
 
-এই পুরো ব্যবস্থার অংশগুলো কী হবে, তারা কীভাবে একে অন্যের সঙ্গে যোগাযোগ করবে, ডেটা কোথায় থাকবে, কত ব্যবহারকারী সামলাতে পারবে এবং কোনো অংশ ব্যর্থ হলে কীভাবে কাজ চালিয়ে যাবে—এসব সিদ্ধান্ত নেওয়ার প্রক্রিয়াই System Design।
+System design is the process of deciding what parts a system needs, how those parts communicate, where data lives, how much traffic the system should handle, and how it should continue operating when a component fails.
 
-একটি সিস্টেমকে আমরা কয়েকটি দৃষ্টিকোণ থেকে দেখি। **Components** হলো সিস্টেমের অংশ—যেমন client, application server ও database। **Data flow** বোঝায় তথ্য কোন পথে যায়। **Interfaces** নির্ধারণ করে একটি অংশ অন্য অংশকে কীভাবে অনুরোধ করবে। **Constraints** হলো সীমাবদ্ধতা—যেমন বাজেট, হার্ডওয়্যার, সময়, নিরাপত্তা এবং প্রত্যাশিত ব্যবহারকারীর সংখ্যা।
+We can examine a system from several perspectives. **Components** are its building blocks, such as a client, application server, and database. **Data flow** describes how information moves between them. **Interfaces** define how one component requests work from another. **Constraints** are the limits we must work within, including budget, time, hardware, security requirements, and expected user traffic.
 
-System Design মানেই শুরুতেই অনেক সার্ভার, Kubernetes বা microservices ব্যবহার করা নয়। ছোট একটি অ্যাপ্লিকেশনের জন্য একটি সার্ভার ও একটি ডেটাবেসই যথেষ্ট হতে পারে। অপ্রয়োজনীয় জটিলতা খরচ এবং পরিচালনার ঝুঁকি বাড়ায়। ভালো ডিজাইন হলো প্রয়োজন অনুযায়ী সঠিক সমাধান বেছে নেওয়া।
+System design does not mean starting with lots of servers, Kubernetes, or microservices. A small application may work perfectly well with one server and one database. Unnecessary complexity increases cost and operational risk. Good design means choosing an appropriate solution for the actual requirements.
 
-আরেকটি গুরুত্বপূর্ণ বিষয়: ডিজাইনের সিদ্ধান্তের মধ্যে trade-off থাকে। ধরুন, ডেটার একাধিক কপি রাখলে সার্ভার নষ্ট হলেও তথ্য পাওয়া সহজ হতে পারে, কিন্তু কপিগুলোকে একই অবস্থায় রাখা কঠিন হয়। আবার বেশি cache ব্যবহার করলে উত্তর দ্রুত পাওয়া যায়, কিন্তু পুরোনো তথ্য দেখানোর ঝুঁকি থাকে। System Design শেখার অর্থ শুধু প্রযুক্তির নাম জানা নয়; কেন একটি সিদ্ধান্ত নিলাম এবং তার বিনিময়ে কী পেলাম বা হারালাম তা ব্যাখ্যা করতে পারা।
+Another important concept is the **trade-off**. Design decisions often improve one quality while making another harder to achieve. Keeping multiple copies of data can help a service survive a server failure, but keeping those copies consistent is more complicated. Caching can make responses faster, but it may cause users to see outdated information. Learning system design means understanding these trade-offs—not simply memorizing technology names.
 
-একটি সিস্টেম ডিজাইন শুরু করার সহজ পদ্ধতি হলো:
-১. ব্যবহারকারী কী করতে চায় তা বোঝা।
-২. সিস্টেমের মূল কাজ এবং সীমাবদ্ধতা লিখে নেওয়া।
-৩. বড় অংশগুলো চিহ্নিত করা।
-৪. অংশগুলোর মধ্যে request ও data flow আঁকা।
-৫. ডেটা কীভাবে সংরক্ষিত হবে তা ঠিক করা।
-৬. লোড, ব্যর্থতা, নিরাপত্তা ও খরচ বিবেচনা করা।
-৭. পরীক্ষা করে ডিজাইন উন্নত করা।
+Here is a practical way to begin designing a system:
 
-শুরুতে সব উত্তর জানা জরুরি নয়। বরং কী জানা আছে, কী অনুমান করছি, আর কোন প্রশ্নের উত্তর এখনও দরকার—সেটা পরিষ্কার করে বলা জরুরি।
+1. Understand what users need to do.
+2. List the core requirements and constraints.
+3. Identify the major components.
+4. Sketch the request and data flows.
+5. Decide how data should be stored.
+6. Consider traffic, failure, security, and cost.
+7. Test the design and improve it.
 
-### আজকের সারাংশ
+You do not need to know every answer at the beginning. It is more important to distinguish what you know, what you are assuming, and what still needs investigation.
 
-System Design হলো একটি সফটওয়্যার সিস্টেমের অংশ, যোগাযোগ, ডেটা, সীমাবদ্ধতা এবং ব্যর্থতা সামলানোর পরিকল্পনা। লক্ষ্য সবচেয়ে জটিল সিস্টেম বানানো নয়; লক্ষ্য হলো প্রয়োজন মেটায় এমন সহজ, নিরাপদ, নির্ভরযোগ্য এবং রক্ষণাবেক্ষণযোগ্য ব্যবস্থা তৈরি করা।
+### Key Takeaways
 
-### নিজে ভাবুন
+System design is the planning of a software system's components, communication, data, constraints, and failure handling. The goal is not to build the most complicated architecture. The goal is to build a solution that is simple, secure, reliable, and maintainable while meeting its requirements.
 
-একটি অনলাইন বইয়ের দোকানের জন্য অন্তত চারটি প্রধান component লিখুন। প্রতিটি component কী কাজ করবে, এক বাক্যে ব্যাখ্যা করুন।
+### Practice Exercise
 
-### পরের পাঠ
+List at least four major components for an online bookstore. Explain the responsibility of each component in one sentence.
 
-Lesson 02 — একটি সফটওয়্যার সিস্টেমের ভেতরে কীভাবে কাজ হয়?
+### Next Lesson
+
+Lesson 02 — How Does a Software System Work?
