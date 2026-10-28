@@ -23,6 +23,29 @@ Isolation describes how concurrent transactions interact; the exact guarantees d
 
 Keep transactions focused and avoid holding locks while waiting for a slow external API. A database transaction usually cannot atomically include a third-party payment provider. Distributed workflows need patterns such as idempotency, an outbox, sagas, and reconciliation to manage partial failures.
 
+## Learning Objectives
+
+- Explain atomicity, consistency, isolation, and durability.
+- Identify which work belongs inside one database transaction and where distributed workflows need extra design.
+
+## Worked Example
+
+A transfer of 20 units from account A to B should debit A and credit B in one database transaction. If either update fails, roll back both so the database does not retain a half-transfer.
+
+## Check Your Understanding
+
+1. **What goes wrong if a transfer commits the debit but not the credit?**
+
+   The system loses value from the recorded accounts; atomicity requires both changes or neither.
+
+2. **Does an ACID transaction guarantee an external payment API is called exactly once?**
+
+   No. External side effects need idempotency, durable workflow state, and often reconciliation.
+
+## Common Pitfall
+
+Assuming ACID alone solves failures across databases, message brokers, and external services.
+
 ## Key Takeaways
 
 ACID means atomicity, consistency, isolation, and durability. Understand isolation levels and keep transactions short; external systems require additional failure-handling patterns.
@@ -31,6 +54,14 @@ ACID means atomicity, consistency, isolation, and durability. Understand isolati
 
 A money transfer must debit one account and credit another. Explain how a transaction helps, and why calling a payment API inside a long-held database transaction can be risky.
 
+
+### Practice Hint
+
+Mark the exact statements that must succeed together, then decide the transaction boundary and how retries are made safe.
+
+### Self-Check
+
+Can you distinguish a local ACID transaction from a distributed business workflow?
 ## Next Lesson
 
 Lesson 17 — SQL vs. NoSQL: How to Choose
