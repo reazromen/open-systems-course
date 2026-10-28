@@ -1,36 +1,34 @@
-# Lesson 31 — What Is a Distributed System?
+# Lesson 31 — Introduction to Distributed Systems
 
 **Course:** System Design — From the Ground Up  
-**Module 6 — Distributed Systems**
+**Module 7 — Distributed Systems**
 
-## Lesson Overview
+## Learning Objectives
+- Define a distributed system.
+- Identify network and partial-failure challenges.
+- Explain why retries and timeouts need deliberate design.
 
-A distributed system consists of multiple computers or processes that communicate over a network to provide a service. Distribution can improve scale and fault isolation, but it also introduces delays, partial failures, and coordination problems.
+## Core Concept
+A distributed system consists of components communicating across a network. Components can fail independently, messages can be delayed or lost, and one node may be reachable from one place but not another. There is no single shared memory or perfectly reliable global clock.
 
-## More Than One Machine
+## Worked Example
+An order service calls a payment service. The payment service charges the card, but its response is lost. The order service cannot safely assume the charge failed. It should use a bounded timeout and a payment operation identifier so it can check or retry without creating a duplicate charge.
 
-A web application may use separate services for requests, data, queues, and file storage. Each component runs independently and communicates through network protocols. The user sees one product, but a single action can depend on several machines and services.
+## Common Pitfall
+Assuming a timeout proves that the remote operation did not happen. A timeout only means the caller did not receive a response in time.
 
-## Partial Failure
+## Knowledge Check
+1. What is a partial failure?
+   - **Answer:** One component or communication path fails while other parts of the system continue working.
+2. Why should retries be bounded?
+   - **Answer:** Unbounded retries can amplify overload and keep failing work alive indefinitely.
 
-In a single process, a function call usually either returns or fails within that process. Across a network, a request may time out because the remote service is slow, the response was lost, or the service failed after receiving the request. The caller may not know whether the operation happened.
+## Practice Hint
+For a client-service-database diagram, mark what happens if each network link or component becomes slow or unavailable.
 
-## Time and Coordination
-
-Machines have different clocks, and network messages can be delayed or reordered. A timestamp alone may not prove which event happened first. Distributed designs use explicit identifiers, ordering rules, acknowledgments, and coordination protocols where needed.
-
-## Trade-offs Are Fundamental
-
-Distribution can enable independent scaling and geographic availability, but every network boundary creates latency and failure modes. Prefer a simple design until a requirement justifies distribution, and make failure behavior part of the architecture rather than an afterthought.
-
-## Key Takeaways
-
-Distributed systems communicate over networks, where latency and partial failures are normal. Design explicit timeouts, failure handling, and coordination rules.
-
-## Practice Exercise
-
-A checkout request times out after the payment service receives it. Why can the caller not safely assume the payment failed, and what should the system do next?
+## Self-Check
+Can you distinguish “the request failed” from “the outcome is unknown,” and explain why timeouts matter?
 
 ## Next Lesson
 
-Lesson 32 — Message Queues and Event-Driven Architecture
+Lesson 32
