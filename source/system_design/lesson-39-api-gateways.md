@@ -23,6 +23,44 @@ Because requests pass through the gateway, it needs capacity, health monitoring,
 
 Authentication and routing can belong at the edge, but order validation and payment rules should remain with the services that own those domains. Excessive response aggregation can create a gateway that is difficult to change and becomes a hidden monolith.
 
+## Learning Objectives
+
+- Describe the client-facing role of an API gateway.
+
+- Distinguish routing and cross-cutting concerns from domain business logic.
+
+- Recognize gateway availability and latency risks.
+
+## Worked Example
+
+A mobile client calls profile, orders, payments, and notifications separately, increasing client complexity.
+
+**Reasoning:** A gateway can authenticate, route requests, apply quotas, and aggregate suitable reads. Payment authorization and inventory rules remain in their owning services.
+
+## Check Your Understanding
+
+Where should the rule 'a refund cannot exceed the captured payment' live?
+
+- A. Only in the API gateway.
+
+- B. In the payment service that owns the invariant.
+
+- C. In every client application.
+
+**Answer and explanation:** B — domain invariants belong in the service that owns the data; the gateway may enforce cross-cutting policy but should not duplicate core business rules.
+
+## Common Pitfall
+
+Putting business workflows into the gateway turns it into a tightly coupled central application and can make every change risky.
+
+## Practice Hint
+
+Draw the client-to-gateway path and mark which checks are cross-cutting versus domain-specific.
+
+## Self-Check
+
+Can you list two suitable gateway responsibilities and one responsibility that should remain in a domain service?
+
 ## Key Takeaways
 
 Gateways centralize client routing and selected edge policies, but require high availability and clear responsibility boundaries. Keep domain rules with domain-owning services.

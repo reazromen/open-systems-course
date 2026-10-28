@@ -22,6 +22,44 @@ Rightsize, cache repeated reads, batch work, compress payloads, tune retention, 
 
 Track cost per active user, transaction, upload, or other meaningful unit alongside service objectives. Set budgets, review forecasts, and test scaling. A cost reduction that causes outages is not an improvement.
 
+## Learning Objectives
+
+- Estimate traffic, storage, throughput, and peak demand using explicit assumptions.
+
+- Identify dominant cost drivers and unit economics.
+
+- Optimize cost without violating reliability, latency, or security requirements.
+
+## Worked Example
+
+A service has predictable average traffic but experiences sharp peaks during campaigns.
+
+**Reasoning:** Estimate average and peak requests, payload sizes, storage growth, and retention. Compare autoscaling, caching, and queueing costs with their operational risks, then monitor cost per meaningful unit of work.
+
+## Check Your Understanding
+
+Why is optimizing only average utilization risky?
+
+- A. Peak demand and burst behavior can exceed capacity even when average use is low.
+
+- B. Average utilization is always higher than peak.
+
+- C. Cost and reliability are unrelated.
+
+**Answer and explanation:** A — capacity must account for bursts, headroom, scaling delay, and failure scenarios, not just average load.
+
+## Common Pitfall
+
+Reducing replicas or redundancy based only on normal-day averages without assessing peak and failover capacity.
+
+## Practice Hint
+
+Write assumptions with units, estimate average and peak demand, then identify the largest cost drivers and risks.
+
+## Self-Check
+
+Can you estimate one workload's capacity and cost and explain the reliability trade-off of an optimization?
+
 ## Key Takeaways
 
 Use measured workloads and explicit assumptions. Optimize cost per useful outcome while protecting latency, availability, security, and recovery.

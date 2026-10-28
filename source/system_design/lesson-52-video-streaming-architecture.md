@@ -22,6 +22,44 @@ Measure startup time, rebuffering, quality, and seek latency. Segment duration, 
 
 Storage, transcoding, and bandwidth can dominate cost. Validate uploads, enforce authorization, and monitor processing backlog, CDN cache hit rate, origin egress, and playback errors.
 
+## Learning Objectives
+
+- Describe upload, transcoding, storage, CDN, and playback stages.
+
+- Explain adaptive bitrate streaming and segment delivery.
+
+- Balance playback quality, latency, storage, and delivery cost.
+
+## Worked Example
+
+A video uploaded in one high-bitrate format must play on phones with varying network speeds.
+
+**Reasoning:** Store the source, transcode asynchronously into multiple renditions and segments, publish a manifest, and serve segments from object storage through a CDN. The player adapts rendition to available bandwidth and buffer health.
+
+## Check Your Understanding
+
+Why should video segments usually be delivered through a CDN rather than the main application server?
+
+- A. A CDN eliminates the need to store video.
+
+- B. It distributes cached media closer to viewers and reduces repeated origin load.
+
+- C. It guarantees no playback failures.
+
+**Answer and explanation:** B — CDNs improve geographic delivery and absorb repeated reads; origin storage and monitoring are still required.
+
+## Common Pitfall
+
+Serving all large media bytes through application workers, exhausting resources needed for API traffic.
+
+## Practice Hint
+
+Trace source upload through processing and manifest publication, then trace playback and cache misses.
+
+## Self-Check
+
+Can you explain how transcoding, manifests, adaptive bitrate, object storage, and CDN fit together?
+
 ## Key Takeaways
 
 Use asynchronous transcoding, adaptive renditions, object storage, and CDN delivery; optimize viewing quality and delivery cost, not only API latency.

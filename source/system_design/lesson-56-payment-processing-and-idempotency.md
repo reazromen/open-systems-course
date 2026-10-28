@@ -22,6 +22,44 @@ Some flows authorize before capture; others capture immediately. Refunds are sep
 
 Avoid storing raw card data unless equipped and authorized to do so. Prefer provider-hosted fields or tokenization. Monitor duplicate attempts, webhook lag, reconciliation mismatches, and declines.
 
+## Learning Objectives
+
+- Model payment authorization, capture, failure, refund, and reconciliation states.
+
+- Use stable idempotency keys for retry-safe requests.
+
+- Handle webhooks, sensitive data, and ambiguous outcomes.
+
+## Worked Example
+
+A payment request times out after being sent to the provider.
+
+**Reasoning:** Retry with the same idempotency key when provider semantics support it, process signed webhooks idempotently, and reconcile unresolved operations against provider records. Keep payment states explicit rather than equating timeout with failure.
+
+## Check Your Understanding
+
+What is the purpose of a stable idempotency key?
+
+- A. To make each retry a brand-new payment.
+
+- B. To let repeated attempts for the same logical operation be recognized as one operation.
+
+- C. To replace authentication.
+
+**Answer and explanation:** B — the key helps prevent duplicate effects for the same logical request when requests are retried.
+
+## Common Pitfall
+
+Generating a new idempotency key on every retry, which defeats deduplication.
+
+## Practice Hint
+
+Describe the lifecycle from request creation through provider response, webhook, retry, and reconciliation.
+
+## Self-Check
+
+Can you explain how retries and webhooks avoid duplicate payment effects?
+
 ## Key Takeaways
 
 Timeouts create uncertainty. Stable idempotency keys, explicit states, authenticated callbacks, and reconciliation protect financial workflows.

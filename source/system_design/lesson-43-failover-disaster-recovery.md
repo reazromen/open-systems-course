@@ -23,6 +23,44 @@ Document who declares a disaster, how infrastructure is provisioned, how data is
 
 A backup is not proven until restoration has been tested. Conduct recovery exercises, measure actual RTO and RPO, record gaps, and update the runbook. Test partial failures as well as full-region scenarios, and ensure responders can access procedures when the primary systems are unavailable.
 
+## Learning Objectives
+
+- Define recovery time objective (RTO) and recovery point objective (RPO).
+
+- Explain why backups and replicas solve different problems.
+
+- Plan and test a disaster-recovery path.
+
+## Worked Example
+
+A service must return within 60 minutes and can tolerate at most 5 minutes of lost data.
+
+**Reasoning:** Set RTO to 60 minutes and RPO to 5 minutes. Validate backup frequency, restore time, credentials, infrastructure dependencies, and integrity checks in a timed recovery exercise.
+
+## Check Your Understanding
+
+Which metric describes the maximum tolerable amount of lost recent data?
+
+- A. RTO
+
+- B. RPO
+
+- C. MTTR only
+
+**Answer and explanation:** B — RPO is the acceptable data-loss window; RTO is the target time to restore service.
+
+## Common Pitfall
+
+A replica can copy accidental deletion or corruption quickly. Replication is not a substitute for versioned, recoverable backups.
+
+## Practice Hint
+
+Write down the business tolerance first, then test whether the actual restore process meets both targets.
+
+## Self-Check
+
+Can you define RTO and RPO in plain language and describe a test that measures each?
+
 ## Key Takeaways
 
 Define RTO and RPO, isolate backups from production failures, document dependencies, and rehearse restoration. A backup that has never been restored is an unverified assumption.

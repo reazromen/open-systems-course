@@ -22,6 +22,44 @@ Record the alternative, benefit, cost, and condition that would change a decisio
 
 Define user-facing metrics, dashboards, alerts, load tests, backup restoration tests, security checks, and rollout plans. Operators need to know whether the system works and how to recover.
 
+## Learning Objectives
+
+- Review a system against its original requirements and assumptions.
+
+- Trace critical requests and identify bottlenecks and failure modes.
+
+- Compare alternatives using explicit trade-offs and measurable outcomes.
+
+## Worked Example
+
+A proposed design uses a cache to reduce database load, but there is no stated freshness requirement or invalidation plan.
+
+**Reasoning:** Write down the consistency and latency requirements first, estimate hit rate, define invalidation and fallback behavior, then compare the cache against a simpler indexed database query.
+
+## Check Your Understanding
+
+What is the best basis for choosing between two architectures?
+
+- A. Which diagram has more components.
+
+- B. How well each satisfies requirements, including cost, reliability, complexity, and failure behavior.
+
+- C. Which technology is newest.
+
+**Answer and explanation:** B — architecture is a set of trade-offs tied to requirements, not a component-count contest.
+
+## Common Pitfall
+
+Adding infrastructure before identifying the bottleneck or requirement it is meant to address.
+
+## Practice Hint
+
+Review assumptions, request/data flow, capacity, failure modes, security, cost, and observable success criteria.
+
+## Self-Check
+
+Can you defend one architecture decision with a requirement, an alternative, and a measurable trade-off?
+
 ## Key Takeaways
 
 Connect requirements to components, expose assumptions, compare alternatives, and define failure handling and measurable outcomes.

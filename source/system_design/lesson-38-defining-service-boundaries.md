@@ -23,6 +23,44 @@ A service should normally own the data it is responsible for and expose supporte
 
 Use domain language, change patterns, transaction needs, and team responsibilities as evidence. Monitor cross-service calls and coordinated releases. A service can be merged or split later; architecture should respond to evidence rather than treating current boundaries as permanent.
 
+## Learning Objectives
+
+- Define service boundaries around business capabilities.
+
+- Apply cohesion and coupling to service design.
+
+- Explain why each service should own its data and invariants.
+
+## Worked Example
+
+Orders and inventory share one database and update each other's tables directly.
+
+**Reasoning:** Define which service owns stock reservations. Expose a reservation API or event, make the operation idempotent, and model the order as pending until the reservation outcome is known.
+
+## Check Your Understanding
+
+What is a warning sign that two proposed services have a poor boundary?
+
+- A. They have separate deployment pipelines.
+
+- B. They must coordinate through frequent cross-service transactions for ordinary operations.
+
+- C. They use different programming languages.
+
+**Answer and explanation:** B — frequent synchronous coordination and shared invariants suggest the split may create a distributed monolith.
+
+## Common Pitfall
+
+A separate database per service does not automatically create good boundaries if business rules still depend on direct cross-service table access.
+
+## Practice Hint
+
+For each domain, identify the data it owns, the invariants it protects, and the contract other domains use.
+
+## Self-Check
+
+Can you identify the owner of a business invariant and describe how another service requests a change?
+
 ## Key Takeaways
 
 Choose boundaries around cohesive business capabilities, ownership, and data invariants. Reduce cross-service coordination and avoid sharing internal tables as an integration contract.

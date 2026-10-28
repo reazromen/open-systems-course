@@ -22,6 +22,44 @@ Store references to canonical posts with creation or ranking metadata. Use stabl
 
 Precomputed feeds can contain stale references after deletion or privacy changes. Recheck visibility rules, clean stale entries, and monitor latency, fan-out backlog, cache hits, and ranking time.
 
+## Learning Objectives
+
+- Compare fan-out-on-write and fan-out-on-read feed designs.
+
+- Choose feed storage and pagination strategies based on workload.
+
+- Account for freshness, privacy, and very popular accounts.
+
+## Worked Example
+
+Most users follow a modest number of accounts, but one celebrity has millions of followers. Precomputing every follower's feed for every celebrity post may be expensive.
+
+**Reasoning:** Use write-time fan-out for typical accounts and read-time merging for exceptionally large accounts, if product freshness and complexity requirements support a hybrid. Re-check visibility and block rules when serving feed items.
+
+## Check Your Understanding
+
+What is a common trade-off of fan-out-on-write?
+
+- A. It reduces read work but increases write amplification and storage work.
+
+- B. It makes privacy checks unnecessary.
+
+- C. It guarantees every feed is instantly consistent.
+
+**Answer and explanation:** A — precomputing feeds speeds reads but creates work when authors publish, especially for accounts with many followers.
+
+## Common Pitfall
+
+Treating a cached or precomputed feed entry as proof that the viewer is still allowed to see the post.
+
+## Practice Hint
+
+Estimate follower counts, write volume, read volume, and how quickly new posts must appear.
+
+## Self-Check
+
+Can you describe when you would choose read-time, write-time, or hybrid fan-out?
+
 ## Key Takeaways
 
 Choose based on read/write patterns. Keep posts canonical, paginate with cursors, and enforce privacy even for precomputed feed entries.

@@ -23,6 +23,44 @@ Splitting a monolith can create more operational work than business value if bou
 
 First modularize the code and clarify ownership. Identify a capability with a clear interface and independent data needs, then extract it if there is a concrete reason. Measure deployment frequency, reliability, latency, and operating cost after the change. Keep a rollback or migration strategy for data and traffic.
 
+## Learning Objectives
+
+- Compare the operational trade-offs of a monolith and microservices.
+
+- Identify when distribution solves a real organizational or scaling problem.
+
+- Describe a gradual path from a monolith to independently deployable services.
+
+## Worked Example
+
+A 5-person team owns a shopping application. Checkout changes are delayed because releases conflict, but the application has modest traffic.
+
+**Reasoning:** First isolate modules and clarify ownership inside the existing application. Extract a service only when a capability needs independent deployment, scaling, or ownership; then add observability, reliable communication, and data ownership.
+
+## Check Your Understanding
+
+Which is the strongest reason to extract a service?
+
+- A. Microservices are always faster.
+
+- B. A capability has a clear boundary and needs independent ownership or deployment.
+
+- C. A monolith uses one repository.
+
+**Answer and explanation:** B — a clear capability boundary and a concrete need justify the added network, deployment, and operational complexity.
+
+## Common Pitfall
+
+Splitting code by technical layer alone (for example, one service for every controller) often creates chatty services with unclear ownership.
+
+## Practice Hint
+
+For the shopping app in the exercise, list deployment pain, team ownership, data boundaries, and operational costs before choosing an extraction.
+
+## Self-Check
+
+Can you explain one reason to keep a modular monolith and one reason to extract a service?
+
 ## Key Takeaways
 
 Monoliths reduce distributed-systems overhead; microservices can support independent ownership and scaling but add network and operational complexity. A modular monolith is often a sound starting point.

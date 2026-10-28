@@ -23,6 +23,44 @@ Specify request and response schemas, error behavior, timeouts, version compatib
 
 Use synchronous communication when the caller genuinely needs an immediate answer; use asynchronous communication when work can happen later or must survive temporary consumer outages. Avoid adding a broker solely for fashion, and avoid long synchronous chains where independent processing would be safer.
 
+## Learning Objectives
+
+- Compare synchronous request-response with asynchronous messaging.
+
+- Choose communication style based on latency and coupling requirements.
+
+- Design timeouts, retries, and idempotent contracts.
+
+## Worked Example
+
+A customer submits an order; sending a receipt and updating analytics do not need to block the confirmation response.
+
+**Reasoning:** Validate and persist the order synchronously, then publish reliable events for receipt and analytics. Track delivery and make consumers safe to retry.
+
+## Check Your Understanding
+
+Which operation is usually a good candidate for asynchronous processing after an order is accepted?
+
+- A. Validating the request's required fields.
+
+- B. Sending a confirmation email.
+
+- C. Returning whether the API accepted the order.
+
+**Answer and explanation:** B — email can usually happen after acceptance; request validation and the immediate acceptance result belong on the synchronous path.
+
+## Common Pitfall
+
+Retries without idempotency can create duplicate charges, emails, or records when a caller cannot tell whether the first attempt succeeded.
+
+## Practice Hint
+
+For each interaction, ask whether the user must wait for the result and what happens if the dependency is slow or unavailable.
+
+## Self-Check
+
+Can you give one synchronous and one asynchronous interaction and explain the reason for each?
+
 ## Key Takeaways
 
 Synchronous calls provide immediate responses but couple latency and availability. Asynchronous messages improve decoupling but require delivery, retry, and workflow-state design.
