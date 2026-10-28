@@ -23,6 +23,24 @@ Health checks help determine whether an instance should receive traffic. A shall
 
 Load balancing is simplest when any instance can handle any request. If session state exists only in local memory, a later request routed to another instance may lose that state. Store shared session data externally or use another deliberate strategy. Sticky sessions can help in some cases but reduce flexibility and do not replace resilient state design.
 
+## Learning Objectives
+
+- Explain how a load balancer distributes requests and checks backend health.
+
+## Worked Example
+
+With three app instances, a health check marks B unhealthy, so new traffic goes to A and C. Retrying a timed-out payment is only safe when the operation is idempotent.
+
+## Check Your Understanding
+
+1. **Does a healthy load balancer guarantee the whole application is available?**
+
+   No. Backends, dependencies, networking, capacity, or the balancer itself may still fail.
+
+## Common Pitfall
+
+Retries without limits or idempotency can amplify overload or duplicate actions.
+
 ## Key Takeaways
 
 Load balancing distributes traffic, not responsibility for every bottleneck. Use meaningful health checks, understand session state, and plan for partial failure.
@@ -31,6 +49,14 @@ Load balancing distributes traffic, not responsibility for every bottleneck. Use
 
 Two instances sit behind a load balancer, but users randomly lose their login session. Explain a likely cause and one architectural fix.
 
+
+### Practice Hint
+
+Trace a request through selection, health checks, timeout, and retry decisions.
+
+### Self-Check
+
+Can you explain what happens when one backend fails and when a request outcome is ambiguous?
 ## Next Lesson
 
 Lesson 21 — Caching and Redis
