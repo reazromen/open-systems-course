@@ -3,34 +3,32 @@
 **Course:** System Design — From the Ground Up  
 **Module 5 — Scalability and Performance**
 
-## Lesson Overview
+## Learning Objectives
+- Define a bottleneck in a multi-tier system.
+- Use measurements to narrow down performance problems.
+- Distinguish symptoms from causes.
 
-A bottleneck is a component that limits the performance of the overall system. Good system design identifies the limiting resource with evidence before adding capacity or rewriting code.
+## Core Concept
+A bottleneck is the resource or dependency limiting end-to-end throughput or latency. Possible constraints include CPU, memory pressure, disk I/O, network, database locks, connection limits, and slow downstream services. Measure before changing architecture.
 
-## Start with the User-Visible Symptom
+## Worked Example
+A shop page takes 2.8 seconds to load. Tracing shows the API spends 2.3 seconds waiting for a database query, while CPU remains low. Adding web servers is unlikely to help. Inspect the query plan, indexes, row counts, and lock waits; compare timings before and after a targeted change.
 
-Define what is slow: request latency, throughput, error rate, page rendering, or a background job's completion time. Establish a baseline and compare normal behavior with the period when the problem occurs. Averages alone can hide a poor experience, so inspect percentiles such as p95 and p99.
+## Common Pitfall
+High CPU is not the only sign of overload. A service blocked on database connections may have low CPU while requests pile up.
 
-## Follow the Request Path
+## Knowledge Check
+1. If requests spend most of their time waiting on a database, what should you investigate first?
+   - **Answer:** Query latency, execution plans, locks, and connection-pool behavior.
+2. Why record a baseline before optimization?
+   - **Answer:** It lets you compare results and determine whether the change improved the actual user-facing metric.
 
-A request may pass through DNS, a proxy, an application, a cache, a database, and an external API. Measure each stage where possible. Distributed tracing can reveal whether time is spent waiting on the database, calling a third party, contending for locks, or executing application code.
+## Practice Hint
+Record request latency, throughput, error rate, CPU, memory, disk I/O, queue depth, and dependency timings for a slow endpoint.
 
-## Resource Saturation and Queues
-
-CPU saturation can indicate compute-bound work; memory pressure may trigger garbage collection or swapping; disk latency can slow persistence; connection pools can be exhausted; and queues can grow when incoming work exceeds processing capacity. A symptom such as high latency can have several causes, so correlate metrics rather than guessing.
-
-## Change One Thing and Verify
-
-Form a hypothesis, make a controlled change, and compare results against the baseline. Load tests should resemble real traffic and data distributions. Watch for bottleneck migration: after optimizing one dependency, another may become the new limit. Keep rollback options for risky changes.
-
-## Key Takeaways
-
-Diagnose from user-visible symptoms through the request path. Use percentiles, traces, resource metrics, and controlled experiments; do not guess from a single metric.
-
-## Practice Exercise
-
-Users report slow checkout. List four components you would inspect and one metric or trace signal that could help distinguish each cause.
+## Self-Check
+Can you explain why “add more servers” is not a diagnosis, and name the evidence needed to locate a bottleneck?
 
 ## Next Lesson
 
-Lesson 27 — Database Replication
+Lesson 27
