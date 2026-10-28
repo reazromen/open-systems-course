@@ -1,36 +1,34 @@
 # Lesson 28 — Sharding and Partitioning
 
 **Course:** System Design — From the Ground Up  
-**Module 5 — Scalability and Performance**
+**Module 6 — Distributed Data**
 
-## Lesson Overview
+## Learning Objectives
+- Explain partitioning and sharding.
+- Compare range-based and hash-based shard keys.
+- Identify hot partitions and cross-shard query costs.
 
-Partitioning divides a dataset into smaller pieces. Sharding usually refers to distributing those partitions across multiple database nodes so storage and workload can grow beyond one node's practical limits.
+## Core Concept
+Partitioning divides a dataset into smaller pieces. Sharding commonly means distributing those partitions across separate database nodes. A good partition key spreads load while supporting important queries. Range partitioning can make ranges efficient but create hot spots; hash partitioning often distributes keys more evenly but can make range queries harder.
 
-## Why Partition Data?
+## Worked Example
+A messaging service stores events by account ID. Hashing account IDs across four shards can distribute ordinary traffic. But one extremely active account may still overload its shard, and a query across all accounts may need fan-out to every shard.
 
-A single database can eventually face limits in storage, write throughput, or maintenance windows. Partitioning divides data into manageable groups. A database may partition a table within one server, while sharding distributes groups across separate servers and failure domains.
+## Common Pitfall
+Choosing a shard key only because it is easy to implement. Evaluate cardinality, access patterns, write distribution, and future resharding.
 
-## Choose a Partition Key
+## Knowledge Check
+1. What is a hot shard?
+   - **Answer:** A partition or shard receiving disproportionate traffic or work.
+2. Why can a query without the shard key be expensive?
+   - **Answer:** The system may need to query multiple shards and combine the results.
 
-A partition key determines where a record belongs. User ID can work well for user-owned data, while tenant ID may fit a multi-tenant application. A poor key can create hotspots if most traffic targets one partition. Keys should distribute load while keeping common queries efficient.
+## Practice Hint
+Compare account ID, event date, and random hash as shard keys for a high-volume event service.
 
-## Range and Hash Strategies
-
-Range partitioning places nearby key values together, which can help range queries but may overload the newest range when writes follow time. Hash partitioning distributes keys more evenly, but range scans may need to visit many partitions. The right strategy depends on the query workload and data growth.
-
-## Operational Trade-offs
-
-Sharding complicates cross-shard joins, transactions, rebalancing, migrations, backups, and observability. Some systems provide these features, but they still require careful planning. Start sharding only when measured limits justify the operational cost; indexing, query tuning, archiving, or vertical scaling may be sufficient first.
-
-## Key Takeaways
-
-Partitioning divides data; sharding distributes it across nodes. Pick keys based on query patterns and even load distribution, and plan rebalancing and cross-partition operations.
-
-## Practice Exercise
-
-A messaging application stores messages by user ID. What are the advantages and possible hotspot or query challenges of using user ID as the shard key?
+## Self-Check
+Can you describe how your key distributes writes and how common reads find the relevant shard?
 
 ## Next Lesson
 
-Lesson 29 — Connection Pooling
+Lesson 29
