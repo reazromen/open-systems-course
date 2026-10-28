@@ -3,6 +3,13 @@
 **Course:** System Design — From the Ground Up  
 **Module 3 — Database Fundamentals**
 
+## Learning Objectives
+
+By the end of this lesson, you should be able to:
+- Describe tables, rows, columns, primary keys, and foreign keys.
+- Use SQL conceptually to retrieve related records.
+- Explain how constraints and transactions protect data invariants.
+
 ## Lesson Overview
 
 Relational databases organize information into tables with defined relationships and use SQL to query and modify data. They are a strong choice for many systems that need consistent records and transactions.
@@ -23,6 +30,34 @@ Constraints enforce rules such as uniqueness and non-null values close to the da
 
 Before choosing a database, understand what the application reads and writes, which relationships matter, how concurrent updates should behave, and what consistency is required. Relational databases can scale substantially, but indexes, query plans, connection limits, storage, and replication still require deliberate design.
 
+## Worked example: customers and orders
+
+A `customers` table can have `customer_id` as its primary key. An `orders` table can have `order_id` as its primary key and `customer_id` as a foreign key referencing the customer. A query can join orders to customers to show who placed each order. A foreign key helps prevent an order from referencing a customer row that does not exist, while transaction rules help keep related updates consistent.
+
+## Check Your Understanding
+
+**1. Why should an order have its own primary key instead of using only the customer's ID?**
+
+<details>
+<summary>Answer and explanation</summary>
+
+One customer can place many orders. A separate order ID uniquely identifies each order, while customer_id links those orders to the customer.
+
+</details>
+
+**2. What is the purpose of a transaction when reserving inventory and creating an order?**
+
+<details>
+<summary>Answer and explanation</summary>
+
+It groups related changes so the system can avoid leaving an unintended partial state if part of the operation fails. Exact guarantees depend on the database and transaction design.
+
+</details>
+
+## Common Pitfall
+
+A relational database does not automatically make every workflow correct. The schema, constraints, transaction boundaries, isolation level, and application logic still matter.
+
 ## Key Takeaways
 
 Relational databases provide tables, relationships, constraints, SQL, and transactions. Model real entities and invariants, then design queries around actual access patterns.
@@ -34,3 +69,9 @@ Design two tables for customers and orders. Identify each table's primary key an
 ## Next Lesson
 
 Lesson 13 — NoSQL Databases and Their Data Models
+### Practice Hint and Self-Check
+
+**Hint:** Sketch two tables with primary keys and one foreign key. Then describe what should happen if the customer ID does not exist.
+
+**Self-check:** Your model uses a unique key per entity, a valid relationship, and explains one integrity rule enforced by the database.
+

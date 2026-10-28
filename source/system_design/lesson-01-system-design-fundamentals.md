@@ -4,6 +4,13 @@
 **Module 1:** System Design Fundamentals  
 **Learning goal:** Understand what system design means, why it matters, and how to approach a real system.
 
+## Learning Objectives
+
+By the end of this lesson, you should be able to:
+- Explain system design through components, data flow, interfaces, and constraints.
+- Choose a simple architecture that meets requirements without unnecessary complexity.
+- Describe at least one design trade-off.
+
 ## Video Script
 
 Welcome to this System Design course. We will start from the fundamentals and gradually learn how to plan software systems, how their components communicate, and how to keep them reliable as usage grows or parts fail.
@@ -32,6 +39,34 @@ Here is a practical way to begin designing a system:
 
 You do not need to know every answer at the beginning. It is more important to distinguish what you know, what you are assuming, and what still needs investigation.
 
+## Worked example: a small online bookstore
+
+Start with three core needs: list books, place orders, and record payments. A first design could use a web or mobile client, one application server, one relational database, and an external payment provider. Draw arrows from client to server, server to database, and server to payment provider. Before adding a cache or separate microservices, ask whether a measured requirement justifies the added complexity.
+
+## Check Your Understanding
+
+**1. A team adds five microservices before measuring traffic. What is the main design risk?**
+
+<details>
+<summary>Answer and explanation</summary>
+
+It adds operational and communication complexity without evidence that the requirements need it. Start with the simplest design that meets known constraints, then evolve it when evidence shows a limitation.
+
+</details>
+
+**2. Why might caching book details create a trade-off?**
+
+<details>
+<summary>Answer and explanation</summary>
+
+It can reduce response time and database load, but cached details may be stale. The design needs an acceptable freshness policy and a way to update or expire entries.
+
+</details>
+
+## Common Pitfall
+
+System design is not a contest to use the most technologies. A design is only good relative to requirements, constraints, and failure expectations.
+
 ### Key Takeaways
 
 System design is the planning of a software system's components, communication, data, constraints, and failure handling. The goal is not to build the most complicated architecture. The goal is to build a solution that is simple, secure, reliable, and maintainable while meeting its requirements.
@@ -39,6 +74,12 @@ System design is the planning of a software system's components, communication, 
 ### Practice Exercise
 
 List at least four major components for an online bookstore. Explain the responsibility of each component in one sentence.
+
+### Practice Hint and Self-Check
+
+**Hint:** Try Client, Application Server, Database, and Payment Provider. For each one, write its responsibility and show at least one interaction.
+
+**Self-check:** Your answer names at least four components, gives each one a distinct responsibility, and shows at least one interaction between components.
 
 ### Next Lesson
 
