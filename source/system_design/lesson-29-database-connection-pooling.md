@@ -1,36 +1,34 @@
 # Lesson 29 — Database Connection Pooling
 
 **Course:** System Design — From the Ground Up  
-**Module 5 — Scalability and Performance**
+**Module 6 — Distributed Data**
 
-## Lesson Overview
+## Learning Objectives
+- Explain why database connections are limited resources.
+- Describe connection pooling and pool exhaustion.
+- Estimate the combined connection load from application instances.
 
-Opening a database connection has overhead, and databases can only handle a finite number of concurrent connections efficiently. Connection pooling reuses established connections instead of creating one for every request.
+## Core Concept
+Opening a database connection has cost, and databases can serve only a finite number of concurrent connections efficiently. A connection pool reuses established connections. Pools that are too small create waiting; pools that are too large can overwhelm the database when multiplied across many app instances.
 
-## How a Pool Works
+## Worked Example
+Six API instances each allow 30 database connections. Together they may open up to 180 connections, before accounting for workers and admin tools. If the database is comfortable with far fewer active connections, reduce per-instance pool sizes, cap concurrency, and measure wait time and query duration.
 
-A pool maintains a bounded set of database connections. An application borrows a connection for a query or transaction and returns it when finished. Reuse avoids repeated connection setup and provides a limit on how many database operations an application instance can start concurrently.
+## Common Pitfall
+Increasing pool size to fix every timeout. If the database is saturated, more concurrent queries may make latency worse.
 
-## Size the Pool Across Instances
+## Knowledge Check
+1. What is the maximum configured connection count for six instances with pools of 30?
+   - **Answer:** 180, excluding other clients.
+2. What two signals help diagnose pool exhaustion?
+   - **Answer:** Pool wait time/active-versus-idle connections and database query or saturation metrics.
 
-A pool size that seems small on one server can become enormous across many replicas. If 20 application instances each allow 50 connections, the fleet may open up to 1,000 connections. Pool limits should be considered alongside database capacity, workload concurrency, and the number of application instances.
+## Practice Hint
+Calculate the total possible connections for your planned instance count and pool size, including background workers.
 
-## Queueing and Timeouts
-
-When every pooled connection is busy, new requests wait for a free connection. A bounded wait timeout prevents requests from waiting indefinitely, while acquisition latency and pool saturation metrics reveal pressure. Raising the pool size can worsen database overload instead of fixing it.
-
-## Release Connections Safely
-
-Return connections reliably, including on exceptions, and avoid holding them while performing unrelated slow work. Transactions should have clear boundaries. A connection pooler can sometimes sit between application instances and the database, but its transaction and session modes have different compatibility requirements.
-
-## Key Takeaways
-
-Pools reuse connections and cap concurrency. Size them across the whole fleet, observe wait time, and avoid treating a larger pool as a universal performance fix.
-
-## Practice Exercise
-
-A service has 12 instances and each allows 40 database connections. Calculate the potential total and explain what you would check before increasing the per-instance pool size.
+## Self-Check
+Can you explain why pool sizing must consider the whole deployment rather than one server?
 
 ## Next Lesson
 
-Lesson 30 — Capacity Estimation
+Lesson 30
