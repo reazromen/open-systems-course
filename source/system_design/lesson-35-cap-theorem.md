@@ -3,34 +3,41 @@
 **Course:** System Design — From the Ground Up  
 **Module 6 — Distributed Systems**
 
-## Lesson Overview
+## Learning Objectives
+- Define consistency, availability, and partition tolerance in the CAP model.
+- Explain why network partitions force a trade-off between consistency and availability.
+- Recognize why CP and AP are useful shorthand rather than complete descriptions of a database.
 
-The CAP theorem describes a limitation for distributed data systems when a network partition occurs: a system cannot simultaneously guarantee both strong consistency and availability for every request during that partition.
+## Core Concept
+The CAP theorem says that when a network partition prevents distributed nodes from communicating reliably, a system cannot guarantee both a single strongly consistent view of data and a successful response from every non-failed node for every request. Partition tolerance is not an optional feature in a real distributed system: networks can lose, delay, or isolate messages. The practical design decision is what the system should do while communication is broken.
 
 ## What C, A, and P Mean
+- **Consistency:** completed operations appear in a single, up-to-date order, commonly described using linearizability.
+- **Availability:** each request reaching a non-failed node receives a non-error response, even if the response cannot include the newest update.
+- **Partition tolerance:** the system continues to operate despite communication failures between parts of the system.
 
-Consistency in CAP refers to a single, up-to-date view of data, often described through linearizability. Availability means every request to a non-failed node receives a non-error response. Partition tolerance means the system continues operating despite dropped or delayed communication between nodes, although the theorem focuses on the trade-off when such a partition exists.
+These definitions are specific to CAP. Consistency here does not simply mean “the data follows database rules,” and availability is not the same as a service's overall uptime percentage.
 
-## Why the Partition Matters
-
-Network partitions cannot be ruled out in real distributed systems. When a partition separates replicas, one side may not know whether the other side has accepted a write. To preserve strong consistency, a system may reject or wait on some requests. To remain available on both sides, it may accept conflicting or stale operations.
+## Worked Example
+Imagine two inventory replicas, one in Dhaka and one in Singapore. Both show one item left. A network partition separates them, and a customer buys the item through Dhaka. The Singapore replica cannot learn about that purchase. If it accepts another purchase immediately, the system may sell an item it no longer has. If it refuses or delays the second purchase until it can confirm the state, it protects consistency but does not serve every request successfully during the partition.
 
 ## CP and AP Are Simplifications
+A **CP-style** choice preserves strong consistency by refusing or delaying some operations during a partition. An **AP-style** choice continues responding on both sides, potentially returning stale data or accepting updates that must later be reconciled. These are descriptions of behavior under a failure condition, not permanent labels that fully describe every operation in a product. Many systems make different choices for reads, writes, and different data types.
 
-CP and AP are useful shorthand for design choices during partitions, not permanent labels that explain every behavior of a product. Many systems provide different guarantees for different operations, configurations, or failure conditions. Read the actual consistency model and failure semantics rather than relying on a two-letter category.
+## Common Pitfall
+Do not say that a system must always choose only two of consistency, availability, and partition tolerance under normal conditions. CAP focuses on the trade-off when a partition occurs. Latency, durability, replication lag, and recovery are related design concerns, but they are not interchangeable with CAP's three terms.
 
-## Do Not Confuse CAP with Everyday Trade-offs
+## Knowledge Check
+1. Two replicas cannot communicate. One rejects a write until it can safely coordinate with the other. Which property is it prioritizing?
+   - **Answer:** Strong consistency, at the cost of availability for that operation during the partition.
+2. Why is “AP database” an incomplete description?
+   - **Answer:** A product can provide different guarantees for different operations and configurations. The label does not explain its exact read, write, conflict, or recovery behavior.
 
-CAP does not say a system must always choose only two of three properties under normal operation, nor does it mean consistency, availability, and performance are the same thing. Latency, durability, replication lag, and recovery remain separate design concerns. Specify which operations require which guarantees.
+## Practice Hint
+Draw two replicas with a broken network link. Trace one write under two policies: (a) reject or wait, and (b) accept locally and reconcile later. Mark what the client sees and what risks remain.
 
-## Key Takeaways
-
-CAP focuses on what a distributed data system can guarantee during a network partition. Understand the operation's consistency and availability requirements instead of using CP/AP as a complete product description.
-
-## Practice Exercise
-
-A replicated inventory service must avoid selling the last item twice. Explain why it may reject some writes during a partition and why that can be preferable to accepting every request.
+## Self-Check
+Can you explain CAP without saying “pick any two,” and can you identify which user operation should fail safely rather than risk violating a business invariant?
 
 ## Next Lesson
-
 Lesson 36 — Eventual Consistency and Distributed Transactions
