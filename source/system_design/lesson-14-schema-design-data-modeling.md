@@ -23,6 +23,29 @@ Normalization separates facts into appropriate tables to reduce unintended dupli
 
 Understand common reads and writes before finalizing a schema. Define what happens when records are deleted, how historical changes are retained, and how migrations will be rolled out. A schema is a long-lived contract between the application and its data; changes require compatibility and recovery planning.
 
+## Learning Objectives
+
+- Identify entities, keys, and relationships in a domain.
+- Use normalization and deliberate denormalization to preserve correctness and query efficiency.
+
+## Worked Example
+
+For an online shop, model customers, orders, products, and order_items separately. Store the unit price on order_items so an old order retains the price paid even if the product price changes later.
+
+## Check Your Understanding
+
+1. **Why not store all product IDs in one comma-separated order field?**
+
+   It weakens referential integrity and makes filtering, updating, and joining individual items harder.
+
+2. **Why preserve the purchase-time unit price?**
+
+   Historical orders must reflect the agreed price, not today's catalog price.
+
+## Common Pitfall
+
+Optimizing reads by duplicating fields before identifying which copy is authoritative and how updates stay consistent.
+
 ## Key Takeaways
 
 Model entities, relationships, keys, and constraints first. Normalize to protect integrity; denormalize only for a measured reason and with an update plan.
@@ -31,6 +54,14 @@ Model entities, relationships, keys, and constraints first. Normalize to protect
 
 Model customers, orders, and order items for an online store. Name the primary keys, foreign keys, and one constraint that prevents invalid data.
 
+
+### Practice Hint
+
+Draw entities as boxes, relationships as lines, and mark the primary and foreign keys before deciding what to denormalize.
+
+### Self-Check
+
+Can you model a many-to-many relationship without putting lists of IDs into a single column?
 ## Next Lesson
 
 Lesson 15 — Database Indexes
