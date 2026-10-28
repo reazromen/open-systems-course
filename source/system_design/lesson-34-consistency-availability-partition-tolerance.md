@@ -1,36 +1,34 @@
-# Lesson 34 — Consistency, Availability, and Partition Tolerance
+# Lesson 34 — Consistency, Availability, and Network Partitions
 
 **Course:** System Design — From the Ground Up  
-**Module 6 — Distributed Systems**
+**Module 7 — Distributed Systems**
 
-## Lesson Overview
+## Learning Objectives
+- Define consistency and availability in distributed services.
+- Explain a network partition.
+- Recognize that distributed design involves explicit trade-offs.
 
-Distributed data systems must make decisions when nodes communicate imperfectly. Consistency, availability, and partition tolerance describe important properties, but their precise meaning depends on the system and the guarantee being discussed.
+## Core Concept
+Consistency can mean different things in different contexts; in distributed data systems it often concerns whether reads observe writes according to a defined guarantee. Availability concerns whether requests receive a non-error response. A network partition prevents some nodes from communicating. During a partition, a system may have to limit some operations to preserve its chosen correctness guarantees.
 
-## Consistency in Distributed Data
+## Worked Example
+Two regions temporarily lose communication. A globally unique username must not be assigned to two users. The service may reject or delay some registrations until it can safely coordinate, rather than accepting conflicting writes in both regions.
 
-In this context, strong consistency commonly means reads observe the latest successfully completed write according to the system's specified ordering. Other systems allow stale reads or different replicas to temporarily disagree. This is distinct from the database consistency in ACID, which refers to preserving defined rules and invariants.
+## Common Pitfall
+Using “consistent” as a synonym for “the database is healthy.” State the actual guarantee—such as read-after-write or linearizability—and the failure conditions under which it applies.
 
-## Availability
+## Knowledge Check
+1. What is a network partition?
+   - **Answer:** A communication failure that divides nodes into groups unable to reliably communicate with each other.
+2. Why might a system reject writes during a partition?
+   - **Answer:** To preserve a correctness guarantee that cannot safely be maintained by accepting independent conflicting writes.
 
-Availability describes whether a system continues to return responses to requests. A system that rejects a request to preserve a correctness guarantee may be unavailable for that operation even if its servers are running. Real availability also depends on timeouts, routing, dependencies, and what counts as a successful response.
+## Practice Hint
+Choose a username service and a view counter. Decide which operations may tolerate stale results and which require coordination.
 
-## Network Partitions
-
-A network partition occurs when groups of nodes cannot reliably communicate. They may each still be running and reachable by some clients. In a distributed system, it may be impossible to know immediately whether a remote node has failed or is merely unreachable.
-
-## The Trade-off During a Partition
-
-For a replicated data operation during a partition, a system may reject or delay some operations to preserve a strong consistency guarantee, or continue accepting operations in more than one partition and reconcile later. The choice is operation-specific: a shopping cart may tolerate temporary divergence differently from a bank balance.
-
-## Key Takeaways
-
-Define consistency and availability precisely. During network partitions, distributed systems face real trade-offs between accepting operations and preserving a single agreed view of data.
-
-## Practice Exercise
-
-Compare a social-media like counter with a bank transfer during a network partition. Which temporary behaviors might each system permit, and which would be dangerous?
+## Self-Check
+Can you state the consistency guarantee your example needs and what behavior users see during a partition?
 
 ## Next Lesson
 
-Lesson 35 — The CAP Theorem
+Lesson 35
