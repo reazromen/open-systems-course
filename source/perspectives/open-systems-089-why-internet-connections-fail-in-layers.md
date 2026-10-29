@@ -431,3 +431,7 @@ A proxy proves its own boundary.
 The application proves only what its response semantics actually mean.
 
 The final lesson of this module follows one constructed connection end to end and annotates exactly which fields and state change at each boundary.
+
+## Interactive companion exercise
+
+Use the [layered connection timeline](../prototypes/interactive-system-design.html#protocol-title) to distinguish DNS, TCP, TLS, and HTTP failure domains in order.

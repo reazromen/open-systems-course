@@ -40,7 +40,7 @@ client
 public gateway / reverse proxy
   ↓
 private origin or backend
-</code></pre>pre
+</code></pre>
 <p>Both are intermediaries.</p>
 <p>The direction of trust and configuration is different.</p>
 <h2>One user request can create multiple network connections</h2>
@@ -55,7 +55,7 @@ edge / reverse proxy
   │ separate connection B
   ↓
 origin
-</code></pre>pre
+</code></pre>
 <p>Connection A and connection B can have:</p>
 <ul>
 <li>different IP endpoints;</li>
@@ -68,7 +68,7 @@ origin
 <p>A successful client-to-edge TLS handshake proves nothing by itself about edge-to-origin TLS.</p>
 <p>This is one of the most useful architectural facts in production web systems.</p>
 <h2>A CDN is a deployment architecture, not one protocol</h2>
-<p>"CDN" does not define one universal wire protocol or topology.</p>
+<p>&quot;CDN&quot; does not define one universal wire protocol or topology.</p>
 <p>A content-delivery network can combine mechanisms such as:</p>
 <ul>
 <li>DNS-based endpoint selection;</li>
@@ -83,10 +83,10 @@ origin
 <p>Different providers and deployments make different choices.</p>
 <p>So avoid statements such as:</p>
 <pre><code class="language-text">all CDNs work by changing DNS
-</code></pre>pre
+</code></pre>
 <p>or:</p>
 <pre><code class="language-text">a CDN always serves content from cache
-</code></pre>pre
+</code></pre>
 <p>An edge can receive a request and still need to contact the origin.</p>
 <p>The useful abstraction is:</p>
 <p><strong>the edge becomes an additional system boundary between the client and origin.</strong></p>
@@ -95,10 +95,10 @@ origin
 <p>RFC 9111 defines HTTP caching semantics and distinguishes shared caches from private caches.</p>
 <p>A cache hit can change the effective path:</p>
 <pre><code class="language-text">client → edge cache
-</code></pre>pre
+</code></pre>
 <p>instead of:</p>
 <pre><code class="language-text">client → edge → origin
-</code></pre>pre
+</code></pre>
 <p>That reduces work and can reduce latency.</p>
 <p>But it also creates state.</p>
 <p>A cached representation can be:</p>
@@ -109,7 +109,7 @@ origin
 <li>invalidated by deployment-specific mechanisms;</li>
 <li>bypassed for a particular request.</li>
 </ul>
-<p>"Origin is healthy" and "users see the new content" are therefore separate claims.</p>
+<p>&quot;Origin is healthy&quot; and &quot;users see the new content&quot; are therefore separate claims.</p>
 <h2>TLS termination creates a trust boundary</h2>
 <p>If the edge terminates client TLS, it receives the application data after TLS decryption for that connection.</p>
 <p>The edge may then protect the origin leg with another TLS connection.</p>
@@ -119,7 +119,7 @@ origin
 edge makes independent origin connection
        ↓
 edge applies origin trust policy
-</code></pre>pre
+</code></pre>
 <p>The client does not directly validate the certificate on the private origin leg unless the system uses an end-to-end design that preserves that relationship differently.</p>
 <p>This is not automatically insecure.</p>
 <p>It is an architectural boundary that must be explicit.</p>
@@ -158,12 +158,12 @@ user network → Internet → edge
 
 origin path:
 edge network → origin network → backend
-</code></pre>pre
+</code></pre>
 <p>A traceroute from the client cannot reveal the private origin path if packets never travel that path.</p>
 <h2>Inspect without over-interpreting headers</h2>
 <p>For a public service you own or are authorized to inspect:</p>
 <pre><code class="language-bash">curl -vI https://example.com/
-</code></pre>pre
+</code></pre>
 <p>You can inspect:</p>
 <ul>
 <li>resolved addresses;</li>
@@ -172,21 +172,21 @@ edge network → origin network → backend
 <li>response status;</li>
 <li>response headers.</li>
 </ul>
-<p>Headers such as <code>Via</code>code, cache-related fields, or provider-specific diagnostics can reveal intermediaries when present.</p>
+<p>Headers such as <code>Via</code>, cache-related fields, or provider-specific diagnostics can reveal intermediaries when present.</p>
 <p>Absence of a provider-specific header is not proof that no intermediary exists.</p>
 <p>Architecture should be confirmed from configuration and controlled observations, not guessed from one response.</p>
 <h2>Build a local reverse-proxy experiment</h2>
 <p>You can make the boundary visible on one computer.</p>
 <p>Run a local origin:</p>
 <pre><code class="language-bash">python3 -m http.server 8080 --bind 127.0.0.1
-</code></pre>pre
-<p>Then configure an open-source reverse proxy such as Caddy or nginx to listen on another local port and forward to <code>127.0.0.1:8080</code>code.</p>
+</code></pre>
+<p>Then configure an open-source reverse proxy such as Caddy or nginx to listen on another local port and forward to <code>127.0.0.1:8080</code>.</p>
 <p>Request the proxy endpoint rather than the origin directly.</p>
 <p>Observe:</p>
 <pre><code class="language-text">client socket → reverse proxy socket
 reverse proxy socket → origin socket
-</code></pre>pre
-<p>Use <code>ss -tnp</code>code or local packet capture if authorized.</p>
+</code></pre>
+<p>Use <code>ss -tnp</code> or local packet capture if authorized.</p>
 <p>Then stop only the origin.</p>
 <p>The reverse proxy can remain listening while upstream requests fail.</p>
 <p>That is a concrete demonstration that listener health and dependency health are different states.</p>
@@ -217,13 +217,15 @@ Does origin-side TLS succeed if used?
 Does the origin application respond?
         ↓
 Does the edge return the intended response?
-</code></pre>pre
-<p>A single "502" often lives in the middle of that ladder, not at the client's local network.</p>
+</code></pre>
+<p>A single &quot;502&quot; often lives in the middle of that ladder, not at the client's local network.</p>
 <h2>The lesson to carry forward</h2>
 <p>Proxies and CDN edges split an apparently simple request into multiple connections and administrative boundaries.</p>
 <p>That can improve performance, availability, security, and operational control.</p>
 <p>It also creates more places where state can disagree.</p>
-<p>The next lesson builds a disciplined failure model across DNS, routing, transport, TLS, intermediaries, and applications so that "the Internet is down" becomes a set of testable hypotheses.</p>
+<p>The next lesson builds a disciplined failure model across DNS, routing, transport, TLS, intermediaries, and applications so that &quot;the Internet is down&quot; becomes a set of testable hypotheses.</p>
+<h2>Interactive companion exercise</h2>
+<p>Trace a client request through a CDN/reverse proxy, cache decision, origin, and response in the <a href="../prototypes/interactive-system-design.html#protocol-title">proxy timeline</a>.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

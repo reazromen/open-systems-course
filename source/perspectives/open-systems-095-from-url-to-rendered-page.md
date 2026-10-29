@@ -294,3 +294,7 @@ The browser parses a URL, applies navigation policy, fetches resources, interpre
 "The website is slow" is therefore not yet a diagnosis.
 
 The next half of this module moves from loading pages into application state: cookies, sessions, same-origin policy, CORS, APIs, and backend request paths.
+
+## Interactive companion exercise
+
+Follow URL parsing, DNS/connection setup, HTTP response, subresource discovery, and layout/paint in the [browser loading timeline](../prototypes/interactive-system-design.html#protocol-title).

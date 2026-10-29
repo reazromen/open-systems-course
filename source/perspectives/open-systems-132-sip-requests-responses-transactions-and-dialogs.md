@@ -148,3 +148,7 @@ The exercise turns a long packet trace into a state machine.
 SIP has several overlapping identifiers because it tracks transport hops, transactions, dialogs, and logical identities separately.
 
 The next lesson explains how an address-of-record becomes reachable through registration and location service state.
+
+## Interactive companion exercise
+
+Step through INVITE, provisional/final responses, ACK, and BYE in the [SIP call-flow explorer](../prototypes/interactive-system-design.html#sip-title). The model assumes a proxy Record-Route and omits transaction retransmission details.

@@ -27,7 +27,7 @@ default router
 DNS resolver addresses
 lease lifetime
 possibly other site-specific options
-</code></pre>pre
+</code></pre>
 <p>An address alone is not a complete network configuration.</p>
 <p>A host can have a valid local address but no default route. It can have a route but broken DNS configuration. It can have all three and still be blocked by a firewall farther along the path.</p>
 <p>DHCP distributes configuration. It does not prove that every dependency described by that configuration is healthy.</p>
@@ -40,7 +40,7 @@ DHCPOFFER
 DHCPREQUEST
      ↓
 DHCPACK
-</code></pre>pre
+</code></pre>
 <p>This is often remembered as <strong>DORA</strong>.</p>
 <p>RFC 2131 defines these DHCP messages and the client-server interaction.</p>
 <p>The mnemonic is useful, but do not turn it into a law saying every DHCP exchange always contains exactly those four packets in exactly that situation. Renewal, reboot, rebinding, rejection, and other states use different parts of the protocol.</p>
@@ -55,8 +55,8 @@ DHCPACK
 relay, if used
    ↓
 DHCP server
-</code></pre>pre
-<p>If discovery packets leave the client but no offer returns, the failure could be local link policy, relay configuration, server availability, address-pool exhaustion, or filtering. "DHCP is down" is not yet a diagnosis.</p>
+</code></pre>
+<p>If discovery packets leave the client but no offer returns, the failure could be local link policy, relay configuration, server availability, address-pool exhaustion, or filtering. &quot;DHCP is down&quot; is not yet a diagnosis.</p>
 <h2>The offer is not the final commitment</h2>
 <p>A server can answer a discovery with an offer containing an available address and configuration parameters.</p>
 <p>The client then sends DHCPREQUEST to indicate the selected offer or to perform other request/renewal behavior defined by the protocol.</p>
@@ -70,7 +70,7 @@ ack seen
 address installed
 route installed
 resolver configuration installed
-</code></pre>pre
+</code></pre>
 <p>Every line proves something different.</p>
 <h2>DHCP options carry much of the useful configuration</h2>
 <p>DHCP is extensible through options.</p>
@@ -81,7 +81,7 @@ mask:           255.255.255.0
 router:         192.0.2.1
 DNS resolver:   192.0.2.53
 lease:          finite lifetime
-</code></pre>pre
+</code></pre>
 <p>These are documentation addresses.</p>
 <p>The server is describing configuration to the client. The client and operating system still need to install and use that configuration correctly.</p>
 <h2>A lease is time-bounded state</h2>
@@ -100,7 +100,7 @@ lease:          finite lifetime
 <pre><code class="language-text">DHCP server unreachable
 ≠
 all configured clients instantly lose networking
-</code></pre>pre
+</code></pre>
 <p>Time is part of the system.</p>
 <h2>DHCP does not own every network fact</h2>
 <p>A successful DHCP exchange can provide a default-router address.</p>
@@ -121,10 +121,10 @@ all configured clients instantly lose networking
 <pre><code class="language-bash">ip address
 ip route
 resolvectl status
-</code></pre>pre
+</code></pre>
 <p>If NetworkManager is in use, this can also help:</p>
 <pre><code class="language-bash">nmcli device show
-</code></pre>pre
+</code></pre>
 <p>Look for the relationship among:</p>
 <ul>
 <li>interface;</li>
@@ -138,18 +138,18 @@ resolvectl status
 <p>On your own lab network, a packet analyzer can make the bootstrap sequence visible.</p>
 <p>For example, on an interface you are authorized to capture:</p>
 <pre><code class="language-bash">sudo tcpdump -ni &lt;interface&gt; 'udp port 67 or udp port 68'
-</code></pre>pre
+</code></pre>
 <p>Then reconnect a test client or renew a lease using the supported controls for that machine.</p>
 <p>Identify:</p>
 <pre><code class="language-text">DISCOVER
 OFFER
 REQUEST
 ACK
-</code></pre>pre
+</code></pre>
 <p>If the sequence differs, explain why rather than forcing the evidence into the mnemonic.</p>
 <p>Do not disrupt a shared production network merely to produce a capture.</p>
 <h2>Build a failure ladder</h2>
-<p>When a client says "connected but no Internet," separate configuration from reachability:</p>
+<p>When a client says &quot;connected but no Internet,&quot; separate configuration from reachability:</p>
 <pre><code class="language-text">Does the link exist?
       ↓
 Did DHCP complete?
@@ -165,12 +165,14 @@ Is a DNS resolver configured?
 Can that resolver be reached?
       ↓
 Can remote IP paths be reached?
-</code></pre>pre
-<p>This prevents a DNS failure from being misdiagnosed as DHCP, or a missing route from being blamed on "Wi-Fi."</p>
+</code></pre>
+<p>This prevents a DNS failure from being misdiagnosed as DHCP, or a missing route from being blamed on &quot;Wi-Fi.&quot;</p>
 <h2>The lesson to carry forward</h2>
 <p>DHCP turns network configuration into leased distributed state.</p>
 <p>A server can offer parameters. A client can accept them. The operating system can install them. Routers and DNS services can then succeed or fail independently.</p>
 <p>The next lesson follows another stateful boundary commonly encountered after a host is configured: address and port translation at a NAT.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#protocol-title">DHCP timeline</a> to follow the DORA exchange: Discover, Offer, Request, and Acknowledge.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

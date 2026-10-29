@@ -164,3 +164,7 @@ A stack is not important because interview questions ask about it.
 It is important because last-in-first-out order appears naturally in nested execution and reversible context.
 
 Whenever the newest unfinished thing should be handled first, a stack deserves consideration.
+
+## Interactive companion exercise
+
+Try the stack operations in the [data-structure explorer](../prototypes/interactive-system-design.html#data-structure-title) and observe last-in, first-out behavior.

@@ -270,3 +270,7 @@ A secure TLS deployment depends on negotiated cryptography, shared keys, authent
 And even when all of that succeeds, the application can still fail.
 
 The next lesson goes deeper into certificates, names, chains, and trust anchors: the machinery that lets a TLS client decide whether a presented public key belongs to the service it meant to reach.
+
+## Interactive companion exercise
+
+Step through the [TLS handshake timeline](../prototypes/interactive-system-design.html#protocol-title) to distinguish encrypted application data from certificate identity validation and application-level safety.

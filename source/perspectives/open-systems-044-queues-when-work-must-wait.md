@@ -213,3 +213,7 @@ They also create backlog, duplicate-delivery, retry, persistence, and monitoring
 A queue is not storage you can ignore.
 
 It is delayed work with semantics.
+
+## Interactive companion exercise
+
+Try enqueue and dequeue in the [queue operation explorer](../prototypes/interactive-system-design.html#data-structure-title). Its O(1) dequeue assumption requires a head/tail or circular-buffer implementation; it is not JavaScript Array.shift() timing.

@@ -135,3 +135,7 @@ Finally, drain one instance before shutdown.
 Discovery maps service identity to current endpoints; load balancing maps work to those endpoints.
 
 The next lesson asks what happens when one dataset becomes too large for one node: partitioning and sharding.
+
+## Interactive exercise: compare load-balancing policies
+
+Use the [load-balancing simulator](../prototypes/interactive-system-design.html#lb-title) to compare Round Robin with Least Connections, change server health, and observe active request counts. The sequence is deterministic and is not a benchmark.

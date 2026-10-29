@@ -195,3 +195,7 @@ It is asking:
 Which layer's contract failed?
 
 That question lets you move from physical link to local frame, IP route, transport endpoint, security, and application meaning without blaming "the network" for everything.
+
+## Interactive companion exercise
+
+Use the [packet-path explorer](../prototypes/interactive-system-design.html#network-title) to trace application payload, transport, IP, Ethernet, and delivery steps across a local or routed network.

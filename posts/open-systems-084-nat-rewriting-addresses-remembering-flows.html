@@ -17,7 +17,7 @@
 <p>Somewhere between the laptop and the public Internet, a translator may rewrite the packet.</p>
 <p>That mechanism is commonly called NAT.</p>
 <p>For everyday home and enterprise IPv4 networks, the form learners encounter most often is address-and-port translation, where many internal connections share one external address by using different transport-port mappings.</p>
-<p>The key mental model is not simply "private IP becomes public IP."</p>
+<p>The key mental model is not simply &quot;private IP becomes public IP.&quot;</p>
 <p>It is:</p>
 <p><strong>the translator rewrites packet fields and maintains state that connects the inside representation of a flow to the outside representation.</strong></p>
 <h2>Follow one constructed flow</h2>
@@ -25,18 +25,18 @@
 <p>Inside:</p>
 <pre><code class="language-text">source      192.168.1.20:50000
 destination 198.51.100.40:443
-</code></pre>pre
+</code></pre>
 <p>At the NAT, the outbound packet might become:</p>
 <pre><code class="language-text">source      203.0.113.10:62001
 destination 198.51.100.40:443
-</code></pre>pre
+</code></pre>
 <p>These are documentation addresses.</p>
 <p>The translator records a mapping conceptually similar to:</p>
 <pre><code class="language-text">192.168.1.20:50000
         ↔
 203.0.113.10:62001
-</code></pre>pre
-<p>When the reply returns to <code>203.0.113.10:62001</code>code, the device can use its translation state to rewrite the destination back toward the internal host.</p>
+</code></pre>
+<p>When the reply returns to <code>203.0.113.10:62001</code>, the device can use its translation state to rewrite the destination back toward the internal host.</p>
 <p>Traditional NAT and Network Address Port Translation are described in RFC 3022, while RFC 2663 provides broader NAT terminology.</p>
 <h2>Translation is stateful in the common case</h2>
 <p>The mapping cannot normally live forever.</p>
@@ -48,7 +48,7 @@ destination 198.51.100.40:443
 mapping exists now
         ↓
 return traffic can match state
-</code></pre>pre
+</code></pre>
 <p>If the state expires, the same inbound packet later may no longer have a mapping that tells the translator where to send it.</p>
 <p>Time is part of NAT behavior.</p>
 <h2>Outbound success does not imply inbound reachability</h2>
@@ -56,22 +56,22 @@ return traffic can match state
 <p>An unsolicited inbound connection has a different problem.</p>
 <p>Suppose a public host sends:</p>
 <pre><code class="language-text">203.0.113.10:9000
-</code></pre>pre
+</code></pre>
 <p>Which internal machine should receive it?</p>
 <p>Without an existing mapping, static mapping, port-forwarding rule, or another traversal/control mechanism, the translator may have no answer.</p>
 <p>This is why:</p>
 <pre><code class="language-text">internal host can browse outward
-</code></pre>pre
+</code></pre>
 <p>does not prove:</p>
 <pre><code class="language-text">the same host can accept arbitrary inbound connections
-</code></pre>pre
+</code></pre>
 <p>The direction in which state was created matters.</p>
 <h2>NAT and firewall are not synonyms</h2>
 <p>Consumer routers often perform NAT and stateful firewalling in the same device.</p>
 <p>That packaging encourages a conceptual mistake.</p>
 <p>Network address translation changes addressing representation. Firewall policy decides which traffic is permitted or denied.</p>
 <p>The two functions can interact, and one device can implement both, but they are not the same mechanism.</p>
-<p>A security policy should therefore not be described merely as "we have NAT."</p>
+<p>A security policy should therefore not be described merely as &quot;we have NAT.&quot;</p>
 <p>If inbound traffic is blocked, identify the actual control:</p>
 <ul>
 <li>absence of translation state;</li>
@@ -101,7 +101,7 @@ home NAT
 ISP CGN
   ↓
 public Internet
-</code></pre>pre
+</code></pre>
 <p>Port forwarding on the home router cannot create a mapping on an ISP-controlled CGN.</p>
 <p>That is an ownership boundary as much as a protocol boundary.</p>
 <p>When diagnosing inbound reachability, ask who controls every translator on the path.</p>
@@ -115,7 +115,7 @@ local route
 gateway address
 translator state, if you control it
 remote observed source
-</code></pre>pre
+</code></pre>
 <p>Do not infer topology from one value when the path can contain multiple boundaries.</p>
 <h2>Inspect a Linux NAT you control</h2>
 <p>On a Linux router or namespace lab that you own, start with configuration.</p>
@@ -123,15 +123,15 @@ remote observed source
 <pre><code class="language-bash">sudo nft list ruleset
 ip address
 ip route
-</code></pre>pre
+</code></pre>
 <p>If conntrack tooling is installed and authorized:</p>
 <pre><code class="language-bash">sudo conntrack -L
-</code></pre>pre
+</code></pre>
 <p>The exact output is implementation-specific. Your goal is to find evidence connecting an inside flow to translation or connection-tracking state.</p>
 <p>On an endpoint, compare:</p>
 <pre><code class="language-bash">ip address
 ip route
-</code></pre>pre
+</code></pre>
 <p>with the source address observed by a remote test service you intentionally contact.</p>
 <p>Do not scan or manipulate networks you do not administer.</p>
 <h2>Build a safe namespace experiment</h2>
@@ -142,7 +142,7 @@ ip route
 <li>one namespace as a translator/router;</li>
 <li>one namespace as an outside service;</li>
 <li>private or documentation-style addressing inside the isolated lab;</li>
-<li>an <code>nftables</code>code masquerade/SNAT rule on the translator.</li>
+<li>an <code>nftables</code> masquerade/SNAT rule on the translator.</li>
 </ul>
 <p>Then capture on both sides of the translator.</p>
 <p>The same logical connection will have different packet headers on the two interfaces.</p>
@@ -163,13 +163,15 @@ Did it match translation/filtering state?
 Was it rewritten toward the internal host?
         ↓
 Did host firewall and application state accept it?
-</code></pre>pre
-<p>That sequence is much more precise than "NAT problem."</p>
+</code></pre>
+<p>That sequence is much more precise than &quot;NAT problem.&quot;</p>
 <h2>The lesson to carry forward</h2>
 <p>NAT creates two representations of a communication flow and maintains state that connects them.</p>
 <p>That state has ownership, lifetime, transport-specific behavior, and failure modes.</p>
 <p>Once the path is translated correctly, another question remains: if a client reaches a remote service, how can it protect the conversation and authenticate the service it intended to contact?</p>
 <p>That is the next boundary: TLS.</p>
+<h2>Interactive companion exercise</h2>
+<p>Trace a stateful address/port mapping and reverse translation in the <a href="../prototypes/interactive-system-design.html#protocol-title">NAT flow timeline</a>. The addresses are documentation examples, not a real network capture.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

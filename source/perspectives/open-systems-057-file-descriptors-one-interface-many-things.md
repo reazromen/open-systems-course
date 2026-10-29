@@ -217,3 +217,7 @@ The abstraction enables:
 - device access.
 
 When a Linux process has an I/O problem, its open descriptors are often one of the first places worth inspecting.
+
+## Interactive companion exercise
+
+Follow open, descriptor return, read, and close in the [file-descriptor timeline](../prototypes/interactive-system-design.html#os-timeline-title). The model emphasizes that the descriptor is process-local and used for later I/O.

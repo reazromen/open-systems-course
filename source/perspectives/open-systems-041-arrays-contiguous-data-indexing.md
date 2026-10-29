@@ -45,10 +45,10 @@ This is why arrays support constant-time positional access in the standard model
 
 Read:
 
-    array
-    array
-    array
-    array
+    array[0]
+    array[1]
+    array[2]
+    array[3]
 
 Nearby elements often occupy nearby memory.
 
@@ -196,3 +196,7 @@ Learn:
 - cost;
 - memory behaviour;
 - workload fit.
+
+## Interactive companion exercise
+
+Compare indexed reads, dynamic-array resizing, and front insertion in the [data-structure operation explorer](../prototypes/interactive-system-design.html#data-structure-title). The reported steps are simplified complexity examples, not timing benchmarks.

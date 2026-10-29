@@ -21,7 +21,7 @@
 <h2>A function has a contract</h2>
 <p>Consider:</p>
 <pre><code>normalize_temperature(raw_value)
-</code></pre>pre
+</code></pre>
 <p>That name is not enough.</p>
 <p>What unit is raw_value?</p>
 <p>What range is valid?</p>
@@ -35,10 +35,10 @@
 <h2>Inputs reduce hidden dependencies</h2>
 <p>Compare:</p>
 <pre><code>calculate_total()
-</code></pre>pre
+</code></pre>
 <p>which reads five globals, with:</p>
 <pre><code>calculate_total(items, tax_rate)
-</code></pre>pre
+</code></pre>
 <p>The second form exposes more dependencies.</p>
 <p>That makes the behaviour easier to test and reason about.</p>
 <p>Not every function must be pure.</p>
@@ -48,11 +48,11 @@
 <h2>Return values make output explicit</h2>
 <p>A function can transform input:</p>
 <pre><code>celsius_to_fahrenheit(c)
-</code></pre>pre
+</code></pre>
 <p>The result is output.</p>
 <p>A function can also produce side effects:</p>
 <pre><code>save_record(record)
-</code></pre>pre
+</code></pre>
 <p>Now the output may be a changed database rather than only a returned value.</p>
 <p>Side effects are not bad.</p>
 <p>They simply create more system boundaries and failure modes.</p>
@@ -62,7 +62,7 @@
 <pre><code>if retries &lt; 3:
     wait
     retry
-</code></pre>pre
+</code></pre>
 <p>You have duplicated retry policy.</p>
 <p>A reusable function can centralize it.</p>
 <p>Now one change updates the rule.</p>
@@ -79,7 +79,7 @@
 <h2>Function calls have runtime mechanics</h2>
 <p>At the source level:</p>
 <pre><code>result = add(a, b)
-</code></pre>pre
+</code></pre>
 <p>At machine level, a calling convention coordinates arguments, registers, stack state, return addresses, and result placement.</p>
 <p>A compiler may inline a function and eliminate the call entirely when semantics allow.</p>
 <p>So the source abstraction does not require one literal runtime call.</p>
@@ -94,7 +94,7 @@
 <h2>Testability reveals good boundaries</h2>
 <p>Suppose a function calculates:</p>
 <pre><code>should_alert(reading, threshold, now)
-</code></pre>pre
+</code></pre>
 <p>You can test it with controlled values.</p>
 <p>Suppose instead it:</p>
 <ul>
@@ -112,17 +112,21 @@
 <p>Start with:</p>
 <pre><code>if reading.valid and reading.level &gt; threshold:
     send_alert()
-</code></pre>pre
+</code></pre>
 <p>Turn the decision into:</p>
 <pre><code>should_alert(reading, threshold)
-</code></pre>pre
+</code></pre>
 <p>Now define the contract:</p>
-<p>Input:
-- reading value;
-- validity;
-- threshold.</p>
-<p>Output:
-- true or false.</p>
+<p>Input:</p>
+<ul>
+<li>reading value;</li>
+<li>validity;</li>
+<li>threshold.</li>
+</ul>
+<p>Output:</p>
+<ul>
+<li>true or false.</li>
+</ul>
 <p>Then keep actual alert delivery outside.</p>
 <p>You have separated policy from side effect.</p>
 <p>That distinction scales to large systems.</p>

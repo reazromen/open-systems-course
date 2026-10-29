@@ -13,7 +13,7 @@
 <link href="/assets/site.css?v=4ffee5f00ba8" rel="stylesheet"/><link href="/assets/sitewide-v2.css?v=e56d707bf713" rel="stylesheet"/><link href="/assets/phase1.css?v=bb6fafb1b890" rel="stylesheet"/><link href="https://reazromen.com/feed.xml" rel="alternate" title="Reaz Romen — Writing" type="application/rss+xml"/><link href="https://reazromen.com/atom.xml" rel="alternate" title="Reaz Romen — Writing" type="application/atom+xml"/><link href="/assets/responsive-v3.css?v=4533f884b9ce" rel="stylesheet"/><link href="https://learn.reazromen.com/posts/open-systems-091-http-is-a-message-protocol-not-the-web.html" rel="canonical"/><meta content="architecture" data-pagefind-filter="tag[content]"/><meta content="Systems Thinking" data-pagefind-filter="topic[content]"/><meta content="HTTP Is a Message Protocol, Not the Web" property="og:title"/><meta content="HTTP defines request and response semantics between components. The web is a much larger system containing browsers, URLs, DNS, TLS, caches, scripts, servers, storage, and application state." property="og:description"/><meta content="https://learn.reazromen.com/posts/open-systems-091-http-is-a-message-protocol-not-the-web.html" property="og:url"/><link rel="stylesheet" href="/assets/open-systems-course.css?v=course-code-contrast-1"></head>
 <body class="rr-themed"><a class="skip-link" href="#rr-main">Skip to content</a>a
 <header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
-<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>HTTP Is a Message Protocol, Not the Web</h1><p class="lede">HTTP defines request and response semantics between components. The web is a much larger system containing browsers, URLs, DNS, TLS, caches, scripts, servers, storage, and application state.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A browser opens a page and we casually say, "HTTP loaded the website."</p>
+<main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>HTTP Is a Message Protocol, Not the Web</h1><p class="lede">HTTP defines request and response semantics between components. The web is a much larger system containing browsers, URLs, DNS, TLS, caches, scripts, servers, storage, and application state.</p><div class="article-meta"><span>Published 2026-10-07</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A browser opens a page and we casually say, &quot;HTTP loaded the website.&quot;</p>
 <p>That sentence compresses too much.</p>
 <p>HTTP is one protocol family inside a larger web system. It defines semantics for requests and responses: methods, status codes, fields, representations, caching rules, and related behavior. It does not define DNS, routing, TLS certificates, HTML rendering, JavaScript execution, database queries, or user sessions by itself.</p>
 <p>The first useful correction for this module is:</p>
@@ -32,7 +32,7 @@ TLS, usually for HTTPS
 TCP or QUIC
         ↓
 IP
-</code></pre>pre
+</code></pre>
 <p>That stack already reveals an important detail.</p>
 <p>The HTTP semantics can stay mostly the same while the message transport changes.</p>
 <p>RFC 9110 defines HTTP semantics independently from one specific version's framing.</p>
@@ -41,7 +41,7 @@ IP
 <p>HTTP/3 maps HTTP semantics onto QUIC rather than TCP.</p>
 <p>So:</p>
 <pre><code class="language-text">GET /status
-</code></pre>pre
+</code></pre>
 <p>can mean the same kind of operation across HTTP/1.1, HTTP/2, and HTTP/3 even though the bytes on the wire are not encoded the same way.</p>
 <h2>HTTP is request-response</h2>
 <p>At the semantic level, a client sends a request.</p>
@@ -64,22 +64,22 @@ IP
 Host: example.com
 Accept: application/json
 
-</code></pre>pre
+</code></pre>
 <p>Response:</p>
 <pre><code class="language-http">HTTP/1.1 200 OK
 Content-Type: application/json
 Content-Length: 15
 
-{"status":"ok"}
-</code></pre>pre
+{&quot;status&quot;:&quot;ok&quot;}
+</code></pre>
 <p>This textual form is useful because HTTP/1.1 exposes the structure directly.</p>
 <p>Do not copy the visual form onto HTTP/2 or HTTP/3 and assume those protocols transmit identical text lines. Their framing is different.</p>
 <p>The semantics are the transferable mental model.</p>
 <h2>A resource is not necessarily a file</h2>
 <p>The request target:</p>
 <pre><code class="language-text">/users/42
-</code></pre>pre
-<p>does not prove that a file named <code>42</code>code exists on disk.</p>
+</code></pre>
+<p>does not prove that a file named <code>42</code> exists on disk.</p>
 <p>A server can map that target to:</p>
 <ul>
 <li>a static file;</li>
@@ -94,14 +94,14 @@ Content-Length: 15
 <p>HTTP deals with resources and representations at the protocol level, while the server decides how those resources are implemented.</p>
 <p>That distinction matters because many beginner mental models assume:</p>
 <pre><code class="language-text">URL path = filesystem path
-</code></pre>pre
+</code></pre>
 <p>Sometimes that is true.</p>
 <p>Often it is not.</p>
 <h2>HTTP does not require a browser</h2>
 <p>A browser is one HTTP user agent.</p>
 <p>Other clients include:</p>
 <ul>
-<li><code>curl</code>code;</li>
+<li><code>curl</code>;</li>
 <li>package managers;</li>
 <li>mobile applications;</li>
 <li>service-to-service clients;</li>
@@ -111,10 +111,10 @@ Content-Length: 15
 </ul>
 <p>If you make this request:</p>
 <pre><code class="language-bash">curl -i https://example.com/
-</code></pre>pre
+</code></pre>
 <p>you are using HTTP without a browser UI.</p>
 <p>This is important for debugging.</p>
-<p>If the browser fails but <code>curl</code>code succeeds, the difference may involve browser policy, cookies, JavaScript, CORS, service workers, extensions, or rendering rather than basic HTTP reachability.</p>
+<p>If the browser fails but <code>curl</code> succeeds, the difference may involve browser policy, cookies, JavaScript, CORS, service workers, extensions, or rendering rather than basic HTTP reachability.</p>
 <h2>HTTP is not automatically stateless in the whole-system sense</h2>
 <p>HTTP request semantics do not require a server to remember every previous request in a connection-specific application session.</p>
 <p>But real web applications often maintain state through mechanisms such as:</p>
@@ -126,7 +126,7 @@ Content-Length: 15
 <li>browser storage;</li>
 <li>application state.</li>
 </ul>
-<p>So the phrase "HTTP is stateless" should be handled carefully.</p>
+<p>So the phrase &quot;HTTP is stateless&quot; should be handled carefully.</p>
 <p>A more precise statement is:</p>
 <p><strong>HTTP messages can be interpreted independently at the protocol level, but web applications frequently build stateful behavior above them.</strong></p>
 <p>We will study sessions in Lesson 96.</p>
@@ -138,12 +138,12 @@ Content-Length: 15
 <pre><code class="language-text">one request
 ≠
 one TCP connection
-</code></pre>pre
+</code></pre>
 <p>and:</p>
 <pre><code class="language-text">one connection
 ≠
 one request
-</code></pre>pre
+</code></pre>
 <p>That distinction becomes important when measuring latency, connection reuse, failures, and load.</p>
 <p>A server can keep a connection open after sending a response.</p>
 <p>A client can reuse it for later requests.</p>
@@ -152,8 +152,8 @@ one request
 <pre><code class="language-http">HTTP/1.1 200 OK
 Content-Type: application/json
 
-{"payment":"rejected"}
-</code></pre>pre
+{&quot;payment&quot;:&quot;rejected&quot;}
+</code></pre>
 <p>HTTP says the request received a successful 2xx response at the protocol/application-interface level.</p>
 <p>The business operation represented in the body can still be rejected.</p>
 <p>Likewise, an HTTP 500 indicates server-side failure for the request, but it does not tell you whether the root cause was:</p>
@@ -167,7 +167,7 @@ Content-Type: application/json
 </ul>
 <p>Status codes are evidence, not full incident reports.</p>
 <h2>HTTP can cross intermediaries</h2>
-<p>The client might believe it is communicating with <code>api.example.com</code>code.</p>
+<p>The client might believe it is communicating with <code>api.example.com</code>.</p>
 <p>The actual path can be:</p>
 <pre><code class="language-text">client
   ↓
@@ -178,7 +178,7 @@ reverse proxy
 application server
   ↓
 backend dependency
-</code></pre>pre
+</code></pre>
 <p>HTTP allows intermediaries such as proxies and gateways.</p>
 <p>That means headers, caching, connection state, and errors can be produced at different boundaries.</p>
 <p>The machine that sends the final response to the client may not be the machine that stores the business data.</p>
@@ -186,7 +186,7 @@ backend dependency
 <h2>HTTP does not make content safe</h2>
 <p>Receiving:</p>
 <pre><code class="language-text">Content-Type: text/html
-</code></pre>pre
+</code></pre>
 <p>does not mean the content is trustworthy.</p>
 <p>A browser still applies security policies and parsing rules.</p>
 <p>JavaScript still executes under a browser security model.</p>
@@ -197,31 +197,31 @@ backend dependency
 <p>Use a service you own or a public site you are normally allowed to access.</p>
 <p>Start with:</p>
 <pre><code class="language-bash">curl -i https://example.com/
-</code></pre>pre
+</code></pre>
 <p>Then add verbosity:</p>
 <pre><code class="language-bash">curl -v https://example.com/
-</code></pre>pre
+</code></pre>
 <p>Separate what you observe:</p>
 <pre><code class="language-text">DNS resolution
 TCP or QUIC connection behavior
 TLS
 HTTP request
 HTTP response
-</code></pre>pre
-<p>Depending on the build, <code>curl</code>code may negotiate HTTP/2.</p>
+</code></pre>
+<p>Depending on the build, <code>curl</code> may negotiate HTTP/2.</p>
 <p>You can inspect the reported version rather than assuming it.</p>
 <p>If your curl supports it, compare explicit versions against a test service you control:</p>
 <pre><code class="language-bash">curl --http1.1 -I https://example.com/
 curl --http2   -I https://example.com/
-</code></pre>pre
+</code></pre>
 <p>The response semantics should still be recognizable even though the transport framing changes.</p>
 <h2>Build a tiny local HTTP service</h2>
 <p>On a local machine:</p>
 <pre><code class="language-bash">python3 -m http.server 8080 --bind 127.0.0.1
-</code></pre>pre
+</code></pre>
 <p>Then:</p>
 <pre><code class="language-bash">curl -i http://127.0.0.1:8080/
-</code></pre>pre
+</code></pre>
 <p>Observe:</p>
 <ul>
 <li>method;</li>
@@ -232,7 +232,7 @@ curl --http2   -I https://example.com/
 </ul>
 <p>Now request a missing path:</p>
 <pre><code class="language-bash">curl -i http://127.0.0.1:8080/does-not-exist
-</code></pre>pre
+</code></pre>
 <p>The network connection can succeed while the HTTP result changes from a success response to a not-found response.</p>
 <p>That is the protocol boundary made visible.</p>
 <h2>The lesson to carry forward</h2>
@@ -242,6 +242,8 @@ curl --http2   -I https://example.com/
 <p>A response has semantics.</p>
 <p>Connections, caches, browsers, proxies, servers, databases, and sessions add more state around those messages.</p>
 <p>The next lesson opens the HTTP message itself and examines request targets, fields, content, response status, and how message framing differs from semantics.</p>
+<h2>Interactive companion exercise</h2>
+<p>Inspect the request-line, headers, status, and response body in the <a href="../prototypes/interactive-system-design.html#protocol-title">HTTP message timeline</a>. HTTP message semantics are distinct from browser rendering behavior.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

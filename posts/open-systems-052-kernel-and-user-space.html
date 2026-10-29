@@ -29,7 +29,7 @@
   protected boundary
        |
 unprivileged execution
-</code></pre>pre
+</code></pre>
 <p>Hardware helps enforce the boundary.</p>
 <p>Software policy uses it.</p>
 <h2>User space is where ordinary applications live</h2>
@@ -73,7 +73,7 @@ filesystem/driver/etc.
 kernel result
    ↓
 user program
-</code></pre>pre
+</code></pre>
 <p>This transition is controlled.</p>
 <p>The process does not simply call an arbitrary kernel function pointer.</p>
 <h2>Exceptions also enter the kernel</h2>
@@ -137,6 +137,8 @@ user program
 <p>The kernel manages global resources and protection.</p>
 <p>System calls, exceptions, and interrupts cross into privileged execution under defined rules.</p>
 <p>This boundary is one of the reasons many independent programs can share one computer without treating every process as fully trusted.</p>
+<h2>Interactive companion exercise</h2>
+<p>Step through the <a href="../prototypes/interactive-system-design.html#os-timeline-title">user/kernel boundary timeline</a> to see where privilege changes and kernel validation occur.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

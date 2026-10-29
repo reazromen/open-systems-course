@@ -1,0 +1,36 @@
+/* Styles are scoped to interaction regions; existing course chrome is untouched. */
+.interactive-region {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  margin-block: 1.5rem;
+  padding: clamp(.875rem, 2.5vw, 1.25rem);
+  border: 1px solid var(--interaction-border, #c8c8c8);
+  border-radius: .5rem;
+  color: inherit;
+  background: var(--interaction-surface, transparent);
+}
+.interactive-region *, .interactive-region *::before, .interactive-region *::after { box-sizing: border-box; }
+.interactive-region :where(button, input, select, textarea) { font: inherit; max-width: 100%; }
+.interactive-region :where(button, input, select) { min-height: 2.5rem; }
+.interactive-region :where(button, input, select, textarea, a, [tabindex]):focus-visible {
+  outline: 3px solid var(--interaction-focus, #315bd6);
+  outline-offset: 3px;
+}
+.interactive-region :where(svg, canvas, video, img) { max-width: 100%; }
+.interactive-region svg { display: block; height: auto; overflow: visible; }
+.interactive-region .interaction-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.interactive-region .interaction-status { min-height: 1.5em; margin-block: .75rem 0; }
+.interactive-region .interaction-log { max-height: 16rem; overflow: auto; padding-inline-start: 1.5rem; }
+@media (max-width: 36rem) {
+  .interactive-region { padding: .75rem; }
+  .interactive-region .interaction-controls > * { flex: 1 1 9rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .interactive-region *, .interactive-region *::before, .interactive-region *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

@@ -172,3 +172,7 @@ The host needs a link-layer destination.
 IPv4 ARP and IPv6 Neighbor Discovery connect network-layer addressing to local-link delivery.
 
 This is the bridge between route selection and frame transmission.
+
+## Interactive companion exercise
+
+Use the [network path explorer](../prototypes/interactive-system-design.html#network-title) to compare ARP resolution for a same-subnet destination versus the default gateway.

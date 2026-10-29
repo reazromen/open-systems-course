@@ -159,3 +159,7 @@ When tunnel overhead or ICMP feedback is mishandled, connectivity can fail selec
 Do not test a path only with tiny packets.
 
 Sometimes size is the variable.
+
+## Interactive companion exercise
+
+Change payload size and path MTU in the [network path explorer](../prototypes/interactive-system-design.html#network-title) to compare TCP segmentation with the caveats around oversized UDP datagrams, IPv4 fragmentation, and PMTUD.

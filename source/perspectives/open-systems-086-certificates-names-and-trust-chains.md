@@ -299,3 +299,7 @@ Service-name verification checks whether the authenticated identity is the ident
 Those pieces work together, but none should be treated as the whole story.
 
 Next we move below the service again and look at Internet routing between networks: how reachability information crosses autonomous systems and why the Internet does not simply choose the geographically shortest path.
+
+## Interactive companion exercise
+
+Use the [TLS trust-validation timeline](../prototypes/interactive-system-design.html#protocol-title) to inspect hostname, chain, and validity checks before encrypted application data is trusted.

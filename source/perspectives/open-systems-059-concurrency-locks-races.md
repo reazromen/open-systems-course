@@ -214,3 +214,7 @@ What ordering establishes it?
 What happens when participants wait or fail?
 
 These questions recur in threads, databases, networks, and distributed systems.
+
+## Interactive companion exercise
+
+Step through a lost-update interleaving, then switch to the locked schedule in the [race-condition simulator](../prototypes/interactive-system-design.html#race-title). Compare the final shared counter values.

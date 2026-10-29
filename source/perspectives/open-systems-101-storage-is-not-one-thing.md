@@ -82,3 +82,6 @@ Then build a table for one real system you operate with columns such as authorit
 Storage systems differ in lifetime, structure, durability, concurrency, access pattern, and authority. Before choosing a database or cache, name the state contract you actually need.
 
 The next lesson compares two foundational abstractions directly: filesystems and databases.
+
+
+Explore these storage guarantees and trade-offs in the [interactive storage and database model](../prototypes/interactive-system-design.html#database-title). The scenarios are deterministic teaching examples, not real I/O measurements.

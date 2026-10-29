@@ -139,3 +139,7 @@ Stop a consumer after processing an event but before committing its offset, then
 Durable logs decouple event history from consumers and make replay possible.
 
 The next lesson returns to synchronous traffic and asks how clients find services and how load is distributed among instances.
+
+## Interactive companion exercise
+
+Explore how queued events wait for worker capacity in the [queue-and-worker simulator](../prototypes/interactive-system-design.html#queue-title). It is a simplified flow model rather than a stream-processing benchmark.

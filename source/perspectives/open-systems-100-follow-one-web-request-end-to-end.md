@@ -551,3 +551,7 @@ What did the browser do with it?
 That turns "the website is broken" into a sequence of testable contracts.
 
 Module 11 moves below the application into **Data Systems**: filesystems, relational databases, indexes, transactions, caches, queues, durability, and one complete write path from application state to persistent storage.
+
+## Interactive companion exercise
+
+Follow a web request from URL parsing through DNS/TCP/TLS, HTTP, subresource loading, and paint in the [end-to-end browser timeline](../prototypes/interactive-system-design.html#protocol-title).

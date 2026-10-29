@@ -124,3 +124,6 @@ Do not generalize SQLite's exact behavior to PostgreSQL or another engine. The p
 Transactions group database work into a recoverable concurrent unit. Atomicity, isolation, and durability are separate guarantees.
 
 The next lesson goes deeper into concurrency: what two transactions can see and why isolation levels exist.
+
+
+Explore these storage guarantees and trade-offs in the [interactive storage and database model](../prototypes/interactive-system-design.html#database-title). The scenarios are deterministic teaching examples, not real I/O measurements.

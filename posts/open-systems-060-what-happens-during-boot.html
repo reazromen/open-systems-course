@@ -76,7 +76,7 @@
 <pre><code>run script 1
 run script 2
 run script 3
-</code></pre>pre
+</code></pre>
 <p>Modern init systems model dependencies and can start independent units concurrently.</p>
 <p>Boot becomes a graph scheduling problem.</p>
 <h2>Login is only another stage</h2>
@@ -91,7 +91,7 @@ run script 3
 </ul>
 <p>A console login requires less.</p>
 <p>An embedded server may never start graphics at all.</p>
-<p>"Boot complete" depends on the intended machine role.</p>
+<p>&quot;Boot complete&quot; depends on the intended machine role.</p>
 <p>A headless server can be fully operational with no GUI.</p>
 <h2>Failure location changes debugging</h2>
 <p>Black screen before firmware logo?</p>
@@ -115,7 +115,7 @@ run script 3
 <p>On a system you own:</p>
 <pre><code>dmesg
 journalctl -b
-</code></pre>pre
+</code></pre>
 <p>The first focuses largely on kernel messages.</p>
 <p>The second can show journal entries for the current boot on systemd systems.</p>
 <p>Look for stages:</p>
@@ -140,9 +140,11 @@ journalctl -b
   -&gt; PID 1
   -&gt; services
   -&gt; login/application
-</code></pre>pre
+</code></pre>
 <p>Each handoff has its own state, logs, configuration, and failure modes.</p>
 <p>Module 7 now stays inside a running Linux system and learns to inspect those mechanisms directly.</p>
+<h2>Interactive companion exercise</h2>
+<p>Step through a simplified firmware → bootloader → kernel → PID 1 → services sequence in the <a href="../prototypes/interactive-system-design.html#os-timeline-title">Linux boot timeline</a>. Actual boot paths vary by platform and configuration.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

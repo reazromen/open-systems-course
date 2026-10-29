@@ -175,3 +175,7 @@ The central model is:
 Routing protocols later determine how larger networks learn those routes.
 
 For now, master forwarding.
+
+## Interactive companion exercise
+
+Step through router forwarding in the [network path explorer](../prototypes/interactive-system-design.html#network-title): the router strips the incoming link header, decrements TTL, and emits a new link-layer frame while IP endpoints remain unchanged.

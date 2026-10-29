@@ -20,7 +20,7 @@
 <li>Is the client communicating with the service identity it intended to reach?</li>
 </ol>
 <p>TLS exists to provide cryptographic protection for communication and, when used with the appropriate authentication model, to authenticate peers.</p>
-<p>But "TLS means encryption" is incomplete.</p>
+<p>But &quot;TLS means encryption&quot; is incomplete.</p>
 <p>TLS 1.3 includes a handshake that negotiates cryptographic parameters, establishes shared keying material, and authenticates as required, plus a record protocol that protects traffic using the resulting keys.</p>
 <h2>Place TLS in the path</h2>
 <p>For a common HTTPS-over-TCP connection, a useful model is:</p>
@@ -33,7 +33,7 @@ TCP
 IP
        ↓
 link
-</code></pre>pre
+</code></pre>
 <p>The TCP handshake and the TLS handshake are different events.</p>
 <p>A successful TCP three-way handshake proves that transport state was established between the endpoints as represented by the network path.</p>
 <p>It does not prove that the server's certificate is acceptable for the service name.</p>
@@ -51,7 +51,7 @@ ClientHello  -------------------&gt;
                   in certificate-based deployments
 
 Finished     &lt;-----------------&gt;
-</code></pre>pre
+</code></pre>
 <p>The actual protocol contains specific messages, extensions, transcript processing, key schedules, and optional paths. The diagram is deliberately simplified.</p>
 <p>The important systems transition is:</p>
 <pre><code class="language-text">before handshake:
@@ -62,8 +62,8 @@ negotiate + key agreement + authentication evidence
 
 after successful handshake:
 protected application traffic can use derived traffic keys
-</code></pre>pre
-<p>TLS 1.3 was designed differently from older TLS versions. Do not learn an old RSA key-exchange diagram and label it "how TLS works today."</p>
+</code></pre>
+<p>TLS 1.3 was designed differently from older TLS versions. Do not learn an old RSA key-exchange diagram and label it &quot;how TLS works today.&quot;</p>
 <h2>ClientHello begins negotiation</h2>
 <p>The client starts by advertising information needed to negotiate a connection, including supported protocol capabilities and cryptographic parameters.</p>
 <p>In ordinary name-based deployments, the client can also provide a server-name indication through a TLS extension so the server knows which configured service it is trying to reach. SNI is specified in RFC 6066.</p>
@@ -92,7 +92,7 @@ protected application traffic can use derived traffic keys
 TLS record protection
       ↓
 ciphertext carried by transport
-</code></pre>pre
+</code></pre>
 <p>TCP still sees bytes.</p>
 <p>Routers still forward IP packets.</p>
 <p>The link still transmits frames.</p>
@@ -104,14 +104,14 @@ ciphertext carried by transport
 TCP: success
 TLS: success
 HTTP: 503
-</code></pre>pre
-<p>The failure is not "TLS is broken."</p>
+</code></pre>
+<p>The failure is not &quot;TLS is broken.&quot;</p>
 <p>The protected channel worked far enough for an application-level response to arrive.</p>
 <p>Or consider:</p>
 <pre><code class="language-text">DNS: success
 TCP: success
 TLS: certificate name mismatch
-</code></pre>pre
+</code></pre>
 <p>Now transport reachability exists, but the identity check for the intended service fails.</p>
 <p>These are different incidents.</p>
 <p>A useful ladder is:</p>
@@ -128,7 +128,7 @@ certificate/path accepted
 service identity matched
    ↓
 application request succeeded
-</code></pre>pre
+</code></pre>
 <p>Do not collapse the ladder into a green padlock.</p>
 <h2>TLS can authenticate clients too</h2>
 <p>Server authentication is common, but TLS can also authenticate a client using certificates when the application and deployment require mutual authentication.</p>
@@ -140,7 +140,7 @@ application request succeeded
 <p>It also defines optional 0-RTT early data.</p>
 <p>Early data has different security properties, including replay considerations. RFC 8446 explicitly requires applications to consider whether their operations are safe for 0-RTT.</p>
 <p>For a first mental model, treat a fresh full handshake as the baseline. Then add resumption as an optimization with its own state and risks.</p>
-<p>Never assume "fewer round trips" means "identical semantics."</p>
+<p>Never assume &quot;fewer round trips&quot; means &quot;identical semantics.&quot;</p>
 <h2>Inspect a TLS 1.3 connection</h2>
 <p>Use a public test service or a server you operate.</p>
 <p>With OpenSSL:</p>
@@ -148,7 +148,7 @@ application request succeeded
   -connect example.com:443 \
   -servername example.com \
   -tls1_3
-</code></pre>pre
+</code></pre>
 <p>Inspect:</p>
 <ul>
 <li>negotiated TLS version;</li>
@@ -157,11 +157,11 @@ application request succeeded
 <li>certificate subject alternative names when shown by your tooling;</li>
 <li>verification result.</li>
 </ul>
-<p>The <code>-servername</code>code argument matters because it supplies the service name through SNI for name-based hosting.</p>
+<p>The <code>-servername</code> argument matters because it supplies the service name through SNI for name-based hosting.</p>
 <p>Another useful view:</p>
 <pre><code class="language-bash">curl -v https://example.com/
-</code></pre>pre
-<p>Depending on the build and platform, <code>curl</code>code can show DNS, connection, TLS, and application progress in one timeline.</p>
+</code></pre>
+<p>Depending on the build and platform, <code>curl</code> can show DNS, connection, TLS, and application progress in one timeline.</p>
 <p>Do not disable certificate verification just to make an error disappear. A verification failure is evidence.</p>
 <h2>Break it safely</h2>
 <p>On a local test server you control, deliberately create separate cases:</p>
@@ -175,10 +175,12 @@ application request succeeded
 <p>The goal is to learn which boundary emitted the failure.</p>
 <p>Use only a local environment or infrastructure you are authorized to administer.</p>
 <h2>The lesson to carry forward</h2>
-<p>TLS is not a synonym for "the bytes are encrypted."</p>
+<p>TLS is not a synonym for &quot;the bytes are encrypted.&quot;</p>
 <p>A secure TLS deployment depends on negotiated cryptography, shared keys, authentication evidence, service-identity verification, and correct application use of the resulting channel.</p>
 <p>And even when all of that succeeds, the application can still fail.</p>
 <p>The next lesson goes deeper into certificates, names, chains, and trust anchors: the machinery that lets a TLS client decide whether a presented public key belongs to the service it meant to reach.</p>
+<h2>Interactive companion exercise</h2>
+<p>Step through the <a href="../prototypes/interactive-system-design.html#protocol-title">TLS handshake timeline</a> to distinguish encrypted application data from certificate identity validation and application-level safety.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

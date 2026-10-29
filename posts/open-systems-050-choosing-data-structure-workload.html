@@ -20,7 +20,7 @@ linked list = insertion
 hash table = lookup
 tree = sorted
 queue = jobs
-</code></pre>pre
+</code></pre>
 <p>Real engineering is messier.</p>
 <p>Choose from the workload.</p>
 <h2>Write operations before structures</h2>
@@ -66,7 +66,7 @@ queue = jobs
 <h2>Scale matters</h2>
 <p>For 20 configuration entries, a linear list may be simpler and faster enough.</p>
 <p>For 20 billion records, storage layout, distribution, and indexing dominate.</p>
-<p>Do not import "web scale" complexity into a tiny firmware menu.</p>
+<p>Do not import &quot;web scale&quot; complexity into a tiny firmware menu.</p>
 <p>Do not use tiny-demo structures for massive production workloads without analysis.</p>
 <p>Scale is a requirement.</p>
 <h2>Hardware locality matters</h2>
@@ -86,7 +86,7 @@ queue = jobs
 <p>An in-memory tree disappears on restart.</p>
 <p>A filesystem-backed index needs crash recovery.</p>
 <p>A distributed data structure needs replication and consistency semantics.</p>
-<p>The word "tree" or "hash" describes only part of the system.</p>
+<p>The word &quot;tree&quot; or &quot;hash&quot; describes only part of the system.</p>
 <p>Durable data structures operate under failure.</p>
 <h2>Memory overhead matters</h2>
 <p>A hash table may reserve extra capacity.</p>
@@ -104,10 +104,10 @@ insert          medium          moderate
 range query     high            low
 delete          rare            moderate
 ordered scan    high            streaming
-</code></pre>pre
+</code></pre>
 <p>Then compare candidate structures.</p>
 <p>This is much better than starting:</p>
-<p>"I want to use Redis."</p>
+<p>&quot;I want to use Redis.&quot;</p>
 <p>Technology should follow operations and constraints.</p>
 <h2>Exercise: design a call-history store</h2>
 <p>Requirements:</p>
@@ -138,6 +138,8 @@ ordered scan    high            streaming
 <li>failure semantics.</li>
 </ul>
 <p>If you cannot describe the workload, choosing the structure is guessing.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#data-structure-title">data-structure explorer</a> to compare operations before choosing a structure for a workload. The complexity assumptions are listed beside the model.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

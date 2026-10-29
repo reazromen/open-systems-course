@@ -442,3 +442,7 @@ HTTP provides methods, statuses, fields, and representations.
 The application adds schemas, validation, domain semantics, authorization, retries, pagination, and change policy.
 
 The next lesson places that API inside a deployment: web server, reverse proxy, application process, database, cache, queue, and upstream services.
+
+## Interactive companion exercise
+
+Use the [API contract timeline](../prototypes/interactive-system-design.html#protocol-title) to follow payload validation, structured validation errors, and documented response/version compatibility.

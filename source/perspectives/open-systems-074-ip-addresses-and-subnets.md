@@ -185,3 +185,7 @@ Subnetting answers the first forwarding question:
 Is the destination local, or do I send toward a router?
 
 Once that is clear, routing stops feeling like magic.
+
+## Interactive companion exercise
+
+Follow source/destination IP addressing and the same-subnet versus remote-subnet decision in the [packet path explorer](../prototypes/interactive-system-design.html#network-title).

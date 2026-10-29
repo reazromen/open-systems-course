@@ -164,3 +164,7 @@ If the timeline is ambiguous, add the missing context rather than adding generic
 Logs capture discrete events with context.
 
 The next lesson moves from individual events to aggregate behavior: metrics, counters, gauges, histograms, and cardinality.
+
+## Interactive companion exercise
+
+Use the [queue-and-worker simulator](../prototypes/interactive-system-design.html#queue-title) as a companion model for queued event processing and worker capacity. The model does not represent log storage or query semantics.

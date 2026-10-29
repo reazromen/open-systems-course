@@ -280,3 +280,7 @@ It is a distributed process involving caches, delegations, referrals, authoritat
 A recursive resolver hides much of that work from the client, which is useful. Troubleshooting sometimes requires revealing the hidden boundaries again.
 
 The next lesson moves earlier in a host's network life: before DNS can be useful, the machine often needs local configuration such as an address, a route, and a resolver. DHCP is one way IPv4 hosts obtain that configuration.
+
+## Interactive companion exercise
+
+Step through recursive DNS resolution in the [protocol timeline explorer](../prototypes/interactive-system-design.html#protocol-title), including cache lookup, referrals, authoritative response, and TTL-based caching.

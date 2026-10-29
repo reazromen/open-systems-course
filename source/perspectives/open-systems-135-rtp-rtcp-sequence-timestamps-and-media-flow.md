@@ -136,3 +136,7 @@ If they differ, your capture is observing a different boundary.
 RTP gives real-time media enough identity and timing to be reconstructed under imperfect networks.
 
 The next lesson explains the user-visible consequence of network variation: codecs, packetization, jitter buffers, delay, loss, and perceived audio quality.
+
+## Interactive companion exercise
+
+The [SIP signaling/media flow explorer](../prototypes/interactive-system-design.html#sip-title) highlights the transition from signaling messages to RTP media and lets you compare direct media with a relayed path. It does not model packet timing, jitter, or codec behavior.

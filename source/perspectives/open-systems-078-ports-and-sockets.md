@@ -181,3 +181,7 @@ For troubleshooting, always identify:
 - socket state.
 
 "Port 443 is open" is shorthand, not a full network model.
+
+## Interactive companion exercise
+
+Inspect the transport step in the [network path explorer](../prototypes/interactive-system-design.html#network-title), which makes source/destination ports and socket demultiplexing explicit.

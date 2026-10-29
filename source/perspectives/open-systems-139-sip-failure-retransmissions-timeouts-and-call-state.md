@@ -154,3 +154,7 @@ Build a table mapping visible user symptom to protocol evidence.
 Call failures are state transitions distributed across several SIP agents and media paths.
 
 The final telephony lesson follows one call end to end from registration through routing, SDP, RTP, NAT, trunking, and teardown.
+
+## Interactive companion exercise
+
+Explore timeout/retry behavior and stable request identity in the [retry and idempotency simulator](../prototypes/interactive-system-design.html#retry-title). The sequence is scripted and does not model SIP timers or protocol state machines in full.

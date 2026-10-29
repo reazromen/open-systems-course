@@ -286,3 +286,7 @@ BGP lets autonomous systems exchange reachability information under policy. Rout
 The path can be asymmetric, dynamic, and administratively shaped.
 
 The next lesson adds another kind of intermediary: proxies, reverse proxies, caches, and CDN edges. They can change where a connection terminates even when DNS and routing are working exactly as designed.
+
+## Interactive companion exercise
+
+Follow next-hop selection, longest-prefix route lookup, and hop-by-hop forwarding in the [routing timeline](../prototypes/interactive-system-design.html#protocol-title). The model separates precomputed control-plane routes from per-packet forwarding.

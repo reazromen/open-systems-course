@@ -16,7 +16,7 @@
 <main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>File Descriptors: One Interface, Many Things</h1><p class="lede">On Unix-like systems, a small integer file descriptor can refer to a regular file, socket, pipe, terminal, device, or other kernel object. The abstraction unifies I/O without making those objects identical.</p><div class="article-meta"><span>Published 2026-10-06</span><span>11 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>A program opens a text file.</p>
 <p>It gets:</p>
 <pre><code>fd = 3
-</code></pre>pre
+</code></pre>
 <p>A network server accepts a TCP connection.</p>
 <p>It also gets a small integer file descriptor.</p>
 <p>A pipe gets file descriptors too.</p>
@@ -28,7 +28,7 @@
 <pre><code>0 = standard input
 1 = standard output
 2 = standard error
-</code></pre>pre
+</code></pre>
 <p>A shell can connect these descriptors to:</p>
 <ul>
 <li>terminal;</li>
@@ -42,25 +42,25 @@
 <p>Descriptor 3 in process A is unrelated to descriptor 3 in process B unless some explicit sharing or inheritance relationship exists.</p>
 <p>Think:</p>
 <pre><code>process table of open handles
-</code></pre>pre
+</code></pre>
 <p>not:</p>
 <pre><code>global file number 3
-</code></pre>pre
+</code></pre>
 <p>The kernel keeps per-process descriptor mappings to open-file descriptions or other supported objects.</p>
 <p>This distinction matters during fork, exec, descriptor passing, and debugging.</p>
 <h2>read and write become generic operations</h2>
 <p>A regular file can support:</p>
 <pre><code>read
 write
-</code></pre>pre
+</code></pre>
 <p>A pipe supports:</p>
 <pre><code>read
 write
-</code></pre>pre
+</code></pre>
 <p>A socket supports:</p>
 <pre><code>read
 write
-</code></pre>pre
+</code></pre>
 <p>The underlying semantics differ.</p>
 <p>Files have offsets.</p>
 <p>Streams may block.</p>
@@ -71,7 +71,7 @@ write
 <h2>Pipes connect descriptors</h2>
 <p>A shell command:</p>
 <pre><code>producer | consumer
-</code></pre>pre
+</code></pre>
 <p>creates a pipe.</p>
 <p>Producer's standard output is connected to the pipe's write side.</p>
 <p>Consumer's standard input is connected to the read side.</p>
@@ -81,7 +81,7 @@ write
 <h2>Redirection rewires descriptors before execution</h2>
 <p>Run:</p>
 <pre><code>command &gt; output.txt
-</code></pre>pre
+</code></pre>
 <p>The shell opens the file, arranges file descriptor 1 to refer to it, then launches the program.</p>
 <p>The program writes to stdout.</p>
 <p>It may not know that stdout is now a file.</p>
@@ -116,7 +116,7 @@ write
 <h2>/proc makes descriptors visible</h2>
 <p>Linux exposes each process's descriptors under:</p>
 <pre><code>/proc/PID/fd/
-</code></pre>pre
+</code></pre>
 <p>The entries are symbolic links identifying the referenced objects.</p>
 <p>The man page notes that file descriptors for pipes and sockets appear using type and inode-like identifiers.</p>
 <p>This gives you a direct way to ask:</p>
@@ -126,10 +126,10 @@ write
 <p>Run normally.</p>
 <p>Then:</p>
 <pre><code>program &gt; hello.txt
-</code></pre>pre
+</code></pre>
 <p>Then:</p>
 <pre><code>program | another_program
-</code></pre>pre
+</code></pre>
 <p>The source program did not change.</p>
 <p>Descriptor wiring changed.</p>
 <p>This is an excellent demonstration of interface versus environment.</p>
@@ -145,6 +145,8 @@ write
 <li>device access.</li>
 </ul>
 <p>When a Linux process has an I/O problem, its open descriptors are often one of the first places worth inspecting.</p>
+<h2>Interactive companion exercise</h2>
+<p>Follow open, descriptor return, read, and close in the <a href="../prototypes/interactive-system-design.html#os-timeline-title">file-descriptor timeline</a>. The model emphasizes that the descriptor is process-local and used for later I/O.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

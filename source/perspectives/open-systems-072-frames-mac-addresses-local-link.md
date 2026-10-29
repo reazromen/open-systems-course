@@ -159,3 +159,7 @@ from:
     remote destination
 
 the rest of networking becomes much easier.
+
+## Interactive companion exercise
+
+Step through Ethernet framing and ARP next-hop resolution in the [network path explorer](../prototypes/interactive-system-design.html#network-title). The model distinguishes local destination MAC addresses from end-to-end IP addresses.

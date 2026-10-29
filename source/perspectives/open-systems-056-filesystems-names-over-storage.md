@@ -211,3 +211,7 @@ It manages:
 When you call open("/path/file"), you are using an enormous abstraction.
 
 Later, databases will build another persistent abstraction on top of this one.
+
+## Interactive companion exercise
+
+Trace a path from `open(path)` through kernel path resolution and a file descriptor in the [file-I/O timeline](../prototypes/interactive-system-design.html#os-timeline-title). It is a conceptual sequence, not a filesystem implementation.

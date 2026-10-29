@@ -450,3 +450,7 @@ A production web service is usually a graph of cooperating components.
 The public endpoint, reverse proxy, application, database, cache, queue, and external services have different responsibilities and failure modes.
 
 The final lesson of this module follows one web request end to end and annotates which state changes at every boundary.
+
+## Interactive companion exercise
+
+Trace a request through a reverse proxy/CDN cache decision, origin forwarding, and response return in the [proxy timeline](../prototypes/interactive-system-design.html#protocol-title).

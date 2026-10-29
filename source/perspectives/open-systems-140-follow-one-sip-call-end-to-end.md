@@ -249,3 +249,7 @@ A call is a distributed real-time system.
 ## The module to carry forward
 
 Module 15 generalizes these ideas beyond telephony into Distributed Systems and Cloud Architecture: partial failure, replication, consistency, coordination, retries, discovery, partitioning, distributed transactions, and one complete cross-service request.
+
+## Interactive companion exercise
+
+Follow a simplified SIP call from INVITE and SDP negotiation through ACK, RTP media, and BYE in the [end-to-end call-flow companion](../prototypes/interactive-system-design.html#sip-title). Registration is assumed complete and proxy Record-Route is assumed.

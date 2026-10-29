@@ -33,7 +33,7 @@ transit or peer AS
 destination AS
    ↓
 service network
-</code></pre>pre
+</code></pre>
 <p>The arrows do not imply one router per AS.</p>
 <p>Each AS can contain a large internal network with its own routing protocols, topology, and policies.</p>
 <p>BGP operates at the boundary where networks exchange reachability.</p>
@@ -41,7 +41,7 @@ service network
 <p>A BGP speaker can advertise reachability to IP prefixes.</p>
 <p>Conceptually:</p>
 <pre><code class="language-text">203.0.113.0/24 reachable through this BGP path
-</code></pre>pre
+</code></pre>
 <p>The example prefix is documentation space.</p>
 <p>That route does not say:</p>
 <ul>
@@ -59,10 +59,10 @@ service network
 <p>A conceptual advertisement might contain:</p>
 <pre><code class="language-text">prefix: 198.51.100.0/24
 AS_PATH: 64496 64497 64498
-</code></pre>pre
+</code></pre>
 <p>The AS numbers shown are from the range reserved for documentation in RFC 5398.</p>
 <p>AS_PATH supports loop detection and participates in routing policy.</p>
-<p>But do not translate it into "physical routers the packet will cross."</p>
+<p>But do not translate it into &quot;physical routers the packet will cross.&quot;</p>
 <p>An AS path is inter-domain control-plane information. Inside each AS, the actual data-plane path can include many routers.</p>
 <h2>NEXT_HOP connects BGP to forwarding</h2>
 <p>RFC 4271 defines NEXT_HOP as a mandatory path attribute that identifies the IP address to use as a next hop toward advertised destinations under the relevant rules.</p>
@@ -73,11 +73,11 @@ learn and select reachability information
 
 data plane:
 forward actual packets using installed forwarding state
-</code></pre>pre
+</code></pre>
 <p>A BGP session can be healthy while a forwarding problem exists elsewhere.</p>
 <p>A forwarding path can also continue temporarily based on installed state while a routing-control event is changing.</p>
 <p>Troubleshooting should know which plane it is observing.</p>
-<h2>"Shortest path" is an incomplete mental model</h2>
+<h2>&quot;Shortest path&quot; is an incomplete mental model</h2>
 <p>BGP policy is not equivalent to geographic shortest path.</p>
 <p>Networks make routing decisions based on attributes, policy, commercial relationships, local preference, engineering goals, and implementation configuration.</p>
 <p>AS_PATH length can matter in route selection, but it is not a physical-distance meter and is not the only decision input.</p>
@@ -94,7 +94,7 @@ AS 64496 → 64497 → 64498
 
 B → A:
 AS 64498 → 64499 → 64496
-</code></pre>pre
+</code></pre>
 <p>Asymmetry can be completely normal.</p>
 <p>It becomes important when debugging:</p>
 <ul>
@@ -111,7 +111,7 @@ AS 64498 → 64499 → 64496
 <p>This means Internet reachability has a temporal dimension.</p>
 <p>A routing incident can affect some networks before others.</p>
 <p>Different observers can select different paths to the same prefix.</p>
-<p>"Works from my network" and "fails from another region" can both be true because the observers are not attached to the same routing state or data path.</p>
+<p>&quot;Works from my network&quot; and &quot;fails from another region&quot; can both be true because the observers are not attached to the same routing state or data path.</p>
 <h2>BGP policy needs protection</h2>
 <p>Because BGP exchanges routing information between administrative domains, incorrect advertisements can cause large effects.</p>
 <p>RFC 7454 documents BGP operational and security practices including prefix filtering, AS-path filtering, session protection, and other controls.</p>
@@ -120,13 +120,13 @@ AS 64498 → 64499 → 64496
 <p><strong>a protocol session is not the same thing as authorization to accept every state update it carries.</strong></p>
 <p>Connectivity and policy are different contracts.</p>
 <h2>traceroute is not a BGP decoder</h2>
-<p>A tool such as <code>traceroute</code>code or <code>tracepath</code>code can provide useful data-plane observations.</p>
+<p>A tool such as <code>traceroute</code> or <code>tracepath</code> can provide useful data-plane observations.</p>
 <p>For example:</p>
 <pre><code class="language-bash">tracepath example.com
-</code></pre>pre
+</code></pre>
 <p>or:</p>
 <pre><code class="language-bash">traceroute example.com
-</code></pre>pre
+</code></pre>
 <p>depending on the system.</p>
 <p>The output may reveal responding routers along one path for that probe.</p>
 <p>It does not directly print the BGP AS_PATH that produced the forwarding state.</p>
@@ -135,7 +135,7 @@ AS 64498 → 64499 → 64496
 <h2>Inspect the local decision first</h2>
 <p>Before thinking globally, ask what your own machine will do:</p>
 <pre><code class="language-bash">ip route get 1.1.1.1
-</code></pre>pre
+</code></pre>
 <p>Replace the destination with an address you are intentionally testing.</p>
 <p>This can show the selected local next hop, interface, and source-address decision on Linux.</p>
 <p>Then move outward.</p>
@@ -171,7 +171,7 @@ Does forwarding follow the selected route?
 Does the transport succeed?
         ↓
 Does TLS/application behavior succeed?
-</code></pre>pre
+</code></pre>
 <p>Not every operator can observe every rung.</p>
 <p>That is why cross-network incidents require evidence from multiple administrative domains.</p>
 <h2>The lesson to carry forward</h2>
@@ -179,6 +179,8 @@ Does TLS/application behavior succeed?
 <p>BGP lets autonomous systems exchange reachability information under policy. Routers turn selected control-plane state into forwarding behavior.</p>
 <p>The path can be asymmetric, dynamic, and administratively shaped.</p>
 <p>The next lesson adds another kind of intermediary: proxies, reverse proxies, caches, and CDN edges. They can change where a connection terminates even when DNS and routing are working exactly as designed.</p>
+<h2>Interactive companion exercise</h2>
+<p>Follow next-hop selection, longest-prefix route lookup, and hop-by-hop forwarding in the <a href="../prototypes/interactive-system-design.html#protocol-title">routing timeline</a>. The model separates precomputed control-plane routes from per-packet forwarding.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

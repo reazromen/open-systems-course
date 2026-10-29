@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interactive Course Framework Smoke Fixture</title>
+  <link rel="stylesheet" href="../assets/interactive-course.css">
+  <style>
+    body { font: 16px/1.5 sans-serif; margin: 1rem; }
+    .probe { animation: probe 2s infinite; transition: opacity 2s; }
+    @keyframes probe { from { opacity: .5; } to { opacity: 1; } }
+  </style>
+  <script src="../assets/interactive-course.js"></script>
+</head>
+<body>
+  <h1>Framework smoke fixture</h1>
+  <section id="counter-a" class="interactive-region" data-interaction="smoke-counter" aria-labelledby="title-a">
+    <h2 id="title-a">Counter A</h2>
+    <p class="probe">Motion preference probe</p>
+    <button type="button" data-action="step">Step A</button>
+    <button type="button" data-action="reset">Reset A</button>
+    <p data-interaction-status role="status" aria-live="polite">Ready.</p>
+  </section>
+  <section id="counter-b" class="interactive-region" data-interaction="smoke-counter" aria-labelledby="title-b">
+    <h2 id="title-b">Counter B</h2>
+    <button type="button" data-action="step">Step B</button>
+    <button type="button" data-action="reset">Reset B</button>
+    <p data-interaction-status role="status" aria-live="polite">Ready.</p>
+  </section>
+  <script>
+    (function () {
+      'use strict';
+      CourseInteractions.register('smoke-counter', function (ctx) {
+        var count = 0;
+        var stepButton = ctx.root.querySelector('[data-action="step"]');
+        var resetButton = ctx.root.querySelector('[data-action="reset"]');
+        function render() { ctx.status('Count: ' + count); }
+        ctx.listen(stepButton, 'click', function () { count += 1; render(); });
+        ctx.listen(resetButton, 'click', function () { count = 0; render(); });
+        render();
+        return {
+          reset: function () { count = 0; render(); },
+          destroy: function () {},
+          read: function () { return count; }
+        };
+      });
+      window.fixtureResult = CourseInteractions.init(document);
+      window.fixtureInstances = window.fixtureResult.instances;
+    })();
+  </script>
+</body>
+</html>

@@ -57,7 +57,7 @@
 <p>Protocols such as ARP use broadcast requests in IPv4 Ethernet environments.</p>
 <p>Broadcast does not travel arbitrarily across routers.</p>
 <p>Routers create boundaries between IP networks.</p>
-<p>This is why "same LAN" matters.</p>
+<p>This is why &quot;same LAN&quot; matters.</p>
 <h2>VLANs create logical link boundaries</h2>
 <p>A physical switch can host multiple virtual LANs.</p>
 <p>Traffic can be separated into distinct Layer-2 broadcast domains.</p>
@@ -74,12 +74,12 @@
 <p>It can detect many transmission errors.</p>
 <p>It does not authenticate the sender.</p>
 <p>Integrity detection and cryptographic authenticity are different properties.</p>
-<p>Do not turn "CRC passed" into a security claim.</p>
+<p>Do not turn &quot;CRC passed&quot; into a security claim.</p>
 <h2>Exercise: inspect local link state</h2>
 <p>On Linux:</p>
 <pre><code>ip link
 ip neigh
-</code></pre>pre
+</code></pre>
 <p>The first shows interfaces and link-layer information.</p>
 <p>The second shows IP-to-neighbor link-layer mappings when available.</p>
 <p>Then ask:</p>
@@ -93,11 +93,13 @@ ip neigh
 <p>Routers remove one link-layer envelope and create another while forwarding the IP packet.</p>
 <p>Once you separate:</p>
 <pre><code>local next hop
-</code></pre>pre
+</code></pre>
 <p>from:</p>
 <pre><code>remote destination
-</code></pre>pre
+</code></pre>
 <p>the rest of networking becomes much easier.</p>
+<h2>Interactive companion exercise</h2>
+<p>Step through Ethernet framing and ARP next-hop resolution in the <a href="../prototypes/interactive-system-design.html#network-title">network path explorer</a>. The model distinguishes local destination MAC addresses from end-to-end IP addresses.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

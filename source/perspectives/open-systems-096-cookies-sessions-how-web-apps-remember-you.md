@@ -300,3 +300,7 @@ The session record is not automatically authorization.
 Each layer needs its own validation and lifetime.
 
 The next lesson explains the browser boundary that makes many web security rules necessary: origins, same-origin policy, and CORS.
+
+## Interactive companion exercise
+
+Trace session creation, Set-Cookie, later Cookie transmission, server-side session lookup, and logout invalidation in the [cookie/session timeline](../prototypes/interactive-system-design.html#protocol-title).

@@ -8,3 +8,29 @@
   color: inherit !important;
   background: transparent !important;
 }
+
+/* Keep the shared global header inside the course viewport on narrow screens.
+   The generic responsive stylesheet lets .nav size to all links plus actions,
+   which makes the body wider than the viewport on mobile. */
+@media (max-width: 720px) {
+  body.rr-themed .site-header-inner {
+    width: min(calc(100% - 1.5rem), var(--wide));
+    gap: .25rem;
+  }
+  body.rr-themed .nav {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-left: auto;
+    overflow: hidden !important;
+  }
+  body.rr-themed .nav-scroll {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+  }
+  body.rr-themed .nav-actions {
+    flex: 0 0 auto;
+  }
+}

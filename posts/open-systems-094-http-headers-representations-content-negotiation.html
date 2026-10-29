@@ -42,64 +42,64 @@
 <h2>Content-Type describes the selected representation</h2>
 <p>A response might include:</p>
 <pre><code class="language-http">Content-Type: application/json
-</code></pre>pre
+</code></pre>
 <p>That tells the recipient how the enclosed representation is identified.</p>
 <p>A different response for the same conceptual resource might use:</p>
 <pre><code class="language-http">Content-Type: text/html; charset=utf-8
-</code></pre>pre
+</code></pre>
 <p>The resource can remain the same while the representation changes.</p>
 <p>This distinction is useful for APIs that support both machine-readable and human-readable forms.</p>
 <h2>Accept expresses a client preference</h2>
 <p>A request can say:</p>
 <pre><code class="language-http">Accept: application/json
-</code></pre>pre
+</code></pre>
 <p>or:</p>
 <pre><code class="language-http">Accept: text/html,application/xhtml+xml
-</code></pre>pre
+</code></pre>
 <p>The client is expressing preferences about acceptable response media types.</p>
 <p>The server can use those preferences when selecting a representation.</p>
 <p>It is still the server's responsibility to decide what it can provide.</p>
 <p>Content negotiation is not a command that forces a representation into existence.</p>
-<p>If no acceptable representation can be produced, <code>406 Not Acceptable</code>code exists for that class of outcome, though deployments often choose other behaviors.</p>
-<p>Likewise, if a request body uses a media type the server does not support, <code>415 Unsupported Media Type</code>code is the relevant status.</p>
+<p>If no acceptable representation can be produced, <code>406 Not Acceptable</code> exists for that class of outcome, though deployments often choose other behaviors.</p>
+<p>Likewise, if a request body uses a media type the server does not support, <code>415 Unsupported Media Type</code> is the relevant status.</p>
 <p>Those are different failures:</p>
 <pre><code class="language-text">406:
 response representation negotiation failed
 
 415:
 request content type is unsupported
-</code></pre>pre
+</code></pre>
 <h2>Content-Encoding is not Content-Type</h2>
 <p>Compression adds another layer.</p>
 <p>A response can say:</p>
 <pre><code class="language-http">Content-Type: text/html
 Content-Encoding: gzip
-</code></pre>pre
+</code></pre>
 <p>The media type is HTML.</p>
 <p>The transfer representation has additionally been encoded with gzip.</p>
 <p>After decoding the content encoding, the recipient still has HTML.</p>
-<p>This is why compression does not change a PNG into "gzip data" at the semantic level. Gzip describes an encoding applied to the representation.</p>
+<p>This is why compression does not change a PNG into &quot;gzip data&quot; at the semantic level. Gzip describes an encoding applied to the representation.</p>
 <h2>Vary tells caches which request fields mattered</h2>
 <p>Suppose a server returns different representations based on:</p>
 <pre><code class="language-http">Accept-Language
-</code></pre>pre
+</code></pre>
 <p>A shared cache needs to know that two requests for the same URL can legitimately receive different selected responses based on that field.</p>
-<p>The <code>Vary</code>code response field communicates which request fields influenced representation selection.</p>
+<p>The <code>Vary</code> response field communicates which request fields influenced representation selection.</p>
 <p>For example:</p>
 <pre><code class="language-http">Vary: Accept-Language
-</code></pre>pre
+</code></pre>
 <p>Caching semantics are defined in RFC 9111.</p>
 <p>Without the correct variation metadata, a cache can reuse a response for a request that should have selected a different representation.</p>
 <p>That turns a header detail into a correctness issue.</p>
 <h2>Validators reduce unnecessary transfers</h2>
 <p>A response can include validators such as:</p>
-<pre><code class="language-http">ETag: "abc123"
-</code></pre>pre
+<pre><code class="language-http">ETag: &quot;abc123&quot;
+</code></pre>
 <p>or:</p>
 <pre><code class="language-http">Last-Modified: Tue, 06 Oct 2026 10:00:00 GMT
-</code></pre>pre
+</code></pre>
 <p>A client can later make a conditional request.</p>
-<p>If the selected representation has not changed according to the validator semantics, the server can respond with <code>304 Not Modified</code>code instead of sending the full representation again.</p>
+<p>If the selected representation has not changed according to the validator semantics, the server can respond with <code>304 Not Modified</code> instead of sending the full representation again.</p>
 <p>The important model is:</p>
 <pre><code class="language-text">resource
   ↓
@@ -108,27 +108,27 @@ selected representation
 validator for that representation
   ↓
 conditional request
-</code></pre>pre
+</code></pre>
 <p>Do not treat an ETag as a universal database version number unless your application explicitly defines it that way.</p>
 <h2>Authorization fields do not equal authorization policy</h2>
-<p>An HTTP request can carry credentials through mechanisms such as the <code>Authorization</code>code field.</p>
+<p>An HTTP request can carry credentials through mechanisms such as the <code>Authorization</code> field.</p>
 <p>The presence of that field does not prove the credential is valid.</p>
 <p>The server still needs to authenticate the credential and apply authorization policy.</p>
 <p>Similarly, a proxy can forward or remove authentication-related fields according to its configuration and trust boundary.</p>
 <p>Protocol metadata and access-control decisions are different layers.</p>
 <h2>Practical inspection</h2>
-<p>On a service you control, return the same logical object as HTML and JSON depending on the <code>Accept</code>code field.</p>
+<p>On a service you control, return the same logical object as HTML and JSON depending on the <code>Accept</code> field.</p>
 <p>For example, make requests that prefer:</p>
 <pre><code class="language-text">text/html
 application/json
-</code></pre>pre
+</code></pre>
 <p>Record:</p>
 <ul>
-<li>request <code>Accept</code>code;</li>
-<li>response <code>Content-Type</code>code;</li>
+<li>request <code>Accept</code>;</li>
+<li>response <code>Content-Type</code>;</li>
 <li>status;</li>
 <li>response body;</li>
-<li>any <code>Vary</code>code field.</li>
+<li>any <code>Vary</code> field.</li>
 </ul>
 <p>Then add an ETag and perform a conditional request.</p>
 <p>The goal is to see that one resource can have multiple representations and that caches need metadata describing how the representation was selected.</p>
@@ -136,6 +136,8 @@ application/json
 <p>HTTP fields are not decoration around a body. They carry protocol state about representation, caching, authentication, conditional requests, and more.</p>
 <p>Content negotiation separates the identity of a resource from the format chosen for a particular exchange.</p>
 <p>The next lesson moves into the browser itself: what happens after a user enters a URL, from navigation and fetching through parsing, subresource discovery, script execution, layout, and painting.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#protocol-title">HTTP header/content-negotiation timeline</a> to explore Accept, Content-Type, Vary, and Cache-Control roles.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

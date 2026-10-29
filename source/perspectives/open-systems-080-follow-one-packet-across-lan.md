@@ -215,3 +215,7 @@ A local connection crosses:
 One packet is enough to connect the concepts from the entire networking module.
 
 Module 9 now extends the path beyond the LAN into DNS, DHCP, NAT, TLS, Internet routing, CDNs, and proxies.
+
+## Interactive companion exercise
+
+Follow one payload end to end in the [network path explorer](../prototypes/interactive-system-design.html#network-title), comparing a same-subnet path with a routed path.

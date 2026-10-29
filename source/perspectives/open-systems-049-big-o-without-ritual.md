@@ -192,3 +192,7 @@ It does not tell you:
 The mature workflow is:
 
 analyze growth, measure reality, understand both.
+
+## Interactive companion exercise
+
+Apply operations in the [data-structure complexity explorer](../prototypes/interactive-system-design.html#data-structure-title) and compare the modelled primitive-step count with the stated Big-O class.

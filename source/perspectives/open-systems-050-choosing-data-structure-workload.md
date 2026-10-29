@@ -211,3 +211,7 @@ Choose by:
 - failure semantics.
 
 If you cannot describe the workload, choosing the structure is guessing.
+
+## Interactive companion exercise
+
+Use the [data-structure explorer](../prototypes/interactive-system-design.html#data-structure-title) to compare operations before choosing a structure for a workload. The complexity assumptions are listed beside the model.

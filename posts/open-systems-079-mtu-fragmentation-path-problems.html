@@ -25,7 +25,7 @@
 <pre><code>link A: 1500
 tunnel: effective 1400
 link B: 1500
-</code></pre>pre
+</code></pre>
 <p>The path cannot safely carry a 1500-byte inner packet through the 1400-byte tunnel without adaptation.</p>
 <p>The limiting value is not bandwidth.</p>
 <p>It is packet size.</p>
@@ -50,7 +50,7 @@ link B: 1500
 minus IP header 20
 minus TCP header 20
 gives MSS 1460
-</code></pre>pre
+</code></pre>
 <p>Real headers, options, and tunnels can change this.</p>
 <h2>Why small probes can mislead</h2>
 <p>Suppose the path allows 1300-byte packets.</p>
@@ -77,16 +77,16 @@ gives MSS 1460
 <h2>Exercise: reason about one tunnel</h2>
 <p>Outer-link MTU:</p>
 <pre><code>1500 bytes
-</code></pre>pre
+</code></pre>
 <p>Tunnel overhead:</p>
 <pre><code>60 bytes
-</code></pre>pre
+</code></pre>
 <p>Approximate maximum inner packet:</p>
 <pre><code>1440 bytes
-</code></pre>pre
+</code></pre>
 <p>If inner IPv4 plus TCP headers consume 40 bytes:</p>
 <pre><code>approximate TCP payload = 1400 bytes
-</code></pre>pre
+</code></pre>
 <p>This is a constructed arithmetic example, not a configuration recommendation.</p>
 <p>The purpose is to show that encapsulation uses space.</p>
 <h2>The lesson to carry forward</h2>
@@ -95,6 +95,8 @@ gives MSS 1460
 <p>When tunnel overhead or ICMP feedback is mishandled, connectivity can fail selectively.</p>
 <p>Do not test a path only with tiny packets.</p>
 <p>Sometimes size is the variable.</p>
+<h2>Interactive companion exercise</h2>
+<p>Change payload size and path MTU in the <a href="../prototypes/interactive-system-design.html#network-title">network path explorer</a> to compare TCP segmentation with the caveats around oversized UDP datagrams, IPv4 fragmentation, and PMTUD.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

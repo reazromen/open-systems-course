@@ -18,7 +18,7 @@
 <p>Each node can contain data plus a reference to another node.</p>
 <p>For a singly linked list:</p>
 <pre><code>[A | next] -&gt; [B | next] -&gt; [C | next] -&gt; null
-</code></pre>pre
+</code></pre>
 <p>The structure is defined by links, not physical adjacency.</p>
 <h2>Indirection changes access</h2>
 <p>Want item 2 in an array?</p>
@@ -34,10 +34,10 @@
 <p>Change:</p>
 <pre><code>B.next = X
 X.next = old B.next
-</code></pre>pre
+</code></pre>
 <p>No large contiguous block needs shifting.</p>
 <p>That sounds ideal.</p>
-<p>But "insertion O(1)" hides an assumption:</p>
+<p>But &quot;insertion O(1)&quot; hides an assumption:</p>
 <p>You already have the insertion location.</p>
 <p>If you first search from the head to find B, total operation may still be linear.</p>
 <p>Complexity statements require the complete operation.</p>
@@ -89,7 +89,7 @@ X.next = old B.next
 <li>rarely index by number.</li>
 </ul>
 <p>Which structure would you test first?</p>
-<p>Do not answer "array always" or "linked list always."</p>
+<p>Do not answer &quot;array always&quot; or &quot;linked list always.&quot;</p>
 <p>State the operations and hardware considerations.</p>
 <p>That is the habit.</p>
 <h2>The lesson to carry forward</h2>
@@ -98,6 +98,8 @@ X.next = old B.next
 <p>They make positional access, metadata overhead, ownership, and locality more complicated.</p>
 <p>Every data structure moves cost somewhere.</p>
 <p>Your job is to move it toward the operation your workload can afford.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#data-structure-title">data-structure explorer</a> to compare linked-list traversal with head/tail pointer operations. The model assumes a tail pointer and makes that assumption explicit.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

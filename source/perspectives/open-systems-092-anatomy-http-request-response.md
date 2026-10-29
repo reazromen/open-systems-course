@@ -127,3 +127,7 @@ The point is to see that one user action creates several different protocol obse
 An HTTP exchange is a structured protocol message, not just "data over the web."
 
 Method, target, fields, status, and content each carry separate meaning. The next lesson focuses on methods, safety, idempotency, and status codes.
+
+## Interactive companion exercise
+
+Step through the [HTTP request/response anatomy scenario](../prototypes/interactive-system-design.html#protocol-title) to see how the request line, headers, status line, and body fit together.

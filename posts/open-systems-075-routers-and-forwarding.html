@@ -45,7 +45,7 @@
 <pre><code>0.0.0.0/0 -&gt; default gateway
 10.0.0.0/8 -&gt; tunnel A
 10.20.0.0/16 -&gt; tunnel B
-</code></pre>pre
+</code></pre>
 <p>Destination 10.20.5.2 matches all three.</p>
 <p>The /16 is most specific.</p>
 <p>Forwarding systems use prefix-match structures optimized for high-speed lookup.</p>
@@ -61,7 +61,7 @@
 <p>An Ethernet router receives:</p>
 <pre><code>Ethernet frame
     contains IP packet
-</code></pre>pre
+</code></pre>
 <p>It removes/validates the incoming link framing, makes an IP forwarding decision, then sends the packet inside a new frame on the outgoing link.</p>
 <p>Source and destination MAC addresses change hop by hop.</p>
 <p>IP source and destination generally remain end-to-end unless translation or other mechanisms modify them.</p>
@@ -69,7 +69,7 @@
 <h2>A route can exist while the path fails</h2>
 <p>Your table says:</p>
 <pre><code>default via gateway
-</code></pre>pre
+</code></pre>
 <p>That proves local routing configuration.</p>
 <p>The gateway may be offline.</p>
 <p>The ISP may lack a route.</p>
@@ -88,7 +88,7 @@
 <h2>Exercise: read your route table</h2>
 <p>On Linux:</p>
 <pre><code>ip route
-</code></pre>pre
+</code></pre>
 <p>Find:</p>
 <ul>
 <li>connected subnet;</li>
@@ -106,9 +106,11 @@
    -&gt; longest matching route
    -&gt; outgoing interface / next hop
    -&gt; local link delivery
-</code></pre>pre
+</code></pre>
 <p>Routing protocols later determine how larger networks learn those routes.</p>
 <p>For now, master forwarding.</p>
+<h2>Interactive companion exercise</h2>
+<p>Step through router forwarding in the <a href="../prototypes/interactive-system-design.html#network-title">network path explorer</a>: the router strips the incoming link header, decrements TTL, and emits a new link-layer frame while IP endpoints remain unchanged.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

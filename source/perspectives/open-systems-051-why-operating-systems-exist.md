@@ -217,3 +217,7 @@ It is the software layer that manages shared hardware and exposes protected abst
 - clocks.
 
 The rest of this module opens those mechanisms one by one.
+
+## Interactive companion exercise
+
+Follow the user-mode to kernel-mode boundary in the [operating-system timeline explorer](../prototypes/interactive-system-design.html#os-timeline-title). It illustrates one common system-call path rather than every OS responsibility.

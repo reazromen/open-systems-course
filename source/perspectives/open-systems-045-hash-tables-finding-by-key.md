@@ -175,3 +175,7 @@ The price is collision handling, extra capacity, resizing, and reliance on hash 
 "Use a dictionary" is not just syntax.
 
 It is a data-structure decision.
+
+## Interactive companion exercise
+
+Explore expected hash-table lookup and its worst-case caveat in the [data-structure explorer](../prototypes/interactive-system-design.html#data-structure-title). Collision behavior is described but not simulated.

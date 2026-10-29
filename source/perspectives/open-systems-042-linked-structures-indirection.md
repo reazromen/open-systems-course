@@ -159,3 +159,7 @@ They make positional access, metadata overhead, ownership, and locality more com
 Every data structure moves cost somewhere.
 
 Your job is to move it toward the operation your workload can afford.
+
+## Interactive companion exercise
+
+Use the [data-structure explorer](../prototypes/interactive-system-design.html#data-structure-title) to compare linked-list traversal with head/tail pointer operations. The model assumes a tail pointer and makes that assumption explicit.

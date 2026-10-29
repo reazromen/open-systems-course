@@ -15,7 +15,7 @@
 <header class="site-header rr-global-header"><div class="site-header-inner"><a aria-label="Reaz Romen home" class="brand" href="/">RR</a>a<nav aria-label="Main navigation" class="nav"><div class="nav-scroll"><a href="https://reazromen.com/portfolio.html">Work</a>a<a href="https://reazromen.com/perspectives.html">Perspectives</a>a<a href="/course.html">Course</a>a<a href="https://reazromen.com/music.html">Music</a>a<a href="https://reazromen.com/bangla.html" lang="bn">বাংলা</a>a<a href="https://reazromen.com/about.html">About</a>a<a href="https://reazromen.com/systems.html">Stack</a>a</div><div class="nav-actions"><button aria-label="Search and quick navigation" class="icon-link search-action" data-open-command="" title="Search (Ctrl/⌘ K)" type="button"><svg aria-hidden="true" class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg></button><a aria-label="GitHub" class="icon-link github-action" href="https://github.com/reazromen" rel="noopener" target="_blank"><svg aria-hidden="true" class="icon icon-fill" viewBox="0 0 24 24"><path d="M12 .7a11.3 11.3 0 0 0-3.57 22.03c.57.1.78-.25.78-.55v-2.18c-3.18.69-3.85-1.35-3.85-1.35-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.74.4-1.25.73-1.54-2.54-.29-5.21-1.27-5.21-5.65 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.46.11-3.03 0 0 .96-.31 3.15 1.17A10.9 10.9 0 0 1 12 5.9c.98 0 1.96.13 2.87.39 2.19-1.48 3.15-1.17 3.15-1.17.62 1.57.23 2.74.11 3.03.74.8 1.18 1.82 1.18 3.07 0 4.39-2.68 5.35-5.23 5.64.41.36.78 1.06.78 2.14v3.18c0 .3.2.66.79.55A11.3 11.3 0 0 0 12 .7Z"></path></svg></a>a<button aria-label="Toggle color scheme" class="theme-toggle" onclick="toggleTheme()" type="button"><svg aria-hidden="true" class="icon" data-theme-icon="moon" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.5 6.5 0 0 0 21 12.8Z"></path></svg><svg aria-hidden="true" class="icon" data-theme-icon="sun" hidden="" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path></svg></button></div></nav></div></header>
 <main class="shell site-main" id="rr-main"><article class="article" data-pagefind-body=""><p class="eyebrow">Perspectives</p><h1>ARP and Neighbor Discovery</h1><p class="lede">A host can know the next-hop IP address and still need a link-layer destination. IPv4 ARP and IPv6 Neighbor Discovery solve that local-neighbor problem through different protocols.</p><div class="article-meta"><span>Published 2026-10-06</span><span>12 min read</span></div><div class="tags"><a data-pagefind-filter="tag" href="https://reazromen.com/tags/architecture.html">architecture</a>a</div><div class="prose"><p>Your route table says:</p>
 <pre><code>default via 192.168.1.1
-</code></pre>pre
+</code></pre>
 <p>Good.</p>
 <p>Now Ethernet still asks:</p>
 <p>What destination MAC address should carry the frame to 192.168.1.1?</p>
@@ -24,7 +24,7 @@
 <h2>ARP maps IPv4 to local hardware address</h2>
 <p>A host needs to reach IPv4 address:</p>
 <pre><code>192.168.1.1
-</code></pre>pre
+</code></pre>
 <p>If no ARP cache entry exists, it can broadcast an ARP request asking which local interface owns that protocol address.</p>
 <p>The owner replies with its hardware address.</p>
 <p>The host caches the result.</p>
@@ -78,11 +78,11 @@
 <p>A high-level test may report:</p>
 <pre><code>network unreachable
 timeout
-</code></pre>pre
+</code></pre>
 <p>The root problem is below DNS and TCP.</p>
 <p>Tools such as:</p>
 <pre><code>ip neigh
-</code></pre>pre
+</code></pre>
 <p>make this state visible.</p>
 <h2>Duplicate addresses create conflict</h2>
 <p>If two hosts use the same IP address on one link, neighbor resolution can oscillate or map unpredictably.</p>
@@ -92,13 +92,13 @@ timeout
 <h2>Exercise: clear the mental model</h2>
 <p>Destination:</p>
 <pre><code>8.8.8.8
-</code></pre>pre
+</code></pre>
 <p>Local network:</p>
 <pre><code>192.168.1.0/24
-</code></pre>pre
+</code></pre>
 <p>Gateway:</p>
 <pre><code>192.168.1.1
-</code></pre>pre
+</code></pre>
 <p>Question:</p>
 <p>Which IPv4 address does your laptop ARP for?</p>
 <p>Normally the gateway 192.168.1.1, because 8.8.8.8 is not on the local subnet.</p>
@@ -108,6 +108,8 @@ timeout
 <p>The host needs a link-layer destination.</p>
 <p>IPv4 ARP and IPv6 Neighbor Discovery connect network-layer addressing to local-link delivery.</p>
 <p>This is the bridge between route selection and frame transmission.</p>
+<h2>Interactive companion exercise</h2>
+<p>Use the <a href="../prototypes/interactive-system-design.html#network-title">network path explorer</a> to compare ARP resolution for a same-subnet destination versus the default gateway.</p>
 </div></article></main>
 <footer class="shell site-footer">
 <div>

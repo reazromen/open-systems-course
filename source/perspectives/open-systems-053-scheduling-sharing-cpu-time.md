@@ -199,3 +199,7 @@ Good scheduling policy matches workload requirements:
 When a process is slow, do not ask only whether it is running.
 
 Ask whether it is runnable, waiting, preempted, or blocked.
+
+## Interactive companion exercise
+
+Compare FCFS and Round Robin with a fixed three-process workload in the [CPU scheduler simulator](../prototypes/interactive-system-design.html#scheduler-title). The two-tick Round Robin quantum is a teaching assumption, not Linux CFS behavior.

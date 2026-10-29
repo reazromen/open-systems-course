@@ -147,3 +147,7 @@ The business outcome changes because the application contract changed.
 Retries are safe only when failure ambiguity, deadlines, and operation identity are designed together.
 
 The next lesson examines asynchronous systems built around logs, queues, and event streams.
+
+## Interactive companion exercise
+
+Use the [retry, exponential-backoff, and idempotency exercise](../prototypes/interactive-system-design.html#retry-title) to see why retries need bounded delays and a stable idempotency key when a response can be lost after a side effect commits.

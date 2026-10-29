@@ -190,11 +190,13 @@ Turn the decision into:
 Now define the contract:
 
 Input:
+
 - reading value;
 - validity;
 - threshold.
 
 Output:
+
 - true or false.
 
 Then keep actual alert delivery outside.
