@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test');
 const assert=require('node:assert/strict');
-const {createLoadBalancer,createCache,createQueue,createRetry,createSipFlow,createDataStructure,createGraphTraversal,createTimeline,createScheduler,createVirtualMemory,createRaceSimulator,createNetworkPath,createProtocolTimeline,createCap}=require('../assets/interactive-simulations.js');
+const {createLoadBalancer,createCache,createQueue,createRetry,createSipFlow,createDataStructure,createGraphTraversal,createTimeline,createScheduler,createVirtualMemory,createRaceSimulator,createNetworkPath,createProtocolTimeline,createDatabaseExplorer,createCap}=require('../assets/interactive-simulations.js');
 
 test('round robin distributes requests deterministically and tracks active work',()=>{
  const s=createLoadBalancer({count:6});
@@ -232,4 +232,16 @@ test('header negotiation and API validation timelines expose response contracts'
 });
 test('all simulation snapshots are copies and cannot mutate internal state',()=>{
  const s=createLoadBalancer();const snap=s.snapshot();snap.servers[0].requests=999;assert.equal(s.snapshot().servers[0].requests,0);
+});
+
+test('database/storage explorer models durability, replication, indexes, and isolation explicitly',()=>{
+ const s=createDatabaseExplorer();
+ assert.equal(s.snapshot().scenario,'storage');assert.match(s.snapshot().current.detail,/power-loss durability/);
+ s.setFsync(false);for(let i=0;i<4;i++)s.next();assert.match(s.snapshot().current.detail,/no explicit confirmation/);
+ s.setScenario('replication');s.setReplication('async');assert.match(s.snapshot().sequence[1].message,/before replica catches up/);assert.match(s.snapshot().sequence[3].detail,/may be absent/);
+ s.setScenario('index');s.setIndex(false);assert.match(s.snapshot().sequence[1].detail,/up to n=10000 rows/);s.setRows(1000);s.setIndex(true);assert.match(s.snapshot().sequence[1].detail,/log₂\(n\)/);
+ s.setScenario('transaction');s.setIsolation('read-committed');assert.match(s.snapshot().sequence.at(-1).detail,/lost-update/);s.setIsolation('serializable');assert.match(s.snapshot().sequence[3].message,/abort T2/);
+ assert.throws(()=>s.setRows(500),/Rows must be/);assert.throws(()=>s.setReplication('eventual'),/Unknown replication mode/);
+ const snap=s.snapshot();snap.sequence[0].message='tampered';assert.notEqual(s.snapshot().sequence[0].message,'tampered');
+ s.reset();assert.equal(s.snapshot().index,0);
 });

@@ -463,6 +463,80 @@
     return {setScenario,next,previous,reset,snapshot};
   }
 
+  function createDatabaseExplorer() {
+    const initial=()=>({scenario:'storage',index:0,fsync:true,replication:'sync',indexEnabled:true,rows:10000,isolation:'serializable',events:['Scenarios use explicit teaching assumptions; no real disk or database I/O is performed.']});
+    let state=initial();
+    function sequence(){
+      if(state.scenario==='storage')return [
+        {from:'Application',to:'Kernel page cache',message:'Write bytes to a file descriptor',detail:'A successful write can mean bytes reached kernel-managed buffers; it does not alone prove power-loss durability.'},
+        {from:'Kernel',to:'Filesystem',message:'Update data and filesystem metadata',detail:'The filesystem may order data and metadata through journaling or copy-on-write rules; exact guarantees vary.'},
+        {from:'Filesystem',to:'Block layer / device',message:'Submit storage I/O',detail:'Requests pass through queues and may be acknowledged by a controller cache before reaching nonvolatile media.'},
+        {from:'Storage device',to:'Media',message:'Commit data to persistent media',detail:'Persistence depends on the device, its cache, and whether flush/barrier commands are correctly honored.'},
+        {from:'Application',to:state.fsync?'Kernel fsync()':'Kernel write return',message:state.fsync?'Request a durability barrier':'Return without explicit fsync',detail:state.fsync?'fsync() asks the kernel to make file data and required metadata durable under the filesystem/device contract.':'Without fsync/fdatasync or an equivalent contract, the application has no explicit confirmation that recent writes survive power loss.'},
+        {from:'Kernel',to:'Application',message:state.fsync?'Return after fsync':'Return success without durability confirmation',detail:state.fsync?'Durability still depends on filesystem and device correctly honoring flushes.':'Recent writes may be lost on a crash or power failure; a successful write() is not the same as a durable commit.'}
+      ];
+      if(state.scenario==='replication')return state.replication==='sync'?[
+        {from:'Client',to:'Primary database',message:'Submit write transaction',detail:'The primary validates the write and records it in its write-ahead log (WAL).'},
+        {from:'Primary database',to:'Replica',message:'Send log record to replica',detail:'Synchronous replication waits for the configured replica acknowledgement policy.'},
+        {from:'Replica',to:'Primary database',message:'Acknowledge durable log receipt',detail:'This simplified synchronous mode assumes the replica has durably recorded the required log position.'},
+        {from:'Primary database',to:'Client',message:'Commit and acknowledge success',detail:'The primary reports success only after the configured synchronous acknowledgement condition is met.'},
+        {from:'Failover',to:'Replica',message:'Promote replica with acknowledged state',detail:'The model assumes the acknowledged replica is eligible for promotion; real systems need quorum, fencing, and recovery rules.'}
+      ]:[
+        {from:'Client',to:'Primary database',message:'Submit write transaction',detail:'The primary validates the write and records it in its write-ahead log (WAL).'},
+        {from:'Primary database',to:'Client',message:'Commit and acknowledge before replica catches up',detail:'Asynchronous replication does not wait for the replica to confirm this log position.'},
+        {from:'Primary database',to:'Replica',message:'Ship log record asynchronously',detail:'The replica may lag behind the primary; lag duration depends on workload and network conditions.'},
+        {from:'Failover',to:'Replica',message:'Promote a potentially lagging replica',detail:'If the primary fails before the record arrives, the last acknowledged write may be absent after failover.'}
+      ];
+      if(state.scenario==='index'){
+        const steps=Math.ceil(Math.log2(state.rows+1));
+        return [
+          {from:'Application',to:'Database',message:'Query by key',detail:'The workload requests one row by a selective key; table size is '+state.rows+' rows.'},
+          {from:'Query planner',to:state.indexEnabled?'B-tree index':'Table scan',message:state.indexEnabled?'Use index to locate candidate row':'Scan rows until key matches',detail:state.indexEnabled?'Illustrative lookup work is about log₂(n) comparisons (~'+steps+'), ignoring cache, fan-out, and query-plan details.':'Illustrative worst-case lookup may inspect up to n='+state.rows+' rows.'},
+          {from:'Database',to:'Application',message:'Return matching row',detail:state.indexEnabled?'The index narrows the candidate set before fetching the row.':'A scan can be reasonable for small tables or low-selectivity queries.'},
+          {from:'Database',to:'Index maintenance',message:'Insert/update a row',detail:state.indexEnabled?'The write must maintain the index as well as the table, trading write work/storage for faster eligible reads.':'Without the index, this write avoids index maintenance but future lookups may scan rows.'}
+        ];
+      }
+      if(state.scenario==='transaction')return state.isolation==='serializable'?[
+        {from:'T1',to:'Database',message:'Read counter = 0',detail:'T1 starts an application-level read-modify-write transaction.'},
+        {from:'T2',to:'Database',message:'Read counter = 0',detail:'T2 reads the same value before T1 commits.'},
+        {from:'T1',to:'Database',message:'Write counter = 1 and commit',detail:'T1 commits its increment.'},
+        {from:'T2',to:'Database',message:'Detect serialization conflict; abort T2',detail:'Serializable isolation prevents both conflicting read-modify-write transactions from silently committing as if serial.'},
+        {from:'T2 retry',to:'Database',message:'Retry and read counter = 1',detail:'The application must handle the serialization failure and retry the whole transaction when appropriate.'},
+        {from:'T2 retry',to:'Database',message:'Write counter = 2 and commit',detail:'After retrying against the new value, both increments are represented; final counter is 2.'}
+      ]:[
+        {from:'T1',to:'Database',message:'Read counter = 0',detail:'This simplified application-level read-modify-write transaction uses Read Committed isolation.'},
+        {from:'T2',to:'Database',message:'Read counter = 0',detail:'T2 reads the same value before either transaction writes.'},
+        {from:'T1',to:'Database',message:'Write counter = 1',detail:'T1 writes its locally computed value.'},
+        {from:'T2',to:'Database',message:'Write counter = 1',detail:'T2 overwrites with its locally computed value; this schedule loses one increment.'},
+        {from:'Database',to:'Application',message:'Both transactions commit; final counter = 1',detail:'This is a specific lost-update schedule, not a claim that every Read Committed SQL statement has this behavior.'}
+      ];
+      if(state.scenario==='constraints')return [
+        {from:'Client',to:'Database',message:'Insert customer id=7',detail:'A valid primary key is accepted and becomes a referenced parent row.'},
+        {from:'Client',to:'Database',message:'Insert duplicate customer id=7',detail:'The primary-key/unique constraint rejects a duplicate identifier.'},
+        {from:'Client',to:'Database',message:'Insert order referencing missing customer',detail:'The foreign-key constraint rejects an orphan reference.'},
+        {from:'Client',to:'Database',message:'Insert order referencing customer 7',detail:'The foreign-key check succeeds because the referenced customer exists.'}
+      ];
+      return [
+        {from:'Filesystem',to:'Path lookup',message:'Resolve a name to a file',detail:'A filesystem exposes paths, permissions, byte streams, and metadata; the application usually owns the file format.'},
+        {from:'Database',to:'Query planner',message:'Resolve a query against a schema',detail:'A database adds structured query execution, constraints, indexes, transactions, and concurrency control.'},
+        {from:'Application',to:'Storage choice',message:'Choose based on workload and invariants',detail:'Files/object storage suit durable blobs and large objects; databases suit structured queries and transactional constraints.'},
+        {from:'Application',to:'Storage layer',message:'Keep recovery and integrity requirements explicit',detail:'Backups, replication, consistency, access control, and restore testing matter whichever storage type is selected.'}
+      ];
+    }
+    function log(m){state.events.unshift(m);state.events=state.events.slice(0,10);}
+    function setScenario(s){if(!['storage','replication','index','transaction','constraints','filesystem'].includes(s))throw new TypeError('Unknown database/storage scenario');state.scenario=s;state.index=0;log('Scenario changed to '+s+'.');}
+    function setFsync(v){state.fsync=!!v;state.index=0;log('Explicit fsync '+(state.fsync?'enabled':'disabled')+'.');}
+    function setReplication(v){if(!['sync','async'].includes(v))throw new TypeError('Unknown replication mode');state.replication=v;state.index=0;log('Replication mode set to '+v+'.');}
+    function setIndex(v){state.indexEnabled=!!v;state.index=0;log('Index '+(state.indexEnabled?'enabled':'disabled')+'.');}
+    function setRows(v){const n=Number(v);if(![1000,10000].includes(n))throw new RangeError('Rows must be 1000 or 10000');state.rows=n;state.index=0;log('Table size set to '+n+'.');}
+    function setIsolation(v){if(!['read-committed','serializable'].includes(v))throw new TypeError('Unknown isolation level');state.isolation=v;state.index=0;log('Isolation set to '+v+'.');}
+    function next(){if(state.index<sequence().length-1){state.index++;log('Advanced to '+sequence()[state.index].message+'.');return true;}return false;}
+    function previous(){if(state.index>0){state.index--;log('Returned to '+sequence()[state.index].message+'.');return true;}return false;}
+    function reset(){state.index=0;state.events=['Scenario reset; selected assumptions retained.'];}
+    function snapshot(){return JSON.parse(JSON.stringify({...state,sequence:sequence(),total:sequence().length,current:sequence()[state.index]}));}
+    return {setScenario,setFsync,setReplication,setIndex,setRows,setIsolation,next,previous,reset,snapshot};
+  }
+
   function createCap() {
     const initial=()=>({policy:'consistency',partition:false,side:'BC',nextVersion:2,replicas:[{id:'A',value:1,version:1},{id:'B',value:1,version:1},{id:'C',value:1,version:1}],events:['All replicas start with value v1.']});
     let state=initial();
@@ -491,5 +565,5 @@
     function snapshot(){return JSON.parse(JSON.stringify(state));}
     return {setPolicy,setPartition,setSide,write,read,reset,snapshot};
   }
-  return {createLoadBalancer,createCache,createQueue,createRetry,createSipFlow,createDataStructure,createGraphTraversal,createTimeline,createScheduler,createVirtualMemory,createRaceSimulator,createNetworkPath,createProtocolTimeline,createCap};
+  return {createLoadBalancer,createCache,createQueue,createRetry,createSipFlow,createDataStructure,createGraphTraversal,createTimeline,createScheduler,createVirtualMemory,createRaceSimulator,createNetworkPath,createProtocolTimeline,createDatabaseExplorer,createCap};
 });
