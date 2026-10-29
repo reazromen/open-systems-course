@@ -33,11 +33,18 @@ Host script: /home/romen/private-course-preview/deploy-course.sh.
 1. Takes a non-blocking lock at /tmp/open-systems-course-deploy.lock.
 2. Changes directory to /home/romen/private-course-preview/course-deploy.
 3. Runs git pull --ff-only origin main.
-4. Ensures dist/assets, dist/static, dist/posts, dist/system_design, and dist/embedded_systems_iot exist.
-5. Copies course.html; synchronizes assets/ and static/; copies posts/open-systems-*.html; synchronizes both companion HTML directories.
+4. Ensures dist/assets, dist/static, dist/posts, dist/system_design, dist/embedded_systems_iot, and dist/prototypes exist.
+5. Copies course.html, favicon.svg, and favicon.ico; synchronizes assets/, static/, and prototypes/; copies posts/open-systems-*.html; synchronizes both companion HTML directories.
 6. Logs the deployed commit and timestamp to deploy-course.log.
 
-It does not render Markdown, run tests, delete old output, or replace shared dist/ wholesale. The site is served by learn-course-preview.service through serve_domain.py and exposed through Cloudflare Tunnel. Preserve X-Robots-Tag: noindex, nofollow, noarchive.
+It does not render Markdown, run tests, delete old output, or replace shared dist/ wholesale. The site is served by serve_domain.py and exposed through Cloudflare Tunnel. Preserve X-Robots-Tag: noindex, nofollow, noarchive.
+
+## Interactive coverage status after the first production release
+
+- Fifteen reusable interactive models are available at `/prototypes/interactive-system-design.html`.
+- Seventy-three Open Systems lesson pages link to an appropriate companion model anchor. These are **linked companion demonstrations, not embedded interactive widgets inside the lesson body**.
+- The other 107 Open Systems lessons do not yet link to an interactive model. The 73 links should not be reported as full 180-lesson interactive coverage.
+- The browser smoke suite verifies the model behaviors and mapped lesson anchors; production Firefox checks verified the live prototype at 390×844 and 360×800 with reduced motion enabled, no horizontal overflow, visible keyboard focus, and no observed console errors.
 
 ## Phase 1–2 implications
 
