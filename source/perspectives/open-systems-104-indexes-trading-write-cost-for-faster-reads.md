@@ -106,3 +106,6 @@ The point is not to publish a universal benchmark. It is to observe the read/wri
 Indexes are maintained alternate access paths. They can transform read cost while consuming disk, memory, CPU, and write bandwidth.
 
 The next lesson moves from finding rows to changing them safely: transactions, atomicity, isolation, and durability.
+
+
+Explore these storage guarantees and trade-offs in the [interactive storage and database model](../prototypes/interactive-system-design.html#database-title). The scenarios are deterministic teaching examples, not real I/O measurements.

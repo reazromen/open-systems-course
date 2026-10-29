@@ -116,3 +116,6 @@ The exercise shows which invalid states are rejected by the database rather than
 Tables organize structured rows. Keys define identity. Foreign keys define relationships. Constraints define invariants.
 
 The next lesson asks how a database finds rows efficiently without scanning everything: indexes and the cost trade-offs they introduce.
+
+
+Explore these storage guarantees and trade-offs in the [interactive storage and database model](../prototypes/interactive-system-design.html#database-title). The scenarios are deterministic teaching examples, not real I/O measurements.

@@ -260,3 +260,6 @@ How do we restore?
 Those questions turn data architecture from product names into explicit guarantees.
 
 Module 12 moves into Embedded Systems: microcontrollers, GPIO, interrupts, timers, buses, memory, firmware structure, RTOS behavior, watchdogs, power, and one complete sensor-to-output path.
+
+
+Explore these storage guarantees and trade-offs in the [interactive storage and database model](../prototypes/interactive-system-design.html#database-title). The scenarios are deterministic teaching examples, not real I/O measurements.

@@ -106,3 +106,6 @@ Measure only on your own machine and label the environment. The point is not to 
 A filesystem organizes named bytes. A database adds structured data semantics and coordination.
 
 The next lesson focuses on relational structure: tables, keys, constraints, and why schema is executable policy rather than documentation alone.
+
+
+Explore these storage guarantees and trade-offs in the [interactive storage and database model](../prototypes/interactive-system-design.html#database-title). The scenarios are deterministic teaching examples, not real I/O measurements.

@@ -1,6 +1,6 @@
 # Phase 2 — Interactive system-design prototypes
 
-**Status:** Fourteen isolated prototypes implemented and browser-smoke-tested. Sixty-five existing lesson source/output pairs link to the standalone companion lab; simulations are not yet embedded inline in lesson prose.
+**Status:** Fifteen isolated prototypes implemented and browser-smoke-tested. Seventy-three existing lesson source/output pairs link to the standalone companion lab; simulations are not yet embedded inline in lesson prose.
 
 ## Entry point
 
@@ -122,4 +122,4 @@ Verified in Firefox 157.0.1 with all twelve interactions mounted and no initiali
 
 ## Phase 2 exit decision
 
-Fourteen representative behavior models are implemented and the deterministic unit tests pass. Sixty-five source/output lesson pairs link to the companion lab: Lessons 041–060, 071–100, 107, 108, 113, 131, 132, 134, 135, 139, 140, 143, 145, 146, 147, 149, and 152. These links are not yet inline embeds. The pinned body-only renderer is now reproducible for reviewed, selected Open Systems lessons. The canonical 180-lesson source/output gate now passes; further rollout remains gated on the separate companion-track provenance and additional reviewed batches.
+Fifteen representative behavior models are implemented and the deterministic unit tests pass. Seventy-three source/output lesson pairs link to the companion lab: Lessons 041–060, 071–110 (with the existing 107–108 links retained), 113, 131, 132, 134, 135, 139, 140, 143, 145, 146, 147, 149, and 152. These links are not yet inline embeds. The pinned body-only renderer is now reproducible for reviewed, selected Open Systems lessons. The canonical 180-lesson source/output gate now passes; further rollout remains gated on the separate companion-track provenance and additional reviewed batches.

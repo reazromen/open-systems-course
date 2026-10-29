@@ -177,3 +177,6 @@ Concurrency is not free parallelism. It creates overlapping views of mutable sta
 Isolation levels, MVCC, locks, conflict detection, and retries determine which concurrent outcomes are allowed.
 
 The next lesson moves from authoritative data to deliberately duplicated data: caches.
+
+
+Explore these storage guarantees and trade-offs in the [interactive storage and database model](../prototypes/interactive-system-design.html#database-title). The scenarios are deterministic teaching examples, not real I/O measurements.

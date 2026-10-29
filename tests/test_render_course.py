@@ -7,8 +7,8 @@ sys.path.insert(0, str(ROOT / "tools"))
 import render_course
 
 class RendererPilotTests(unittest.TestCase):
-    def test_sixty_five_pilot_lessons_have_matching_source_and_output_text(self):
-        for number in (41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 107, 108, 113, 131, 132, 134, 135, 139, 140, 143, 145, 146, 147, 149, 152):
+    def test_seventy_three_pilot_lessons_have_matching_source_and_output_text(self):
+        for number in (41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 109, 110, 107, 108, 113, 131, 132, 134, 135, 139, 140, 143, 145, 146, 147, 149, 152):
             path = next((ROOT / "source/perspectives").glob(f"open-systems-{number:03d}-*.md"))
             ok, message = render_course.check_one(path)
             self.assertTrue(ok, message)

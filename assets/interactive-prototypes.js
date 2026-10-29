@@ -248,5 +248,26 @@
     renderCap(ctx,sim);
     return {reset(){sim.reset();renderCap(ctx,sim);},destroy(){}};
   });
+  function renderDatabase(ctx,sim){
+    const s=sim.snapshot(),step=s.current;
+    text(ctx.root,'[data-database-step]',s.index+1);text(ctx.root,'[data-database-total]',s.total);text(ctx.root,'[data-database-scenario-label]',s.scenario.toUpperCase());
+    text(ctx.root,'[data-database-from]',step.from);text(ctx.root,'[data-database-to]',step.to);text(ctx.root,'[data-database-message]',step.message);text(ctx.root,'[data-database-detail]',step.detail);
+    const prev=find(ctx.root,'[data-action="database-previous"]'),next=find(ctx.root,'[data-action="database-next"]');if(prev)prev.disabled=s.index===0;if(next)next.disabled=s.index===s.total-1;
+    list(ctx.root,'[data-database-sequence]',s.sequence.map((x,i)=>(i===s.index?'Current: ':'Step '+(i+1)+': ')+x.message+' — '+x.from+' → '+x.to));
+    list(ctx.root,'[data-database-log]',s.events);ctx.status(s.scenario+' storage/database scenario, step '+(s.index+1)+' of '+s.total+': '+step.message+'.');
+  }
+  window.CourseInteractions.register('database-storage-explorer',function(ctx){
+    const sim=S.createDatabaseExplorer();
+    listenAll(ctx,'[data-database-scenario]','change',e=>{sim.setScenario(e.currentTarget.value);renderDatabase(ctx,sim);});
+    listenAll(ctx,'[data-database-fsync]','change',e=>{sim.setFsync(e.currentTarget.checked);renderDatabase(ctx,sim);});
+    listenAll(ctx,'[data-database-replication]','change',e=>{sim.setReplication(e.currentTarget.value);renderDatabase(ctx,sim);});
+    listenAll(ctx,'[data-database-index]','change',e=>{sim.setIndex(e.currentTarget.value==='on');renderDatabase(ctx,sim);});
+    listenAll(ctx,'[data-database-rows]','change',e=>{sim.setRows(Number(e.currentTarget.value));renderDatabase(ctx,sim);});
+    listenAll(ctx,'[data-database-isolation]','change',e=>{sim.setIsolation(e.currentTarget.value);renderDatabase(ctx,sim);});
+    listenAll(ctx,'[data-action="database-next"]','click',()=>{sim.next();renderDatabase(ctx,sim);});
+    listenAll(ctx,'[data-action="database-previous"]','click',()=>{sim.previous();renderDatabase(ctx,sim);});
+    listenAll(ctx,'[data-action="reset"]','click',()=>{sim.reset();renderDatabase(ctx,sim);});
+    renderDatabase(ctx,sim);return {reset(){sim.reset();renderDatabase(ctx,sim);},destroy(){}};
+  });
   document.addEventListener('DOMContentLoaded',()=>window.CourseInteractions.init(document));
 })();

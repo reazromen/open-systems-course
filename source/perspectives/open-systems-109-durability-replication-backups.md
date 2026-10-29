@@ -164,3 +164,6 @@ Backups preserve recovery history.
 None replaces the others.
 
 The final lesson of this module follows one application write from HTTP request through transaction, WAL, indexes, cache invalidation, replication, and backup history.
+
+
+Explore these storage guarantees and trade-offs in the [interactive storage and database model](../prototypes/interactive-system-design.html#database-title). The scenarios are deterministic teaching examples, not real I/O measurements.

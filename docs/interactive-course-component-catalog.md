@@ -1,6 +1,6 @@
 # Interactive component catalog (initial library)
 
-The reusable foundation and fourteen tested behavior modules live in:
+The reusable foundation and fifteen tested behavior modules live in:
 
 - `assets/interactive-course.js` — mount/reset/destroy lifecycle and accessible status support.
 - `assets/interactive-course.css` — scoped interaction styles, focus-visible, reduced motion.
@@ -141,4 +141,14 @@ Every registered component returns `reset()` and `destroy()`; event listeners ar
 
 ## Coverage boundary
 
-This is the initial reusable library, not the final component catalog for all 180 lessons. Request-flow, failure/recovery, capacity calculators, quizzes, and embedded-system timelines remain future components. Sixty-five lessons now link to these external companion exercises; the simulators are not yet embedded inline in lesson prose.
+This is the initial reusable library, not the final component catalog for all 180 lessons. Request-flow, failure/recovery, capacity calculators, quizzes, and embedded-system timelines remain future components. Seventy-three lessons now link to these external companion exercises; the simulators are not yet embedded inline in lesson prose.
+
+
+## Storage and database explorer — `database-storage-explorer`
+
+- **Learning objective:** distinguish buffered writes from durability barriers, synchronous from asynchronous replication, index read/write trade-offs, transaction isolation outcomes, and filesystem/database responsibilities.
+- **Inputs:** scenario selector, explicit fsync toggle, replication mode, index enabled/disabled, table size, isolation level, previous/next/reset.
+- **Outputs:** current actor/operation/detail, scenario sequence, step position, and bounded event log.
+- **Invariants:** no real I/O occurs; fsync claims remain conditional on filesystem/device contracts; asynchronous failover may lose a write not yet replicated; index comparisons are illustrative rather than benchmarks; lost-update behavior is tied to the stated schedule.
+- **Accessibility/fallback:** native selects, checkbox and buttons; text sequence and status live region; no animation is required.
+- **Tests:** durability wording, replication/failover, index scan vs lookup, transaction isolation, invalid settings and defensive snapshots; Firefox smoke verifies interactive state and mobile width.
